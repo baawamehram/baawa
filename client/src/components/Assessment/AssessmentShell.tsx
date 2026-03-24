@@ -17,6 +17,8 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   const { state, startSession, submitAnswer } = useSession()
   const [phase, setPhase] = useState<Phase>('intro')
   const [questionIndex, setQuestionIndex] = useState(0)
+  const [isRecording, setIsRecording] = useState(false)
+  const [impressed, setImpressed] = useState(false)
 
   // Auto-advance intro after 2s
   useEffect(() => {
@@ -41,11 +43,21 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   }, [state.done, onComplete])
 
   const handleSubmit = async (answer: string) => {
+    if (answer.length > 100) {
+      setImpressed(true)
+      setTimeout(() => setImpressed(false), 1500)
+    }
     await submitAnswer(answer)
     setQuestionIndex((i) => i + 1)
   }
 
-  const genieState: GenieState = state.loading ? 'thinking' : 'idle'
+  const genieState: GenieState = isRecording
+    ? 'listening'
+    : impressed
+      ? 'impressed'
+      : state.loading
+        ? 'thinking'
+        : 'idle'
   const progress = Math.min(state.questionCount / MAX_QUESTIONS, 1)
 
   return (
@@ -276,6 +288,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 questionKey={questionIndex}
                 loading={state.loading}
                 onSubmit={(answer) => void handleSubmit(answer)}
+                onRecordingChange={setIsRecording}
               />
             )}
           </motion.div>

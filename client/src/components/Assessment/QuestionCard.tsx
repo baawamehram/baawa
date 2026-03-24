@@ -7,9 +7,10 @@ interface QuestionCardProps {
   questionKey: number // changes per question so AnimatePresence remounts
   loading: boolean
   onSubmit: (answer: string) => void
+  onRecordingChange?: (isRecording: boolean) => void
 }
 
-export function QuestionCard({ question, questionKey, loading, onSubmit }: QuestionCardProps) {
+export function QuestionCard({ question, questionKey, loading, onSubmit, onRecordingChange }: QuestionCardProps) {
   const [answer, setAnswer] = useState('')
 
   // Reset answer when question changes
@@ -104,6 +105,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit }: Quest
             <VoiceInput
               onTranscript={(text) => setAnswer((prev) => (prev ? `${prev} ${text}` : text))}
               disabled={loading}
+              onRecordingChange={onRecordingChange}
             />
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

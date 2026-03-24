@@ -7,10 +7,18 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 interface VoiceInputProps {
   onTranscript: (text: string) => void
   disabled?: boolean
+  onRecordingChange?: (isRecording: boolean) => void
 }
 
-export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) {
+export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }: VoiceInputProps) {
   const { recorderState, startRecording, stopRecording, audioBlob, error } = useVoiceRecorder()
+
+  const isRecording = recorderState === 'recording'
+
+  // Notify parent when recording state changes
+  useEffect(() => {
+    onRecordingChange?.(isRecording)
+  }, [isRecording, onRecordingChange])
 
   // When recording stops and we have a blob, transcribe it
   useEffect(() => {
@@ -34,8 +42,6 @@ export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) 
 
     void transcribe()
   }, [audioBlob, onTranscript])
-
-  const isRecording = recorderState === 'recording'
 
   const handleClick = () => {
     if (isRecording) {
