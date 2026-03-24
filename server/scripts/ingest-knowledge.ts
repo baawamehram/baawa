@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import { ingestMarkdown } from '../src/services/knowledge'
 import { db } from '../src/db/client'
@@ -7,6 +7,11 @@ import { db } from '../src/db/client'
 async function main() {
   const filePath = process.argv[2] ?? join(__dirname, '../../knowledge-base/rory-sutherland.md')
   const sourceName = process.argv[3] ?? 'rory-sutherland'
+
+  if (!existsSync(filePath)) {
+    console.error(`File not found: ${filePath}`)
+    process.exit(1)
+  }
 
   console.log(`Ingesting: ${filePath} as source "${sourceName}"`)
   const text = readFileSync(filePath, 'utf-8')

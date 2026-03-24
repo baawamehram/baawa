@@ -11,7 +11,8 @@ export async function retrieveRelevantChunks(
     model: 'text-embedding-3-small',
     input: queryText,
   })
-  const embedding = embeddingRes.data[0].embedding
+  const embedding = embeddingRes.data[0]?.embedding
+  if (!embedding) throw new Error('Failed to get embedding from OpenAI')
 
   const result = await db.query<{ content: string }>(
     `SELECT content

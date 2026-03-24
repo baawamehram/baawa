@@ -3,6 +3,12 @@ import { db } from '../db/client'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
+let knowledgeTextCache: string | null = null
+
+export function invalidateKnowledgeCache(): void {
+  knowledgeTextCache = null
+}
+
 const CHUNK_SIZE = 500    // tokens (approximate by chars / 4)
 const CHUNK_OVERLAP = 50  // tokens
 
@@ -24,28 +30,41 @@ export async function ingestMarkdown(
   markdownText: string,
   sourceName: string
 ): Promise<number> {
-  // Delete existing chunks for this source
   await db.query('DELETE FROM knowledge_chunks WHERE source_name = $1', [sourceName])
 
   const chunks = chunkText(markdownText)
-  let inserted = 0
+  if (chunks.length === 0) return 0
+
+  // Batch embed all chunks (OpenAI supports up to 100 per request)
+  const BATCH_SIZE = 50
+  const allEmbeddings: number[][] = []
+  const totalBatches = Math.ceil(chunks.length / BATCH_SIZE)
+
+  for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
+    const batchNum = Math.floor(b / BATCH_SIZE) + 1
+    console.log(`Embedding batch ${batchNum}/${totalBatches}...`)
+    const batch = chunks.slice(b, b + BATCH_SIZE)
+    const res = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: batch,
+    })
+    const sorted = res.data.sort((a, b) => a.index - b.index)
+    for (const item of sorted) {
+      if (!item.embedding) throw new Error(`Missing embedding at index ${item.index}`)
+      allEmbeddings.push(item.embedding)
+    }
+  }
 
   for (let i = 0; i < chunks.length; i++) {
-    const embeddingRes = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: chunks[i],
-    })
-    const embedding = embeddingRes.data[0].embedding
-
     await db.query(
       `INSERT INTO knowledge_chunks (content, embedding, source_name, chunk_index)
        VALUES ($1, $2, $3, $4)`,
-      [chunks[i], `[${embedding.join(',')}]`, sourceName, i]
+      [chunks[i], `[${allEmbeddings[i].join(',')}]`, sourceName, i]
     )
-    inserted++
   }
 
-  return inserted
+  invalidateKnowledgeCache()
+  return chunks.length
 }
 
 export async function listKnowledgeSources(): Promise<
@@ -76,17 +95,21 @@ export async function setSourceActive(
     'UPDATE knowledge_chunks SET is_active = $1 WHERE source_name = $2',
     [isActive, sourceName]
   )
+  invalidateKnowledgeCache()
 }
 
 export async function deleteSource(sourceName: string): Promise<void> {
   await db.query('DELETE FROM knowledge_chunks WHERE source_name = $1', [sourceName])
+  invalidateKnowledgeCache()
 }
 
 export async function getFullKnowledgeText(): Promise<string> {
+  if (knowledgeTextCache !== null) return knowledgeTextCache
   const result = await db.query<{ content: string }>(
     `SELECT content FROM knowledge_chunks
      WHERE is_active = true
      ORDER BY source_name, chunk_index`
   )
-  return result.rows.map((r) => r.content).join('\n\n')
+  knowledgeTextCache = result.rows.map((r) => r.content).join('\n\n')
+  return knowledgeTextCache
 }
