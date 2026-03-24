@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CosmicJourney } from './components/CosmicJourney'
 import { AssessmentShell } from './components/Assessment/AssessmentShell'
+import { EmailCapture } from './components/EmailCapture'
+import { ThankYou } from './components/ThankYou'
 
-type FunnelPhase = 'journey' | 'assessment' | 'done'
+type FunnelPhase = 'journey' | 'assessment' | 'done' | 'thankyou'
 
 function FunnelPage() {
   const [phase, setPhase] = useState<FunnelPhase>('journey')
+  const [sessionId, setSessionId] = useState<string>('')
 
   if (phase === 'journey') {
     return (
@@ -22,16 +25,26 @@ function FunnelPage() {
 
   if (phase === 'assessment') {
     return (
-      <AssessmentShell onComplete={() => setPhase('done')} />
+      <AssessmentShell
+        onComplete={(id: string) => {
+          setSessionId(id)
+          setPhase('done')
+        }}
+      />
     )
   }
 
-  // 'done' — email capture placeholder (Task 10)
-  return (
-    <div style={{ background: '#0a0a0f', color: '#fff', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 24 }}>Email capture (Task 10)</div>
-    </div>
-  )
+  if (phase === 'done') {
+    return (
+      <EmailCapture
+        sessionId={sessionId}
+        onComplete={() => setPhase('thankyou')}
+      />
+    )
+  }
+
+  // 'thankyou'
+  return <ThankYou />
 }
 
 export default function App() {

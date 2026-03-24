@@ -6,7 +6,7 @@ import { QuestionCard } from './QuestionCard'
 import type { GenieState } from './GenieCharacter'
 
 interface AssessmentShellProps {
-  onComplete: () => void
+  onComplete: (sessionId: string) => void
 }
 
 type Phase = 'intro' | 'assessment'
@@ -36,10 +36,10 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
 
   // Watch for done flag
   useEffect(() => {
-    if (state.done) {
-      onComplete()
+    if (state.done && state.sessionId) {
+      onComplete(state.sessionId)
     }
-  }, [state.done, onComplete])
+  }, [state.done, state.sessionId, onComplete])
 
   const handleRecordingChange = useCallback((recording: boolean) => {
     setIsRecording(recording)
