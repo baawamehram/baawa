@@ -12,7 +12,7 @@ export async function geolocateIP(ip: string): Promise<GeoResult | null> {
     ip === '::1' ||
     ip.startsWith('192.168.') ||
     ip.startsWith('10.') ||
-    ip.startsWith('172.')
+    /^172\.(1[6-9]|2\d|3[01])\./.test(ip)
   ) {
     return { city: 'Local', country: 'Dev', lat: 0, lon: 0 }
   }
