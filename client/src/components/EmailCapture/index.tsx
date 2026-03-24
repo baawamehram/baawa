@@ -16,6 +16,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
   const [emailError, setEmailError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [apiError, setApiError] = useState('')
+  const [focused, setFocused] = useState(false)
 
   // Advance from loader to form after 3 seconds
   useEffect(() => {
@@ -265,8 +266,10 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   style={{
                     background: 'rgba(99,102,241,0.07)',
                     border: emailError
-                      ? '1.5px solid rgba(248,113,113,0.6)'
-                      : '1.5px solid rgba(99,102,241,0.25)',
+                      ? '1.5px solid #ef4444'
+                      : focused
+                      ? '1.5px solid #6366f1'
+                      : '1.5px solid rgba(99,102,241,0.3)',
                     borderRadius: 10,
                     padding: '13px 16px',
                     fontFamily: 'Inter, sans-serif',
@@ -277,14 +280,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                     boxSizing: 'border-box',
                     transition: 'border-color 0.2s',
                   }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = 'rgba(99,102,241,0.6)'
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = emailError
-                      ? 'rgba(248,113,113,0.6)'
-                      : 'rgba(99,102,241,0.25)'
-                  }}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
                 />
                 {emailError && (
                   <motion.p

@@ -35,7 +35,10 @@ export function ThankYou() {
       })
     }, 400)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      confetti.reset()
+    }
   }, [])
 
   return (

@@ -5,7 +5,7 @@ import { AssessmentShell } from './components/Assessment/AssessmentShell'
 import { EmailCapture } from './components/EmailCapture'
 import { ThankYou } from './components/ThankYou'
 
-type FunnelPhase = 'journey' | 'assessment' | 'done' | 'thankyou'
+type FunnelPhase = 'journey' | 'assessment' | 'email' | 'thankyou'
 
 function FunnelPage() {
   const [phase, setPhase] = useState<FunnelPhase>('journey')
@@ -28,13 +28,13 @@ function FunnelPage() {
       <AssessmentShell
         onComplete={(id: string) => {
           setSessionId(id)
-          setPhase('done')
+          setPhase('email')
         }}
       />
     )
   }
 
-  if (phase === 'done') {
+  if (phase === 'email') {
     return (
       <EmailCapture
         sessionId={sessionId}
