@@ -7,6 +7,9 @@ export async function generateDeferEmail(
   conversation: ConversationTurn[],
   founderEmail: string
 ): Promise<string> {
+  if (!founderEmail || !founderEmail.includes('@')) {
+    throw new Error('Invalid founderEmail for defer email generation')
+  }
   const model = process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001'
 
   const transcript = conversation

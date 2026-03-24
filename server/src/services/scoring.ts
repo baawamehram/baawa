@@ -66,9 +66,19 @@ Output ONLY valid JSON in this exact format:
 
   try {
     const parsed = JSON.parse(text.trim()) as ScoringResult
-    // Validate structure
-    if (typeof parsed.score !== 'number') throw new Error('Missing score')
+    if (typeof parsed.score !== 'number' || parsed.score < 0 || parsed.score > 100) {
+      throw new Error('Invalid score value')
+    }
     if (!parsed.breakdown) throw new Error('Missing breakdown')
+    const { pmf, validation, growth, mindset, revenue } = parsed.breakdown
+    for (const [key, val] of Object.entries({ pmf, validation, growth, mindset, revenue })) {
+      if (typeof val !== 'number' || val < 0 || val > 20) {
+        throw new Error(`Invalid breakdown value for ${key}: ${val}`)
+      }
+    }
+    if (typeof parsed.summary !== 'string' || !parsed.summary.trim()) {
+      throw new Error('Missing summary')
+    }
     return parsed
   } catch {
     throw new Error(`Failed to parse scoring response: ${text}`)
