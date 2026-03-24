@@ -5,9 +5,14 @@ import { db } from './client'
 
 async function migrate() {
   const sql = readFileSync(join(__dirname, 'schema.sql'), 'utf-8')
-  await db.query(sql)
-  console.log('Migration complete')
-  await db.end()
+  const client = await db.connect()
+  try {
+    await client.query(sql)
+    console.log('Migration complete')
+  } finally {
+    client.release()
+    await db.end()
+  }
 }
 
 migrate().catch((err) => {

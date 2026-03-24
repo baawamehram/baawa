@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   lon DECIMAL(10,6),
   conversation JSONB NOT NULL DEFAULT '[]',
   question_count INT NOT NULL DEFAULT 0,
-  status VARCHAR(50) NOT NULL DEFAULT 'active',
+  status VARCHAR(50) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS assessments (
   score_summary TEXT,
   biggest_opportunity TEXT,
   biggest_risk TEXT,
-  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewing', 'onboarded', 'deferred')),
   founder_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS clients (
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(50),
   website VARCHAR(255),
-  stage VARCHAR(50) NOT NULL DEFAULT 'phase1',
+  stage VARCHAR(50) NOT NULL DEFAULT 'phase1' CHECK (stage IN ('phase1', 'phase2', 'churned')),
   phase1_fee DECIMAL(10,2),
   phase2_monthly_fee DECIMAL(10,2),
   phase2_revenue_pct DECIMAL(5,2),
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS deliverables (
   client_id INT REFERENCES clients(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed')),
   due_date DATE,
   completed_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -101,3 +101,4 @@ CREATE INDEX IF NOT EXISTS idx_assessment_status ON assessments(status);
 CREATE INDEX IF NOT EXISTS idx_assessment_created ON assessments(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_client_stage ON clients(stage);
 CREATE INDEX IF NOT EXISTS idx_deliverable_client ON deliverables(client_id);
+CREATE INDEX IF NOT EXISTS idx_assessment_session ON assessments(session_id);

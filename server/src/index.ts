@@ -7,9 +7,14 @@ import { db } from './db/client'
 const app = express()
 
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_URL ?? '*' }))
-app.use(express.json())
+const CLIENT_URL = process.env.CLIENT_URL
+if (!CLIENT_URL && process.env.NODE_ENV === 'production') {
+  console.error('FATAL: CLIENT_URL must be set in production')
+  process.exit(1)
+}
+app.use(cors({ origin: CLIENT_URL ?? '*' }))
 app.use(rateLimit({ windowMs: 60_000, max: 60 }))
+app.use(express.json())
 
 // Health
 app.get('/health', async (_req, res) => {
