@@ -28,6 +28,7 @@ export function useSession(): UseSessionReturn {
   })
 
   const startSession = useCallback(async () => {
+    if (state.loading || state.sessionId) return
     setState((s) => ({ ...s, loading: true, error: null }))
     try {
       const res = await fetch(`${API_URL}/api/sessions/start`, {
@@ -50,7 +51,7 @@ export function useSession(): UseSessionReturn {
         error: err instanceof Error ? err.message : 'Unknown error',
       }))
     }
-  }, [])
+  }, [state.loading, state.sessionId])
 
   const submitAnswer = useCallback(
     async (answer: string) => {

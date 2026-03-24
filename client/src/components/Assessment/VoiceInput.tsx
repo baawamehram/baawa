@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVoiceRecorder } from '../../hooks/useVoiceRecorder'
 
@@ -12,6 +12,7 @@ interface VoiceInputProps {
 
 export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }: VoiceInputProps) {
   const { recorderState, startRecording, stopRecording, audioBlob, error } = useVoiceRecorder()
+  const [transcriptionError, setTranscriptionError] = useState<string | null>(null)
 
   const isRecording = recorderState === 'recording'
 
@@ -36,7 +37,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
         const data = (await res.json()) as { transcript: string }
         onTranscript(data.transcript)
       } catch {
-        // Silently fail — user can type manually
+        setTranscriptionError('Transcription failed. Please type your answer.')
       }
     }
 
@@ -47,6 +48,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
     if (isRecording) {
       stopRecording()
     } else {
+      setTranscriptionError(null)
       void startRecording()
     }
   }
@@ -133,6 +135,12 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
       {error && (
         <span style={{ fontSize: 11, color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
           {error}
+        </span>
+      )}
+
+      {transcriptionError && (
+        <span style={{ fontSize: 11, color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
+          {transcriptionError}
         </span>
       )}
 

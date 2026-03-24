@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from '../../hooks/useSession'
 import { GenieCharacter } from './GenieCharacter'
@@ -16,7 +16,6 @@ const MAX_QUESTIONS = 25
 export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   const { state, startSession, submitAnswer } = useSession()
   const [phase, setPhase] = useState<Phase>('intro')
-  const [questionIndex, setQuestionIndex] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
   const [impressed, setImpressed] = useState(false)
 
@@ -42,13 +41,16 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
     }
   }, [state.done, onComplete])
 
+  const handleRecordingChange = useCallback((recording: boolean) => {
+    setIsRecording(recording)
+  }, [])
+
   const handleSubmit = async (answer: string) => {
     if (answer.length > 100) {
       setImpressed(true)
       setTimeout(() => setImpressed(false), 1500)
     }
     await submitAnswer(answer)
-    setQuestionIndex((i) => i + 1)
   }
 
   const genieState: GenieState = isRecording
@@ -285,10 +287,10 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
             {!state.error && state.question && (
               <QuestionCard
                 question={state.question}
-                questionKey={questionIndex}
+                questionKey={state.questionCount}
                 loading={state.loading}
                 onSubmit={(answer) => void handleSubmit(answer)}
-                onRecordingChange={setIsRecording}
+                onRecordingChange={handleRecordingChange}
               />
             )}
           </motion.div>
