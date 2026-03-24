@@ -4,6 +4,7 @@ import { CosmicJourney } from './components/CosmicJourney'
 import { AssessmentShell } from './components/Assessment/AssessmentShell'
 import { EmailCapture } from './components/EmailCapture'
 import { ThankYou } from './components/ThankYou'
+import Dashboard from './components/Dashboard'
 
 type FunnelPhase = 'journey' | 'assessment' | 'email' | 'thankyou'
 
@@ -52,7 +53,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<FunnelPage />} />
-        <Route path="/dashboard" element={<div style={{color:'#fff',padding:32}}>Dashboard (Task 11)</div>} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
