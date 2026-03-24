@@ -1,17 +1,9 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import { db } from '../db/client'
+import { requireAuth } from '../middleware/auth'
 
 const router = Router()
-
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  const token = req.headers.authorization?.replace('Bearer ', '')
-  if (!token || token !== process.env.FOUNDER_API_KEY) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
-  }
-  next()
-}
 
 router.use(requireAuth)
 

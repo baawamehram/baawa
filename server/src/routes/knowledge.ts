@@ -1,18 +1,10 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router, Request, Response } from 'express'
 import multer from 'multer'
 import { ingestMarkdown, listKnowledgeSources, setSourceActive, deleteSource } from '../services/knowledge'
+import { requireAuth } from '../middleware/auth'
 
 const router = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } })
-
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  const token = req.headers.authorization?.replace('Bearer ', '')
-  if (!token || token !== process.env.FOUNDER_API_KEY) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
-  }
-  next()
-}
 
 router.use(requireAuth)
 

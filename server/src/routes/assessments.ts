@@ -1,21 +1,12 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import { db } from '../db/client'
 import { generateDeferEmail } from '../services/deferEmail'
 import { sendOnboardEmail, sendDeferEmail } from '../services/email'
 import { ConversationTurn } from '../services/questioning'
+import { requireAuth } from '../middleware/auth'
 
 const router = Router()
-
-// Auth middleware — Bearer token
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  const token = req.headers.authorization?.replace('Bearer ', '')
-  if (!token || token !== process.env.FOUNDER_API_KEY) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
-  }
-  next()
-}
 
 router.use(requireAuth)
 
@@ -59,6 +50,10 @@ router.post('/:id/onboard', async (req: Request, res: Response) => {
     if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
     const assessment = result.rows[0]
 
+    if (!['pending', 'reviewing'].includes(assessment.status)) {
+      return res.status(400).json({ error: 'Assessment already processed' })
+    }
+
     await db.query(
       `UPDATE assessments SET status = 'onboarded', updated_at = NOW() WHERE id = $1`,
       [req.params.id]
@@ -82,12 +77,16 @@ router.post('/:id/onboard', async (req: Request, res: Response) => {
 // POST /api/assessments/:id/defer — generate + send defer email, mark deferred
 router.post('/:id/defer', async (req: Request, res: Response) => {
   try {
-    const result = await db.query<{ email: string; conversation: ConversationTurn[] }>(
-      'SELECT email, conversation FROM assessments WHERE id = $1',
+    const result = await db.query<{ email: string; status: string; conversation: ConversationTurn[] }>(
+      'SELECT email, status, conversation FROM assessments WHERE id = $1',
       [req.params.id]
     )
     if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
     const assessment = result.rows[0]
+
+    if (!['pending', 'reviewing'].includes(assessment.status)) {
+      return res.status(400).json({ error: 'Assessment already processed' })
+    }
 
     const emailBody = await generateDeferEmail(assessment.conversation, assessment.email)
     await sendDeferEmail(assessment.email, emailBody)
