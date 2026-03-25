@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVoiceRecorder } from '../../hooks/useVoiceRecorder'
 import { API_URL } from '../../lib/api'
@@ -12,6 +12,10 @@ interface VoiceInputProps {
 export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }: VoiceInputProps) {
   const { recorderState, startRecording, stopRecording, audioBlob, error } = useVoiceRecorder()
   const [transcriptionError, setTranscriptionError] = useState<string | null>(null)
+
+  // Keep a stable ref to onTranscript so it never causes the effect to re-run
+  const onTranscriptRef = useRef(onTranscript)
+  useEffect(() => { onTranscriptRef.current = onTranscript })
 
   const isRecording = recorderState === 'recording'
 
@@ -34,14 +38,14 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
         })
         if (!res.ok) throw new Error(`Transcription failed: ${res.status}`)
         const data = (await res.json()) as { transcript: string }
-        onTranscript(data.transcript)
+        onTranscriptRef.current(data.transcript)
       } catch {
         setTranscriptionError('Transcription failed. Please type your answer.')
       }
     }
 
     void transcribe()
-  }, [audioBlob, onTranscript])
+  }, [audioBlob]) // audioBlob only — onTranscript is accessed via ref
 
   const handleClick = () => {
     if (isRecording) {

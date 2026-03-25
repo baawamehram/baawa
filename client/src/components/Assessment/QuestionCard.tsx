@@ -104,7 +104,11 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
           {/* Voice + Submit row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <VoiceInput
-              onTranscript={(text) => setAnswer((prev) => (prev ? `${prev} ${text}` : text))}
+              onTranscript={(text) => {
+                const trimmed = text.trim()
+                setAnswer(trimmed)
+                if (trimmed && !loading) onSubmit(trimmed)
+              }}
               disabled={loading}
               onRecordingChange={onRecordingChange}
             />
