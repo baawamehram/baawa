@@ -107,7 +107,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
   const [showTypewriter, setShowTypewriter] = useState(false)
 
   // Orb double-tap
-  const [orbSub, setOrbSub] = useState('Analysing global signals')
+  const [, setOrbSub] = useState('Analysing global signals')
   const tapsRef = useRef(0)
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -508,6 +508,10 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           0%  {transform:scale(1);  opacity:.5;}
           100%{transform:scale(2.2);opacity:0;}
         }
+        @keyframes tapBlink {
+          0%,100%{opacity:1;transform:scale(1);}
+          50%    {opacity:0.5;transform:scale(0.88);}
+        }
       `}</style>
 
       {/* ── TICKER ── */}
@@ -574,21 +578,33 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
                 background: 'radial-gradient(circle at 36% 32%, #FFAA80, #FF6B35 45%, #B83010)',
                 animation: 'opulse 2.8s ease-in-out infinite',
                 cursor: 'pointer', position: 'relative',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 6,
               }}
-            />
+            >
+              {/* Double-tap icon — two stacked finger-tap circles */}
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                style={{ animation: 'tapBlink 1.6s ease-in-out infinite', flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="4" fill="rgba(255,255,255,0.9)" />
+                <circle cx="12" cy="12" r="7.5" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" fill="none" />
+                <circle cx="12" cy="12" r="11" stroke="rgba(255,255,255,0.22)" strokeWidth="1" fill="none" />
+              </svg>
+              <span style={{
+                fontFamily: 'Courier New, monospace',
+                fontSize: 9, letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.85)',
+                lineHeight: 1.4, textAlign: 'center',
+              }}>
+                double<br />tap
+              </span>
+            </div>
           </div>
           <div style={{
             fontFamily: 'Georgia, serif', fontSize: 14, letterSpacing: '0.05em',
             color: 'rgba(253,252,250,0.6)', marginTop: 20, lineHeight: 1.5,
           }}>
             Getting Baawa ready<br />for your assessment
-          </div>
-          <div style={{
-            fontFamily: 'Courier New, monospace', fontSize: 9, letterSpacing: '0.22em',
-            textTransform: 'uppercase', marginTop: 7,
-            color: bootDone ? 'rgba(255,107,53,0.8)' : 'rgba(255,107,53,0.5)',
-          }}>
-            {orbSub}
           </div>
         </div>
 
