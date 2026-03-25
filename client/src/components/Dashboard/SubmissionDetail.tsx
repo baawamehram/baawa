@@ -220,7 +220,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
             </div>
           ))}
           {(!assessment.conversation || assessment.conversation.length === 0) && (
-            <p className="text-gray-500 font-body text-sm">No conversation data.</p>
+            <p className="text-gray-400 font-body text-sm">No conversation data.</p>
           )}
         </div>
       </div>

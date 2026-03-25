@@ -118,7 +118,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500 font-body text-sm">
+                <td colSpan={4} className="px-6 py-8 text-center text-gray-400 font-body text-sm">
                   No assessments found.
                 </td>
               </tr>

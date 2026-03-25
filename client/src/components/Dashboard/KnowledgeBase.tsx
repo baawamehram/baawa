@@ -165,7 +165,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
                 <td className="px-6 py-4 text-white font-body text-sm">{s.source_name}</td>
                 <td className="px-6 py-4 text-gray-400 font-body text-sm">{s.chunk_count}</td>
                 <td className="px-6 py-4">
-                  <span className={`text-xs font-body ${s.is_active ? 'text-green-400' : 'text-gray-500'}`}>
+                  <span className={`text-xs font-body ${s.is_active ? 'text-green-400' : 'text-gray-400'}`}>
                     {s.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -189,7 +189,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
             ))}
             {sources.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500 font-body text-sm">
+                <td colSpan={4} className="px-6 py-8 text-center text-gray-400 font-body text-sm">
                   No knowledge sources yet.
                 </td>
               </tr>
