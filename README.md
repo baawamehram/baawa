@@ -1,75 +1,87 @@
 # Baawa
 
-## Overview
+AI-powered adaptive assessment funnel + agency CRM.
 
-An adaptive lead-qualification funnel that scores prospects through a conversational assessment, paired with a founder-facing CRM dashboard. Built with React + Vite + TypeScript on the frontend and Node + Express + TypeScript on the backend, backed by PostgreSQL with pgvector for semantic search over a knowledge base.
+## Stack
 
----
+- **Frontend**: React + TypeScript + Vite, deployed on Vercel
+- **Backend**: Node.js + Express + TypeScript, deployed on Railway
+- **Database**: PostgreSQL with `pgvector` extension (Railway)
+- **AI**: Anthropic Claude (model configurable via `CLAUDE_MODEL` env), Google AI embeddings, Groq Whisper voice transcription
 
 ## Prerequisites
 
-- Node 20+
-- PostgreSQL with the `pgvector` extension enabled
-- API keys: Anthropic (Claude), OpenAI (embeddings), Resend (email)
-
----
+- Node.js 20+
+- PostgreSQL database with the `pgvector` extension enabled
+- Anthropic API key
+- Google AI API key (embeddings / knowledge base)
+- Groq API key (Whisper voice transcription)
+- Resend API key (email)
 
 ## Local Setup
 
-1. **Clone and install**
-   ```bash
-   git clone <repo-url>
-   cd baawa-mehram
-   npm install
-   ```
+**1. Clone and install**
+```bash
+git clone <repo>
+cd baawa-mehram
+cd client && npm install
+cd ../server && npm install
+```
 
-2. **Configure environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env and fill in all required values
-   ```
+**2. Environment variables**
 
-3. **Run DB migration**
-   ```bash
-   cd server && npm run migrate
-   ```
+Copy `.env.example` to `server/.env` and fill in your values.
 
-4. **Ingest knowledge base**
+For the client, create `client/.env.local`:
+```
+VITE_API_URL=http://localhost:3001
+```
 
-   Place your source file at `knowledge-base/rory-sutherland.md`, then:
-   ```bash
-   cd server && npm run ingest
-   ```
+**3. Database**
+```bash
+cd server
+npm run migrate
+```
 
-5. **Start dev servers**
-   ```bash
-   # From project root — starts client on :5173 and server on :3001
-   npm run dev
-   ```
+**4. Ingest knowledge base** (optional)
 
----
+Place `.md` files in `knowledge-base/`, then:
+```bash
+cd server && npm run ingest
+```
+
+**5. Run dev servers**
+```bash
+# Terminal 1 — backend
+cd server && npm run dev
+
+# Terminal 2 — frontend
+cd client && npm run dev
+```
+
+Frontend: http://localhost:5173
+Backend: http://localhost:3001
 
 ## Production Deployment
 
-### Frontend — Vercel
+### Frontend (Vercel)
 
-- Point Vercel to the `client/` directory
-- Set the `VITE_API_URL` environment variable to your Railway backend URL (e.g. `https://your-app.up.railway.app`)
-- The `client/vercel.json` rewrite rule handles client-side routing
+1. Connect repo to Vercel
+2. Set **Root Directory** to `client`
+3. Set environment variable: `VITE_API_URL=https://your-railway-domain.railway.app`
+4. Deploy — `client/vercel.json` handles SPA routing
 
-### Backend — Railway
+### Backend (Railway)
 
-- Point Railway to the `server/` directory; Railway will detect and use the `Dockerfile`
-- Set all server-side environment variables: `DATABASE_URL`, `RESEND_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `FOUNDER_API_KEY`, `PORT`, `CLAUDE_MODEL`, `CLIENT_URL`, `EMAIL_FROM`, `FOUNDER_EMAIL`, `DASHBOARD_URL`
-- **PostgreSQL + pgvector** must be provisioned — use the Railway PostgreSQL addon or an external provider, and ensure the `pgvector` extension is enabled before running migrations
+1. Connect repo to Railway
+2. Set **Root Directory** to `server`
+3. Add a PostgreSQL service and enable the `pgvector` extension
+4. Set environment variables (see `.env.example`)
+5. Railway uses `server/Dockerfile` automatically
 
----
+## Environment Variables
 
-## Knowledge Base
-
-Drop `.md` files via the Dashboard → Knowledge Base section in the UI, or re-run `npm run ingest` from the `server/` directory to process files placed in `knowledge-base/`.
-
----
+See `.env.example` for all required variables.
 
 ## Dashboard Access
 
