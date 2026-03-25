@@ -107,6 +107,7 @@ CREATE TABLE session_analytics (
   created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE UNIQUE INDEX session_analytics_session_id ON session_analytics (session_id);
 CREATE INDEX ON session_analytics (completed);
 CREATE INDEX ON session_analytics (created_at DESC);
 CREATE INDEX ON session_analytics (journey_config_version);
@@ -122,7 +123,7 @@ The active config version must be written to `sessions` at `POST /api/sessions/s
   - Set `journey_config_version = 1` for all backfilled rows (they pre-date the versioning system)
   - Skip sessions that already have a `session_analytics` row (idempotent — safe to re-run)
 - **Incremental:** Computed and inserted at `POST /api/sessions/:id/complete` immediately after the assessment record is created. **This insert is non-blocking and non-critical** — wrap in `try/catch`, log any error, but do not fail or roll back the assessment creation. The assessment is the source of truth; analytics is derived and can be recomputed.
-- **Abandoned sessions:** A nightly job identifies `sessions` with `status = 'active'` and `created_at < NOW() - INTERVAL '24 hours'` that have no `session_analytics` row, and inserts an analytics row with `completed = false`
+- **Abandoned sessions:** A nightly job (cron `0 2 * * *` — see Railway Cron Configuration) identifies `sessions` with `status = 'active'` and `created_at < NOW() - INTERVAL '24 hours'` that have no `session_analytics` row, and inserts an analytics row with `completed = false`. Insert uses `ON CONFLICT (session_id) DO NOTHING` so the job is safe to re-run.
 
 ---
 
@@ -193,7 +194,7 @@ Requires ≥10 completed sessions where `journey_config_version = current_active
 
 **Step 1 — Compute metrics from `session_analytics`** (filtered to `journey_config_version = current_active_version`):
 ```
-completion_rate       = completed / total sessions in window
+completion_rate       = completed sessions / (completed + abandoned sessions) in window (sessions with no analytics row are excluded from both numerator and denominator)
 avg_answer_words      = mean of avg_answer_words across completed sessions
 score_mean            = mean score
 score_std             = standard deviation of scores
@@ -240,15 +241,15 @@ User message includes:
 ```
 
 **Risk level rules (Claude determines, server validates):**
-- `low`: Only wording/phrasing changes. No structural reordering. Scoring weights unchanged or shifted by ≤5 points each. Intro message count unchanged.
-- `high`: Any structural change — question topic reordering, intro message count change, any scoring weight shifted by >5 points, or fundamental reframing of approach.
+- `low`: Only wording/phrasing changes. No structural reordering. Scoring weights unchanged or shifted by ≤5 absolute points each (e.g., 20→24 is low-risk; 20→26 is high-risk). Intro message count unchanged.
+- `high`: Any structural change — question topic reordering, intro message count change, any scoring weight shifted by more than 5 absolute points, or fundamental reframing of approach.
 
 **Step 4 — Validate and normalise output:**
 - Parse JSON (retry once with error feedback if malformed; if still bad, abort run)
 - Assert `intro_messages` is a non-empty string array with accumulation invariant: each element's **character count** (not byte length — use `str.length` in JS which counts UTF-16 code units) must be strictly greater than the previous element's character count
 - Assert `scoring_weights` has exactly the five required keys
-- If `scoring_weights` do not sum to 100: normalise using integer rounding — round each value proportionally, then add/subtract the remainder (±1) from the highest-weighted dimension to ensure the sum is exactly 100. Log a warning. Never produce float weights.
-- Server re-validates `risk_level` independently: if any weight shifted >5 from current active config, override to `high` regardless of what Claude returned
+- If `scoring_weights` do not sum to 100: normalise using integer rounding — round each value proportionally, then add/subtract the remainder (±1) from the highest-weighted dimension to ensure the sum is exactly 100. Tie-breaking rule: if multiple dimensions share the highest weight, apply the remainder to the first one in key order (`pmf` → `validation` → `growth` → `mindset` → `revenue`). Log a warning. Never produce float weights.
+- Server re-validates `risk_level` independently: if any weight shifted by more than 5 absolute points from the current active config, override to `high` regardless of what Claude returned
 
 **Step 5 — Apply hybrid approval:**
 - `risk_level: "low"` → within a **single DB transaction**: (1) `UPDATE journey_config SET status='archived' WHERE status='active'`, then (2) `INSERT INTO journey_config (...) VALUES (..., 'active', ...)`. The partial unique index enforces that only one active row exists; the transaction ensures no window exists where zero or two active rows are visible. After commit: call `invalidateConfigCache()`.
@@ -305,10 +306,16 @@ New tab in the existing Dashboard component alongside Pipeline/Submissions.
     {
       "schedule": "0 3 * * 0",
       "command": "node server/dist/src/scripts/runOptimizer.js"
+    },
+    {
+      "schedule": "0 2 * * *",
+      "command": "node server/dist/src/scripts/backfillAnalytics.js"
     }
   ]
 }
 ```
+
+The weekly optimizer runs at 03:00 UTC every Sunday. The nightly abandoned-session backfill runs at 02:00 UTC every day — it is idempotent (ON CONFLICT DO NOTHING) so running it nightly is safe and keeps analytics current.
 
 `runOptimizer.js` is a thin script that directly invokes the optimizer service function (not an HTTP call) and exits with code 0 on success, 1 on failure.
 
