@@ -34,19 +34,19 @@ export function LandingPage({ onStart }: Props) {
           <div style={{
             fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase',
             color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '24px'
-          }}>Marketing Intelligence for Founders</div>
-          <h1 style={{ margin: '0 0 24px', lineHeight: 1.0 }}>
+          }}>Advisor · Consultant · Coach</div>
+          <h1 style={{ margin: '0 0 24px', lineHeight: 1.1 }}>
             <div style={{
-              fontFamily: "'Playfair Display', serif", fontSize: 'clamp(48px, 8vw, 96px)',
+              fontFamily: "'Playfair Display', serif", fontSize: 'clamp(40px, 7vw, 84px)',
               fontWeight: 400, color: '#0a0a0a', display: 'block'
-            }}>The advisor</div>
+            }}>Everyone has that one person</div>
             <div style={{
-              fontFamily: "'Playfair Display', serif", fontSize: 'clamp(48px, 8vw, 96px)',
+              fontFamily: "'Playfair Display', serif", fontSize: 'clamp(40px, 7vw, 84px)',
               fontWeight: 700, fontStyle: 'italic', color: '#6366f1', display: 'block'
-            }}>agencies fear.</div>
+            }}>they call first.</div>
           </h1>
           <p style={{ fontSize: '18px', color: '#555', lineHeight: 1.7, marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
-            We sit between you and every agency you'll ever hire — structuring mandates, writing airtight contracts, and holding them accountable for results.
+            For founders who need things to move — strategy, agencies, mindset, momentum — that person is Baawa.
           </p>
           <button onClick={onStart} style={{
             background: '#0a0a0a', color: '#fff', border: 'none', cursor: 'pointer',
@@ -83,13 +83,13 @@ export function LandingPage({ onStart }: Props) {
       <section style={{ background: '#f5f5f0', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>The Problem</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px', margin: '0 0 16px' }}>Agencies aren't broken. The relationship is.</h2>
-          <p style={{ fontSize: '18px', color: '#555', marginBottom: '48px', maxWidth: '620px' }}>You hired an agency. You got decks, calls, and vague metrics. Here's what actually went wrong.</p>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px', margin: '0 0 16px' }}>Most founders have the vision. Everything else gets in the way.</h2>
+          <p style={{ fontSize: '18px', color: '#555', marginBottom: '48px', maxWidth: '620px' }}>The strategy felt generic. The agencies underdelivered. The momentum never came. Here's why.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {[
-              { num: '01', title: 'No clear mandate', body: 'You told them what you wanted. They heard what they could sell you. Nobody wrote it down properly. Nobody was held to it.' },
-              { num: '02', title: 'Wrong agency, wrong stage', body: "You were matched by a referral or a Google search. The agency was great — for someone else's business, at a different stage." },
-              { num: '03', title: 'No accountability', body: "When results didn't come, they moved the goalposts. You didn't have the language, the contract, or the leverage to push back." },
+              { num: '01', title: 'No one actually on your side', body: "You have advisors, agencies, investors. But when something stalls, everyone points at someone else. Nobody is actually fighting for your outcomes." },
+              { num: '02', title: 'Momentum keeps dying', body: "You know what needs to happen. But decisions drag, agencies underdeliver, and your energy gets eaten by the wrong things. Nothing moves at the pace it should." },
+              { num: '03', title: "You're carrying it alone", body: "The business can only move as fast as you can think clearly and execute boldly. Nobody's helping you do that. And it shows." },
             ].map(({ num, title, body }) => (
               <div key={num} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '52px', fontWeight: 900, color: '#6366f1', lineHeight: 1, marginBottom: '16px' }}>{num}</div>
@@ -105,17 +105,22 @@ export function LandingPage({ onStart }: Props) {
       <section style={{ background: '#fafaf8', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>How We Work</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '48px', margin: '0 0 48px' }}>One firm. Two tracks. One assessment.</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '48px', margin: '0 0 48px' }}>One firm. Three ways in. One assessment.</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+            <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who need clarity and direction</div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Business Consultancy</div>
+              <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>Before anything else, we get clear on where you are, where you're going, and what's actually blocking you. Then we build the plan that gets you there.</div>
+            </div>
             <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
               <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who work with agencies</div>
               <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Agency Advisory</div>
               <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>We structure your mandates, write airtight contracts, hold agencies accountable for results, and match you with the right partner for your stage.</div>
             </div>
             <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who need a trusted advisor</div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Business Consultancy</div>
-              <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>Before any agency enters the picture, we work directly with you — bringing clarity, strategy, and direction to your business challenges.</div>
+              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who need to unlock their own potential</div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Founder Coaching</div>
+              <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>Strategy only works when the person behind it is at their best. We work directly with you — your thinking, your confidence, your ability to move when it matters.</div>
             </div>
           </div>
           <div style={{ textAlign: 'center', fontSize: '14px', color: '#999', fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -128,14 +133,14 @@ export function LandingPage({ onStart }: Props) {
       <section style={{ background: '#fff', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>What We Do</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px', margin: '0 0 16px' }}>We fix the relationship between founders and agencies.</h2>
-          <p style={{ fontSize: '18px', color: '#555', marginBottom: '48px' }}>Four things. Done properly. For founders who are serious about growth.</p>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px', margin: '0 0 16px' }}>We get founders moving.</h2>
+          <p style={{ fontSize: '18px', color: '#555', marginBottom: '48px' }}>Strategy, agencies, momentum — whatever's blocking you, we clear it.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {[
-              { icon: '📋', title: 'Structure the mandate', body: "Before you hire anyone, we define exactly what success looks like — in writing, with metrics, with teeth. No more 'brand awareness' as a KPI." },
-              { icon: '⚖️', title: 'Write airtight contracts', body: "Agency contracts are written by agencies, for agencies. We rewrite the power balance so you're protected from day one." },
-              { icon: '🎯', title: 'Hold them accountable', body: 'Monthly reviews. Hard questions. We sit in the room with you and make sure the agency delivers — or you know exactly when to walk away.' },
-              { icon: '🔍', title: 'Match you with the right agency', body: "We've seen hundreds of agencies. We know who's right for your stage, your industry, your budget. No more expensive trial and error." },
+              { icon: '🧭', title: 'Consulting & strategy', body: "We get clear on where you are, where you need to go, and what's in the way. Then we build the plan and move with you." },
+              { icon: '🔥', title: 'Founder coaching', body: "We work on you. Your thinking, your confidence, your ability to make bold calls and execute. The business moves as fast as its founder." },
+              { icon: '⚖️', title: 'Agency contracts', body: "Agency contracts are written by agencies, for agencies. We rewrite the power balance so you're protected from day one." },
+              { icon: '🎯', title: 'Accountability & results', body: 'Monthly reviews. Hard questions. We make sure whoever you\'re working with delivers — or you know exactly when to walk.' },
             ].map(({ icon, title, body }) => (
               <div key={title} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
                 <div style={{ fontSize: '36px', marginBottom: '20px' }}>{icon}</div>
@@ -156,7 +161,7 @@ export function LandingPage({ onStart }: Props) {
             {[
               { num: '1', title: 'You apply', body: 'Every founder goes through our diagnostic assessment. Brutal, honest, illuminating.' },
               { num: '2', title: 'We assess', body: 'AI-powered questions that go deeper than any agency discovery call ever has.' },
-              { num: '3', title: 'We go to work', body: 'Onboarded in 48 hours. Strategy first, agencies second.' },
+              { num: '3', title: 'We go to work', body: 'Onboarded in 48 hours. Strategy, agencies, coaching — whatever moves the needle first.' },
             ].map(({ num, title, body }, i) => (
               <div key={num} style={{
                 display: 'flex', gap: '32px', alignItems: 'flex-start',
@@ -178,15 +183,15 @@ export function LandingPage({ onStart }: Props) {
       <section style={{ background: '#fafaf8', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>Who This Is For</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '48px', margin: '0 0 48px' }}>Founders who are done being disappointed.</h2>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '48px', margin: '0 0 48px' }}>Founders who are done waiting for things to move.</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px', alignItems: 'start' }}>
             <div>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px' }}>
                 {[
-                  "You've hired at least one agency and felt like you wasted money",
-                  "You have a real business with real revenue — you're not experimenting",
-                  "You want someone on your side who understands agencies from the inside",
-                  "You're ready to be challenged, not just reassured",
+                  "You know what you want but can't get it off the ground",
+                  "You've hired agencies, advisors, or coaches — and felt like nothing really moved",
+                  "You want someone who'll tell you the truth, not reassure you",
+                  "You're ready to be challenged — in your thinking, your decisions, your execution",
                   "You want growth that's measurable, not just visible",
                 ].map((item) => (
                   <li key={item} style={{ display: 'flex', gap: '12px', marginBottom: '16px', fontSize: '16px', color: '#333', lineHeight: 1.5 }}>
@@ -202,7 +207,7 @@ export function LandingPage({ onStart }: Props) {
             </div>
             <div style={{ background: '#0a0a0a', borderRadius: '16px', padding: '56px 48px' }}>
               <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '26px', fontStyle: 'italic', color: '#e0e7ff', lineHeight: 1.5, margin: '0 0 24px' }}>
-                "The agency had great case studies. But nobody asked whether I was ready for what they were selling."
+                "He asked me three questions in twenty minutes that none of my advisors had asked in six months."
               </p>
               <div style={{ fontSize: '13px', color: '#555', fontFamily: 'Space Grotesk, sans-serif' }}>— The founder we built Baawa for</div>
             </div>
