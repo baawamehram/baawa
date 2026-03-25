@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useReducedMotion } from 'framer-motion'
 import { SolarSystem } from './SolarSystem'
 import { EarthZoom } from './EarthZoom'
 import { LocationReveal } from './LocationReveal'
@@ -13,8 +14,56 @@ interface CosmicJourneyProps {
   onComplete: () => void
 }
 
+const STATIC_STARS = [
+  { top: '8%', left: '15%' }, { top: '12%', left: '72%' }, { top: '23%', left: '38%' },
+  { top: '31%', left: '88%' }, { top: '45%', left: '5%' },  { top: '55%', left: '62%' },
+  { top: '67%', left: '28%' }, { top: '74%', left: '91%' }, { top: '82%', left: '47%' },
+  { top: '90%', left: '18%' }, { top: '18%', left: '54%' }, { top: '39%', left: '76%' },
+  { top: '61%', left: '11%' }, { top: '78%', left: '65%' }, { top: '5%',  left: '44%' },
+]
+
 export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJourneyProps) {
   const [phase, setPhase] = useState<Phase>('solar')
+  const reducedMotion = useReducedMotion()
+
+  // Reduced-motion: skip Three.js phases, call onComplete after 1500ms
+  useEffect(() => {
+    if (!reducedMotion) return
+    const timer = setTimeout(() => {
+      onComplete()
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [reducedMotion, onComplete])
+
+  if (reducedMotion) {
+    return (
+      <div
+        style={{
+          background: '#0a0a0f',
+          width: '100vw',
+          height: '100vh',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {STATIC_STARS.map((s, i) => (
+          <span
+            key={i}
+            style={{
+              position: 'absolute',
+              top: s.top,
+              left: s.left,
+              width: i % 3 === 0 ? 3 : 2,
+              height: i % 3 === 0 ? 3 : 2,
+              borderRadius: '50%',
+              background: '#ffffff',
+              opacity: 0.6 + (i % 4) * 0.1,
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
 
   const advance = () => {
     setPhase((p) => {

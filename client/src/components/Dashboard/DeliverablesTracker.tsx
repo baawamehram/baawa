@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface Deliverable {
   id: number
@@ -35,31 +34,47 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
   const [newTitle, setNewTitle] = useState('')
   const [newDueDate, setNewDueDate] = useState('')
   const [adding, setAdding] = useState(false)
+  const [error, setError] = useState('')
 
   const updateStatus = async (delId: number, status: Deliverable['status']) => {
-    const res = await fetch(`${API_URL}/api/deliverables/${delId}`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    })
-    if (res.status === 401) { on401(); return }
-    if (res.ok) onUpdate()
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/deliverables/${delId}`, token, on401, {
+        method: 'PUT',
+        body: JSON.stringify({ status }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
+      onUpdate()
+    } catch {
+      setError('Network error. Please check your connection.')
+    }
   }
 
   const addDeliverable = async () => {
     if (!newTitle.trim()) return
     setAdding(true)
-    const res = await fetch(`${API_URL}/api/clients/${clientId}/deliverables`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: newTitle, due_date: newDueDate || null }),
-    })
-    if (res.status === 401) { on401(); return }
-    setAdding(false)
-    if (res.ok) {
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/clients/${clientId}/deliverables`, token, on401, {
+        method: 'POST',
+        body: JSON.stringify({ title: newTitle, due_date: newDueDate || null }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
       setNewTitle('')
       setNewDueDate('')
       onUpdate()
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setAdding(false)
     }
   }
 
@@ -67,13 +82,19 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Deliverables</h3>
 
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-4 font-body text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="space-y-3 mb-4">
         {deliverables.map((d) => (
           <div key={d.id} className="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
             <div>
               <p className="text-white font-body text-sm">{d.title}</p>
               {d.due_date && (
-                <p className="text-gray-500 font-body text-xs mt-0.5">
+                <p className="text-gray-400 font-body text-xs mt-0.5">
                   Due: {new Date(d.due_date).toLocaleDateString()}
                 </p>
               )}

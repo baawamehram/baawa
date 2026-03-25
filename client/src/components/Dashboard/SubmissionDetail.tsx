@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface Assessment {
   id: number
@@ -37,51 +36,73 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [actionMsg, setActionMsg] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch(`${API_URL}/api/assessments/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.status === 401) { on401(); return null }
-        return res.json()
-      })
-      .then((data) => {
-        if (data) {
-          setAssessment(data)
-          setNotes(data.founder_notes || '')
+    const load = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/assessments/${id}`, token, on401)
+        if (!res) return
+        if (!res.ok) {
+          setError('Failed to load assessment.')
+          return
         }
-      })
-      .finally(() => setLoading(false))
+        const data = await res.json()
+        setAssessment(data)
+        setNotes(data.founder_notes || '')
+      } catch {
+        setError('Network error. Please check your connection.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [id, token, on401])
 
   const saveNotes = async () => {
     setSaving(true)
-    const res = await fetch(`${API_URL}/api/assessments/${id}/notes`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes }),
-    })
-    if (res.status === 401) { on401(); return }
-    setSaving(false)
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/assessments/${id}/notes`, token, on401, {
+        method: 'PUT',
+        body: JSON.stringify({ notes }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+      }
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleAction = async (action: 'onboard' | 'defer') => {
-    const res = await fetch(`${API_URL}/api/assessments/${id}/${action}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    if (res.status === 401) { on401(); return }
-    if (res.ok) {
+    if (action === 'defer' && !window.confirm('Send defer email to this founder? This cannot be undone.')) return
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/assessments/${id}/${action}`, token, on401, {
+        method: 'POST',
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
       setActionMsg(action === 'onboard' ? 'Client onboarded successfully!' : 'Assessment deferred. Email sent.')
       // refresh
-      const updated = await fetch(`${API_URL}/api/assessments/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (updated.ok) {
-        const data = await updated.json()
-        setAssessment(data)
+      try {
+        const updated = await authFetch(`${API_URL}/api/assessments/${id}`, token, on401)
+        if (updated?.ok) {
+          const data = await updated.json()
+          setAssessment(data)
+        }
+      } catch {
+        // Refresh failed but action succeeded — not critical
       }
+    } catch {
+      setError('Network error. Please check your connection.')
     }
   }
 
@@ -126,6 +147,12 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         </div>
       )}
 
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+          {error}
+        </div>
+      )}
+
       {/* Score Breakdown */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
         <h3 className="text-lg font-heading text-white mb-4">Score Breakdown</h3>
@@ -146,7 +173,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
       </div>
 
       {/* Opportunity & Risk */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h3 className="text-sm font-heading text-green-400 mb-2">Biggest Opportunity</h3>
           <p className="text-gray-300 font-body text-sm">{assessment.biggest_opportunity || 'N/A'}</p>

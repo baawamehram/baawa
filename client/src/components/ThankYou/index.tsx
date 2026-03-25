@@ -1,9 +1,13 @@
 import { useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 
 export function ThankYou() {
+  const reducedMotion = useReducedMotion()
+
   useEffect(() => {
+    if (reducedMotion) return
+
     // Confetti burst on mount
     void confetti({
       particleCount: 120,
@@ -39,7 +43,7 @@ export function ThankYou() {
       clearTimeout(timer)
       confetti.reset()
     }
-  }, [])
+  }, [reducedMotion])
 
   return (
     <div
@@ -96,9 +100,9 @@ export function ThankYou() {
       />
 
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
+        initial={reducedMotion ? false : { opacity: 0, y: 30 }}
+        animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={reducedMotion ? undefined : { duration: 0.7, ease: 'easeOut' }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -112,9 +116,9 @@ export function ThankYou() {
       >
         {/* Star icon */}
         <motion.div
-          initial={{ scale: 0, rotate: -30 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.15, duration: 0.5, type: 'spring', stiffness: 200 }}
+          initial={reducedMotion ? false : { scale: 0, rotate: -30 }}
+          animate={reducedMotion ? undefined : { scale: 1, rotate: 0 }}
+          transition={reducedMotion ? undefined : { delay: 0.15, duration: 0.5, type: 'spring', stiffness: 200 }}
           style={{
             width: 64,
             height: 64,
@@ -132,9 +136,9 @@ export function ThankYou() {
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.55 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={reducedMotion ? undefined : { delay: 0.25, duration: 0.55 }}
           style={{
             fontFamily: 'Space Grotesk, sans-serif',
             fontSize: 'clamp(24px, 5vw, 38px)',
@@ -148,9 +152,9 @@ export function ThankYou() {
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.45, duration: 0.55 }}
+          initial={reducedMotion ? false : { opacity: 0 }}
+          animate={reducedMotion ? undefined : { opacity: 1 }}
+          transition={reducedMotion ? undefined : { delay: 0.45, duration: 0.55 }}
           style={{
             fontFamily: 'Inter, sans-serif',
             fontSize: 'clamp(15px, 2.5vw, 18px)',
@@ -164,9 +168,9 @@ export function ThankYou() {
 
         {/* Divider */}
         <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ delay: 0.65, duration: 0.5, ease: 'easeOut' }}
+          initial={reducedMotion ? false : { scaleX: 0 }}
+          animate={reducedMotion ? undefined : { scaleX: 1 }}
+          transition={reducedMotion ? undefined : { delay: 0.65, duration: 0.5, ease: 'easeOut' }}
           style={{
             width: 48,
             height: 1,
@@ -177,9 +181,9 @@ export function ThankYou() {
 
         {/* Brand quote */}
         <motion.blockquote
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.75, duration: 0.55 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={reducedMotion ? undefined : { delay: 0.75, duration: 0.55 }}
           style={{
             fontFamily: 'Space Grotesk, sans-serif',
             fontSize: 'clamp(14px, 2vw, 17px)',

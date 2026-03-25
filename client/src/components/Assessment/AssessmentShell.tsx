@@ -141,6 +141,14 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
             exit={{ opacity: 0, scale: 1.02 }}
             transition={{ duration: 0.5 }}
             onClick={() => setPhase('assessment')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setPhase('assessment')
+              }
+            }}
+            role="button"
+            tabIndex={0}
             style={{
               textAlign: 'center',
               cursor: 'pointer',

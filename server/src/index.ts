@@ -9,6 +9,7 @@ import knowledgeRouter from './routes/knowledge'
 import clientsRouter from './routes/clients'
 import deliverablesRouter from './routes/deliverables'
 import voiceRouter from './routes/voice'
+import geoRouter from './routes/geo'
 
 const app = express()
 
@@ -29,6 +30,7 @@ app.use('/api/knowledge', knowledgeRouter)
 app.use('/api/clients', clientsRouter)
 app.use('/api/deliverables', deliverablesRouter)
 app.use('/api/voice', voiceRouter)
+app.use('/api/geo', geoRouter)
 
 // Health
 app.get('/health', async (_req, res) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL } from '../../lib/api'
 
 interface EmailCaptureProps {
   sessionId: string
@@ -11,6 +11,7 @@ interface EmailCaptureProps {
 type Phase = 'analyzing' | 'form'
 
 export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
+  const reducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<Phase>('analyzing')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -128,8 +129,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
           >
             {/* Spinner */}
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
+              animate={reducedMotion ? {} : { rotate: 360 }}
+              transition={reducedMotion ? {} : { duration: 1.4, repeat: Infinity, ease: 'linear' }}
               style={{
                 width: 56,
                 height: 56,
@@ -142,8 +143,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
 
             {/* Pulsing text */}
             <motion.p
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              animate={reducedMotion ? {} : { opacity: [0.6, 1, 0.6] }}
+              transition={reducedMotion ? {} : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
               style={{
                 fontFamily: 'Space Grotesk, sans-serif',
                 fontSize: 'clamp(16px, 3vw, 22px)',
@@ -161,8 +162,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
-                  animate={{ opacity: [0.2, 0.7, 0.2], scale: [0.85, 1.15, 0.85] }}
-                  transition={{
+                  animate={reducedMotion ? {} : { opacity: [0.2, 0.7, 0.2], scale: [0.85, 1.15, 0.85] }}
+                  transition={reducedMotion ? {} : {
                     duration: 1.2,
                     repeat: Infinity,
                     delay: i * 0.3,

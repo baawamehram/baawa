@@ -6,8 +6,7 @@ import { Pipeline } from './Pipeline'
 import { ClientDetail } from './ClientDetail'
 import { RevenueOverview } from './RevenueOverview'
 import { KnowledgeBase } from './KnowledgeBase'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL } from '../../lib/api'
 
 type Section = 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge'
 
@@ -76,6 +75,7 @@ export default function Dashboard() {
   const [section, setSection] = useState<Section>('assessments')
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null)
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const handle401 = useCallback(() => {
     setToken(null)
@@ -152,10 +152,51 @@ export default function Dashboard() {
     return null
   }
 
+  const handleNavSelect = (key: Section) => {
+    setSection(key)
+    setSelectedAssessmentId(null)
+    setSelectedClientId(null)
+    setMobileNavOpen(false)
+  }
+
   return (
     <div className="flex h-screen bg-space-bg">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-gray-800 flex flex-col py-6 px-4 shrink-0">
+      {/* Mobile header bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-space-bg border-b border-gray-800">
+        <h1 className="text-lg font-heading text-white">
+          <span className="text-brand-indigo">baawa</span> mehram
+        </h1>
+        <button
+          onClick={() => setMobileNavOpen((o) => !o)}
+          className="text-gray-400 hover:text-white text-2xl leading-none"
+          aria-label="Toggle navigation"
+          aria-expanded={mobileNavOpen}
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* Mobile dropdown nav */}
+      {mobileNavOpen && (
+        <div className="md:hidden fixed top-12 left-0 right-0 z-30 bg-gray-900 border-b border-gray-800 px-4 py-3 flex flex-col gap-1">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => handleNavSelect(item.key)}
+              className={`text-left px-4 py-2.5 rounded-lg font-body text-sm transition-colors ${
+                section === item.key
+                  ? 'bg-brand-indigo/20 text-brand-indigo'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Sidebar — desktop only */}
+      <aside className="hidden md:flex w-64 border-r border-gray-800 flex-col py-6 px-4 shrink-0">
         <h1 className="text-xl font-heading text-white mb-8 px-2">
           <span className="text-brand-indigo">baawa</span> mehram
         </h1>
@@ -163,11 +204,7 @@ export default function Dashboard() {
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
-              onClick={() => {
-                setSection(item.key)
-                setSelectedAssessmentId(null)
-                setSelectedClientId(null)
-              }}
+              onClick={() => handleNavSelect(item.key)}
               className={`text-left px-4 py-2.5 rounded-lg font-body text-sm transition-colors ${
                 section === item.key
                   ? 'bg-brand-indigo/20 text-brand-indigo'
@@ -181,7 +218,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-8 pt-20 md:pt-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={`${section}-${selectedAssessmentId}-${selectedClientId}`}

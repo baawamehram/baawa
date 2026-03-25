@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { useState, useEffect, useCallback } from 'react'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface Client {
   id: number
@@ -29,31 +28,43 @@ const STAGES: { key: Client['stage']; label: string }[] = [
 export function Pipeline({ token, on401, onSelectClient }: Props) {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const fetchClients = () => {
-    fetch(`${API_URL}/api/clients`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.status === 401) { on401(); return null }
-        return res.json()
-      })
-      .then((data) => {
-        if (data) setClients(data)
-      })
-      .finally(() => setLoading(false))
-  }
+  const fetchClients = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/clients`, token, on401)
+      if (!res) return
+      if (!res.ok) {
+        setError('Failed to load clients.')
+        return
+      }
+      const data = await res.json()
+      setClients(data)
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setLoading(false)
+    }
+  }, [token, on401])
 
-  useEffect(() => { fetchClients() }, [token, on401])
+  useEffect(() => { fetchClients() }, [fetchClients])
 
   const moveClient = async (clientId: number, newStage: Client['stage']) => {
-    const res = await fetch(`${API_URL}/api/clients/${clientId}`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stage: newStage }),
-    })
-    if (res.status === 401) { on401(); return }
-    if (res.ok) fetchClients()
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/clients/${clientId}`, token, on401, {
+        method: 'PUT',
+        body: JSON.stringify({ stage: newStage }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
+      fetchClients()
+    } catch {
+      setError('Network error. Please check your connection.')
+    }
   }
 
   const daysSince = (dateStr: string) => {
@@ -68,13 +79,19 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
     <div>
       <h2 className="text-2xl font-heading text-white mb-6">Pipeline</h2>
 
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-3 gap-4">
         {STAGES.map((stage) => {
           const stageClients = clients.filter((c) => c.stage === stage.key)
           return (
             <div key={stage.key} className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
               <h3 className="text-sm font-heading text-brand-indigo mb-4 uppercase tracking-wider">
-                {stage.label} <span className="text-gray-500">({stageClients.length})</span>
+                {stage.label} <span className="text-gray-400">({stageClients.length})</span>
               </h3>
               <div className="space-y-3">
                 {stageClients.map((client) => (
@@ -88,7 +105,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                     >
                       <p className="text-white font-heading text-sm">{client.founder_name}</p>
                       <p className="text-gray-400 font-body text-xs mt-0.5">{client.company_name}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs font-body text-gray-500">
+                      <div className="flex items-center gap-3 mt-2 text-xs font-body text-gray-400">
                         <span>Score: {client.score ?? 'N/A'}</span>
                         <span>{daysSince(client.start_date)}d</span>
                         {client.phase2_monthly_fee > 0 && <span>${client.phase2_monthly_fee}/mo</span>}
