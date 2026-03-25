@@ -1,8 +1,18 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
 import { db } from '../db/client'
 
-function getEmbeddingClient() {
-  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '', { apiVersion: 'v1' } as any).getGenerativeModel({ model: 'text-embedding-004' })
+async function getEmbedding(text: string): Promise<number[]> {
+  const apiKey = process.env.GOOGLE_AI_API_KEY ?? ''
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/text-embedding-004:embedContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: { parts: [{ text }] } }),
+    }
+  )
+  if (!res.ok) throw new Error(`Google AI embedding failed: ${res.status} ${res.statusText}`)
+  const data = await res.json() as { embedding: { values: number[] } }
+  return data.embedding.values
 }
 
 let knowledgeTextCache: string | null = null
@@ -37,14 +47,11 @@ export async function ingestMarkdown(
   const chunks = chunkText(markdownText)
   if (chunks.length === 0) return 0
 
-  // Embed all chunks one by one (Google AI embedding API)
-  const model = getEmbeddingClient()
   const allEmbeddings: number[][] = []
 
   for (let i = 0; i < chunks.length; i++) {
     console.log(`Embedding chunk ${i + 1}/${chunks.length}...`)
-    const res = await model.embedContent(chunks[i])
-    allEmbeddings.push(res.embedding.values)
+    allEmbeddings.push(await getEmbedding(chunks[i]))
   }
 
   for (let i = 0; i < chunks.length; i++) {

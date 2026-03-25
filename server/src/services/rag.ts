@@ -1,18 +1,25 @@
 import { db } from '../db/client'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
-function getEmbeddingClient() {
-  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '', { apiVersion: 'v1' } as any).getGenerativeModel({ model: 'text-embedding-004' })
+async function getEmbedding(text: string): Promise<number[]> {
+  const apiKey = process.env.GOOGLE_AI_API_KEY ?? ''
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/text-embedding-004:embedContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: { parts: [{ text }] } }),
+    }
+  )
+  if (!res.ok) throw new Error(`Google AI embedding failed: ${res.status} ${res.statusText}`)
+  const data = await res.json() as { embedding: { values: number[] } }
+  return data.embedding.values
 }
 
 export async function retrieveRelevantChunks(
   queryText: string,
   topK = 3
 ): Promise<string[]> {
-  const model = getEmbeddingClient()
-  const res = await model.embedContent(queryText)
-  const embedding = res.embedding.values
-  if (!embedding) throw new Error('Failed to get embedding from Google AI')
+  const embedding = await getEmbedding(queryText)
 
   const result = await db.query<{ content: string }>(
     `SELECT content
