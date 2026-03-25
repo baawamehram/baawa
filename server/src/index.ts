@@ -43,6 +43,14 @@ app.get('/health', async (_req, res) => {
   }
 })
 
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err)
+})
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason)
+})
+
 const PORT = process.env.PORT ?? 3001
 app.listen(PORT, () => console.log(`Server listening on :${PORT}`))
 
