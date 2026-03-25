@@ -5,6 +5,7 @@ import { AssessmentShell } from './components/Assessment/AssessmentShell'
 import { EmailCapture } from './components/EmailCapture'
 import { ThankYou } from './components/ThankYou'
 import Dashboard from './components/Dashboard'
+import { LandingPage } from './components/LandingPage'
 import { API_URL } from './lib/api'
 
 type FunnelPhase = 'journey' | 'assessment' | 'email' | 'thankyou'
@@ -69,10 +70,19 @@ function FunnelPage() {
 }
 
 export default function App() {
+  const [showFunnel, setShowFunnel] = useState(false)
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<FunnelPage />} />
+        <Route
+          path="/"
+          element={
+            showFunnel
+              ? <FunnelPage />
+              : <LandingPage onStart={() => setShowFunnel(true)} />
+          }
+        />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
