@@ -21,6 +21,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
   const handleSubmit = () => {
     const trimmed = answer.trim()
     if (!trimmed || loading) return
+    setAnswer('')
     onSubmit(trimmed)
   }
 
