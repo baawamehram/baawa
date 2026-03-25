@@ -14,18 +14,6 @@
  *   Frankfurter → EUR/USD, USD/INR
  */
 
-interface CacheEntry<T> { data: T; ts: number }
-function cache<T>(): { get(k: string): T | null; set(k: string, v: T): void } {
-  const store = new Map<string, CacheEntry<T>>()
-  return {
-    get(k) {
-      const e = store.get(k)
-      return e ? e.data : null
-    },
-    set(k, v) { store.set(k, { data: v, ts: Date.now() }) },
-  }
-}
-
 // TTL-aware cache
 const TTL_PRICES = 60_000       // 60s
 const TTL_MACRO  = 6 * 3600_000 // 6h  (economic data changes slowly)
