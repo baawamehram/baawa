@@ -17,7 +17,7 @@ interface GeoData {
   lon: number | null
 }
 
-function FunnelPage() {
+function FunnelPage({ onExit }: { onExit: () => void }) {
   const [phase, setPhase] = useState<FunnelPhase>('journey')
   const [sessionId, setSessionId] = useState<string>('')
   const [geo, setGeo] = useState<GeoData>({ city: null, country: null, lat: null, lon: null })
@@ -33,35 +33,60 @@ function FunnelPage() {
 
   const handleJourneyComplete = useCallback(() => setPhase('assessment'), [])
 
+  const exitButton = phase !== 'thankyou' && (
+    <button
+      onClick={onExit}
+      style={{
+        position: 'fixed', top: '20px', left: '20px', zIndex: 1000,
+        background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,255,255,0.2)', color: '#fff',
+        padding: '8px 16px', borderRadius: '6px', cursor: 'pointer',
+        fontSize: '13px', fontFamily: 'Space Grotesk, sans-serif',
+        display: 'flex', alignItems: 'center', gap: '6px'
+      }}
+    >
+      ← Exit
+    </button>
+  )
+
   if (phase === 'journey') {
     return (
-      <CosmicJourney
-        city={geo.city}
-        country={geo.country}
-        lat={geo.lat}
-        lon={geo.lon}
-        onComplete={handleJourneyComplete}
-      />
+      <>
+        {exitButton}
+        <CosmicJourney
+          city={geo.city}
+          country={geo.country}
+          lat={geo.lat}
+          lon={geo.lon}
+          onComplete={handleJourneyComplete}
+        />
+      </>
     )
   }
 
   if (phase === 'assessment') {
     return (
-      <AssessmentShell
-        onComplete={(id: string) => {
-          setSessionId(id)
-          setPhase('email')
-        }}
-      />
+      <>
+        {exitButton}
+        <AssessmentShell
+          onComplete={(id: string) => {
+            setSessionId(id)
+            setPhase('email')
+          }}
+        />
+      </>
     )
   }
 
   if (phase === 'email') {
     return (
-      <EmailCapture
-        sessionId={sessionId}
-        onComplete={() => setPhase('thankyou')}
-      />
+      <>
+        {exitButton}
+        <EmailCapture
+          sessionId={sessionId}
+          onComplete={() => setPhase('thankyou')}
+        />
+      </>
     )
   }
 
@@ -79,7 +104,7 @@ export default function App() {
           path="/"
           element={
             showFunnel
-              ? <FunnelPage />
+              ? <FunnelPage onExit={() => setShowFunnel(false)} />
               : <LandingPage onStart={() => setShowFunnel(true)} />
           }
         />
