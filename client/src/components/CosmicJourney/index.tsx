@@ -412,7 +412,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           text += toAdd[i]
           setTwText(text)
           i++
-          twTimerRef.current = setTimeout(tick, toAdd[i - 1] === '\n' ? 55 : 32)
+          twTimerRef.current = setTimeout(tick, toAdd[i - 1] === '\n' ? 85 : 52)
         } else {
           msgIdx++
           twTimerRef.current = setTimeout(typeNext, 1100)
@@ -452,11 +452,13 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
     }
   }, [startTypewriter])
 
-  // Mic tap → brief state feedback → transition to assessment
+  // Mic tap → fade out typewriter screen → then transition
   const handleMicTap = useCallback(() => {
     if (micTapped) return
     setMicTapped(true)
-    setTimeout(onComplete, 350)
+    // Fade the screen out first, then hand off
+    setTimeout(() => setShowTypewriter(false), 200)
+    setTimeout(onComplete, 1100)
   }, [micTapped, onComplete])
 
   if (reducedMotion) return null
