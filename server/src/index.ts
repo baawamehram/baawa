@@ -10,6 +10,7 @@ import clientsRouter from './routes/clients'
 import deliverablesRouter from './routes/deliverables'
 import voiceRouter from './routes/voice'
 import geoRouter from './routes/geo'
+import marketRouter from './routes/market'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -32,6 +33,7 @@ app.use('/api/clients', clientsRouter)
 app.use('/api/deliverables', deliverablesRouter)
 app.use('/api/voice', voiceRouter)
 app.use('/api/geo', geoRouter)
+app.use('/api/market-data', marketRouter)
 
 // Health
 app.get('/health', async (_req, res) => {
