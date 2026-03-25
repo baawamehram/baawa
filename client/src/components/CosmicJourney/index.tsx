@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useReducedMotion } from 'framer-motion'
-import { SolarSystem } from './SolarSystem'
 import { EarthZoom } from './EarthZoom'
 import { LocationReveal } from './LocationReveal'
 
-type Phase = 'solar' | 'earth' | 'location' | 'done'
+type Phase = 'earth' | 'location' | 'done'
 
 interface CosmicJourneyProps {
   city: string | null
@@ -23,7 +22,7 @@ const STATIC_STARS = [
 ]
 
 export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJourneyProps) {
-  const [phase, setPhase] = useState<Phase>('solar')
+  const [phase, setPhase] = useState<Phase>('earth')
   const reducedMotion = useReducedMotion()
 
   // Reduced-motion: skip Three.js phases, call onComplete after 1500ms
@@ -37,7 +36,6 @@ export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJou
 
   const advance = () => {
     setPhase((p) => {
-      if (p === 'solar') return 'earth'
       if (p === 'earth') return 'location'
       onComplete()
       return 'done'
@@ -49,9 +47,9 @@ export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJou
       onClick={onComplete}
       style={{
         position: 'absolute', top: 16, right: 16,
-        background: 'rgba(99,102,241,0.2)', border: '1px solid #6366f1',
-        color: '#a5b4fc', padding: '8px 16px', borderRadius: 8,
-        cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 14,
+        background: 'rgba(255,107,53,0.15)', border: '1px solid rgba(255,107,53,0.4)',
+        color: 'rgba(253,252,250,0.7)', padding: '8px 16px', borderRadius: 8,
+        cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontSize: 14,
         zIndex: 100,
       }}
     >
@@ -81,8 +79,7 @@ export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJou
         </>
       ) : (
         <>
-          {phase === 'solar' && <SolarSystem onComplete={advance} />}
-          {phase === 'earth' && <EarthZoom onComplete={advance} />}
+          {phase === 'earth' && <EarthZoom lat={lat ?? 51.5} lon={lon ?? -0.1} onComplete={advance} />}
           {phase === 'location' && (
             <LocationReveal
               city={city ?? 'Your City'}

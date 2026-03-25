@@ -60,7 +60,7 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* Section 3 — Proof Bar */}
-      <section style={{ background: '#0A0A0A', padding: '64px 48px' }}>
+      <section style={{ background: '#1C1E26', padding: '64px 48px' }}>
         <div style={{
           maxWidth: '1200px', margin: '0 auto',
           display: 'flex', justifyContent: 'center', gap: '80px', flexWrap: 'wrap'
@@ -72,8 +72,8 @@ export function LandingPage({ onStart }: Props) {
             { num: '100%', label: 'founder-side, always' },
           ].map(({ num, label }) => (
             <div key={num} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', fontWeight: 700, color: '#FFB09A', marginBottom: '8px' }}>{num}</div>
-              <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(107,100,96,0.7)', fontFamily: 'Outfit, sans-serif' }}>{label}</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(36px, 4vw, 52px)', fontWeight: 700, color: '#FDFCFA', marginBottom: '8px' }}>{num}</div>
+              <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(253,252,250,0.5)', fontFamily: 'Outfit, sans-serif' }}>{label}</div>
             </div>
           ))}
         </div>
