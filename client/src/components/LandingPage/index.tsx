@@ -46,7 +46,7 @@ export function LandingPage({ onStart }: Props) {
             }}>they call first.</div>
           </h1>
           <p style={{ fontSize: '18px', color: '#555', lineHeight: 1.7, marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
-            For founders who need things to move — strategy, agencies, mindset, momentum — that person is Baawa.
+            Strategy, agencies, mindset, momentum — whatever's blocking you, we clear it.
           </p>
           <button onClick={onStart} style={{
             background: '#0a0a0a', color: '#fff', border: 'none', cursor: 'pointer',
