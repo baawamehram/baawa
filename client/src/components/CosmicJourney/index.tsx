@@ -491,12 +491,16 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
       <style>{`
         @keyframes scr      { from{transform:translateX(0)} to{transform:translateX(-50%)} }
         @keyframes opulse   {
-          0%,100%{box-shadow:0 0 0 1px rgba(255,107,53,0.15),0 0 40px rgba(255,107,53,0.55),0 0 100px rgba(255,107,53,0.2),0 0 200px rgba(255,107,53,0.08);}
-          50%    {box-shadow:0 0 0 1px rgba(255,107,53,0.2), 0 0 60px rgba(255,107,53,0.75),0 0 140px rgba(255,107,53,0.3),0 0 260px rgba(255,107,53,0.12);}
+          0%,100%{box-shadow:0 0 0 2px rgba(255,107,53,0.2),0 0 60px rgba(255,107,53,0.7),0 0 120px rgba(255,107,53,0.3),0 0 240px rgba(255,107,53,0.12);transform:scale(1);}
+          50%    {box-shadow:0 0 0 3px rgba(255,107,53,0.35),0 0 90px rgba(255,107,53,1),  0 0 180px rgba(255,107,53,0.5),0 0 360px rgba(255,107,53,0.18);transform:scale(1.06);}
         }
         @keyframes opulse2  {
           0%,100%{box-shadow:0 0 60px rgba(255,107,53,0.7),0 0 140px rgba(255,107,53,0.3);}
           50%    {box-shadow:0 0 90px rgba(255,107,53,0.9),0 0 200px rgba(255,107,53,0.45);}
+        }
+        @keyframes orbRadiate {
+          0%   {transform:scale(1);   opacity:0.55;}
+          100% {transform:scale(3.2); opacity:0;}
         }
         @keyframes blink    { 50%{opacity:0} }
         @keyframes liveBlink{ 50%{opacity:0.3} }
@@ -550,18 +554,29 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           transform: 'translate(-50%, calc(-50% - 18px))',
           zIndex: 10, textAlign: 'center',
         }}>
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={handleOrbTap}
-            onKeyDown={e => { if (e.key === 'Enter') handleOrbTap() }}
-            style={{
-              width: 110, height: 110, borderRadius: '50%',
-              background: 'radial-gradient(circle at 36% 32%, #FFAA80, #FF6B35 45%, #B83010)',
-              animation: 'opulse 3.2s ease-in-out infinite',
-              margin: '0 auto', cursor: 'pointer', position: 'relative',
-            }}
-          />
+          {/* Radiating rings */}
+          <div style={{ position: 'relative', width: 160, height: 160, margin: '0 auto' }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                position: 'absolute', inset: 0, borderRadius: '50%',
+                border: '2px solid rgba(255,107,53,0.45)',
+                animation: `orbRadiate 2.4s ease-out ${i * 0.8}s infinite`,
+                pointerEvents: 'none',
+              }} />
+            ))}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={handleOrbTap}
+              onKeyDown={e => { if (e.key === 'Enter') handleOrbTap() }}
+              style={{
+                width: 160, height: 160, borderRadius: '50%',
+                background: 'radial-gradient(circle at 36% 32%, #FFAA80, #FF6B35 45%, #B83010)',
+                animation: 'opulse 2.8s ease-in-out infinite',
+                cursor: 'pointer', position: 'relative',
+              }}
+            />
+          </div>
           <div style={{
             fontFamily: 'Georgia, serif', fontSize: 14, letterSpacing: '0.05em',
             color: 'rgba(253,252,250,0.6)', marginTop: 20, lineHeight: 1.5,
