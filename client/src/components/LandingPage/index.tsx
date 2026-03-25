@@ -1,4 +1,4 @@
-import { useState } from 'react'
+// No state needed — static component
 
 interface Props {
   onStart: () => void
