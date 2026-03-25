@@ -62,10 +62,11 @@ Output ONLY valid JSON in this exact format:
     messages: [{ role: 'user', content: transcript }],
   })
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : ''
+  const raw = response.content[0].type === 'text' ? response.content[0].text : ''
+  const text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
 
   try {
-    const parsed = JSON.parse(text.trim()) as ScoringResult
+    const parsed = JSON.parse(text) as ScoringResult
     if (typeof parsed.score !== 'number' || parsed.score < 0 || parsed.score > 100) {
       throw new Error('Invalid score value')
     }
