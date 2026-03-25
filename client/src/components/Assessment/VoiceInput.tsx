@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVoiceRecorder } from '../../hooks/useVoiceRecorder'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL } from '../../lib/api'
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void

@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { useState, useEffect, useCallback } from 'react'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface KnowledgeSource {
   source_name: string
@@ -20,59 +19,87 @@ export function KnowledgeBase({ token, on401 }: Props) {
   const [uploadName, setUploadName] = useState('')
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
 
-  const fetchSources = () => {
-    fetch(`${API_URL}/api/knowledge`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.status === 401) { on401(); return null }
-        return res.json()
-      })
-      .then((data) => {
-        if (data) setSources(data)
-      })
-      .finally(() => setLoading(false))
-  }
+  const fetchSources = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/knowledge`, token, on401)
+      if (!res) return
+      if (!res.ok) {
+        setError('Failed to load knowledge sources.')
+        return
+      }
+      const data = await res.json()
+      setSources(data)
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setLoading(false)
+    }
+  }, [token, on401])
 
-  useEffect(() => { fetchSources() }, [token, on401])
+  useEffect(() => { fetchSources() }, [fetchSources])
 
   const toggleActive = async (sourceName: string, isActive: boolean) => {
-    const res = await fetch(`${API_URL}/api/knowledge/${encodeURIComponent(sourceName)}`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: !isActive }),
-    })
-    if (res.status === 401) { on401(); return }
-    if (res.ok) fetchSources()
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/knowledge/${encodeURIComponent(sourceName)}`, token, on401, {
+        method: 'PUT',
+        body: JSON.stringify({ is_active: !isActive }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
+      fetchSources()
+    } catch {
+      setError('Network error. Please check your connection.')
+    }
   }
 
   const deleteSource = async (sourceName: string) => {
-    const res = await fetch(`${API_URL}/api/knowledge/${encodeURIComponent(sourceName)}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    if (res.status === 401) { on401(); return }
-    if (res.ok) fetchSources()
+    if (!window.confirm('Delete this knowledge source? This cannot be undone.')) return
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/knowledge/${encodeURIComponent(sourceName)}`, token, on401, {
+        method: 'DELETE',
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
+      fetchSources()
+    } catch {
+      setError('Network error. Please check your connection.')
+    }
   }
 
   const handleUpload = async () => {
     if (!uploadFile || !uploadName.trim()) return
     setUploading(true)
+    setError('')
     const formData = new FormData()
     formData.append('file', uploadFile)
     formData.append('source_name', uploadName)
-    const res = await fetch(`${API_URL}/api/knowledge`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    })
-    if (res.status === 401) { on401(); return }
-    setUploading(false)
-    if (res.ok) {
+    try {
+      const res = await authFetch(`${API_URL}/api/knowledge`, token, on401, {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
       setUploadName('')
       setUploadFile(null)
       fetchSources()
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -81,6 +108,12 @@ export function KnowledgeBase({ token, on401 }: Props) {
   return (
     <div>
       <h2 className="text-2xl font-heading text-white mb-6">Knowledge Base</h2>
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Upload */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">

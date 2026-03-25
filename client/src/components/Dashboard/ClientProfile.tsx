@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface ClientData {
   id: number
@@ -41,17 +40,27 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
     return initial
   })
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSave = async () => {
     setSaving(true)
-    const res = await fetch(`${API_URL}/api/clients/${client.id}`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    if (res.status === 401) { on401(); return }
-    setSaving(false)
-    if (res.ok) onUpdate()
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/clients/${client.id}`, token, on401, {
+        method: 'PUT',
+        body: JSON.stringify(form),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
+      onUpdate()
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -75,6 +84,11 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
           </div>
         ))}
       </div>
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mt-4 font-body text-sm">
+          {error}
+        </div>
+      )}
       <button
         onClick={handleSave}
         disabled={saving}

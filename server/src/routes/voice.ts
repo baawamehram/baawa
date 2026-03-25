@@ -1,11 +1,13 @@
 import { Router, Request, Response } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import multer from 'multer'
-import OpenAI, { toFile } from 'openai'
+import Groq, { toFile } from 'groq-sdk'
 
 const router = Router()
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+function getGroqClient() {
+  return new Groq({ apiKey: process.env.GROQ_API_KEY ?? '' })
+}
 
 const voiceRateLimit = rateLimit({
   windowMs: 60_000,
@@ -43,9 +45,10 @@ router.post(
         type: req.file.mimetype,
       })
 
-      const transcription = await openai.audio.transcriptions.create({
+      const groq = getGroqClient()
+      const transcription = await groq.audio.transcriptions.create({
         file,
-        model: 'whisper-1',
+        model: 'whisper-large-v3-turbo',
       })
 
       return res.json({ transcript: transcription.text })

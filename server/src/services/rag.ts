@@ -1,18 +1,18 @@
 import { db } from '../db/client'
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+function getEmbeddingClient() {
+  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '').getGenerativeModel({ model: 'text-embedding-004' })
+}
 
 export async function retrieveRelevantChunks(
   queryText: string,
   topK = 3
 ): Promise<string[]> {
-  const embeddingRes = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
-    input: queryText,
-  })
-  const embedding = embeddingRes.data[0]?.embedding
-  if (!embedding) throw new Error('Failed to get embedding from OpenAI')
+  const model = getEmbeddingClient()
+  const res = await model.embedContent(queryText)
+  const embedding = res.embedding.values
+  if (!embedding) throw new Error('Failed to get embedding from Google AI')
 
   const result = await db.query<{ content: string }>(
     `SELECT content

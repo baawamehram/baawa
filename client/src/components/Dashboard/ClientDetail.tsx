@@ -3,8 +3,7 @@ import { ClientProfile } from './ClientProfile'
 import { DeliverablesTracker } from './DeliverablesTracker'
 import { ClientNotes } from './ClientNotes'
 import { ActivityFeed } from './ActivityFeed'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface ClientFull {
   id: number
@@ -36,25 +35,38 @@ interface Props {
 export function ClientDetail({ id, token, on401, onBack }: Props) {
   const [client, setClient] = useState<ClientFull | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const fetchClient = useCallback(() => {
-    fetch(`${API_URL}/api/clients/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.status === 401) { on401(); return null }
-        return res.json()
-      })
-      .then((data) => {
-        if (data) setClient(data)
-      })
-      .finally(() => setLoading(false))
+  const fetchClient = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/clients/${id}`, token, on401)
+      if (!res) return
+      if (!res.ok) {
+        setError('Failed to load client.')
+        return
+      }
+      const data = await res.json()
+      setClient(data)
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setLoading(false)
+    }
   }, [id, token, on401])
 
   useEffect(() => { fetchClient() }, [fetchClient])
 
   if (loading) return <p className="text-gray-400 font-body">Loading...</p>
-  if (!client) return <p className="text-gray-400 font-body">Client not found.</p>
+  if (!client) return (
+    <div>
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+          {error}
+        </div>
+      )}
+      <p className="text-gray-400 font-body">Client not found.</p>
+    </div>
+  )
 
   return (
     <div>
@@ -64,6 +76,12 @@ export function ClientDetail({ id, token, on401, onBack }: Props) {
 
       <h2 className="text-2xl font-heading text-white mb-1">{client.founder_name}</h2>
       <p className="text-gray-400 font-body text-sm mb-6">{client.company_name} &middot; {client.stage}</p>
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="space-y-6">
         <ClientProfile client={client} token={token} on401={on401} onUpdate={fetchClient} />

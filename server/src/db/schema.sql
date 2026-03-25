@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS knowledge_chunks (
   id SERIAL PRIMARY KEY,
   content TEXT NOT NULL,
-  embedding vector(1536),
+  embedding vector(768),
   source_name VARCHAR(255) NOT NULL DEFAULT 'default',
   is_active BOOLEAN NOT NULL DEFAULT true,
   chunk_index INT,

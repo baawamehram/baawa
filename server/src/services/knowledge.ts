@@ -1,7 +1,9 @@
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { db } from '../db/client'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+function getEmbeddingClient() {
+  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '').getGenerativeModel({ model: 'text-embedding-004' })
+}
 
 let knowledgeTextCache: string | null = null
 
@@ -35,24 +37,14 @@ export async function ingestMarkdown(
   const chunks = chunkText(markdownText)
   if (chunks.length === 0) return 0
 
-  // Batch embed all chunks (OpenAI supports up to 100 per request)
-  const BATCH_SIZE = 50
+  // Embed all chunks one by one (Google AI embedding API)
+  const model = getEmbeddingClient()
   const allEmbeddings: number[][] = []
-  const totalBatches = Math.ceil(chunks.length / BATCH_SIZE)
 
-  for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
-    const batchNum = Math.floor(b / BATCH_SIZE) + 1
-    console.log(`Embedding batch ${batchNum}/${totalBatches}...`)
-    const batch = chunks.slice(b, b + BATCH_SIZE)
-    const res = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: batch,
-    })
-    const sorted = res.data.sort((a, b) => a.index - b.index)
-    for (const item of sorted) {
-      if (!item.embedding) throw new Error(`Missing embedding at index ${item.index}`)
-      allEmbeddings.push(item.embedding)
-    }
+  for (let i = 0; i < chunks.length; i++) {
+    console.log(`Embedding chunk ${i + 1}/${chunks.length}...`)
+    const res = await model.embedContent(chunks[i])
+    allEmbeddings.push(res.embedding.values)
   }
 
   for (let i = 0; i < chunks.length; i++) {

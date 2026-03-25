@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { API_URL, authFetch } from '../../lib/api'
 
 interface Note {
   id: number
@@ -19,26 +18,40 @@ interface Props {
 export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) {
   const [newNote, setNewNote] = useState('')
   const [adding, setAdding] = useState(false)
+  const [error, setError] = useState('')
 
   const addNote = async () => {
     if (!newNote.trim()) return
     setAdding(true)
-    const res = await fetch(`${API_URL}/api/clients/${clientId}/notes`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: newNote }),
-    })
-    if (res.status === 401) { on401(); return }
-    setAdding(false)
-    if (res.ok) {
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/clients/${clientId}/notes`, token, on401, {
+        method: 'POST',
+        body: JSON.stringify({ content: newNote }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
       setNewNote('')
       onUpdate()
+    } catch {
+      setError('Network error. Please check your connection.')
+    } finally {
+      setAdding(false)
     }
   }
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Notes</h3>
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-4 font-body text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
         {notes.map((note) => (
