@@ -50,16 +50,12 @@ ABSOLUTE RULES:
 7. Otherwise output: {"question": "...", "done": false}
 8. Never output anything except valid JSON in one of these two formats.`
 
-  const messages: Anthropic.MessageParam[] = [
-    ...conversation.map((turn) => ({
-      role: turn.role as 'user' | 'assistant',
-      content: turn.content,
-    })),
-    {
-      role: 'user',
-      content: `Latest answer: "${latestAnswer}"\n\nGenerate the next question.`,
-    },
-  ]
+  const messages: Anthropic.MessageParam[] = conversation.length > 0
+    ? conversation.map((turn) => ({
+        role: turn.role as 'user' | 'assistant',
+        content: turn.content,
+      }))
+    : [{ role: 'user', content: 'Begin the diagnostic interview. Ask your first question.' }]
 
   const response = await anthropic.messages.create({
     model,
