@@ -73,7 +73,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
   return (
     <div
       style={{
-        background: '#0C1220',
+        background: '#0A0A0A',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -93,7 +93,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
           width: '50vw',
           height: '50vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(201,169,98,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -105,7 +105,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
           width: '40vw',
           height: '40vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(184,149,46,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(232,85,32,0.07) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -135,9 +135,9 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                border: '3px solid rgba(201,169,98,0.15)',
-                borderTopColor: '#C9A962',
-                borderRightColor: '#B8952E',
+                border: '3px solid rgba(255,107,53,0.15)',
+                borderTopColor: '#FF6B35',
+                borderRightColor: '#E85520',
               }}
             />
 
@@ -173,7 +173,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                     width: 7,
                     height: 7,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #C9A962, #B8952E)',
+                    background: 'linear-gradient(135deg, #FF6B35, #E85520)',
                   }}
                 />
               ))}
@@ -202,7 +202,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 'clamp(20px, 4vw, 28px)',
-                color: '#F5F3EF',
+                color: '#FDFCFA',
                 margin: '0 0 4px',
                 textAlign: 'center',
                 lineHeight: 1.3,
@@ -218,7 +218,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 15,
-                color: 'rgba(232,213,163,0.65)',
+                color: 'rgba(255,176,154,0.65)',
                 margin: '0 0 24px',
                 textAlign: 'center',
                 lineHeight: 1.6,
@@ -245,7 +245,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   style={{
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: 13,
-                    color: 'rgba(232,213,163,0.6)',
+                    color: 'rgba(255,176,154,0.6)',
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
                   }}
@@ -265,17 +265,17 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   autoComplete="email"
                   disabled={submitting}
                   style={{
-                    background: 'rgba(201,169,98,0.07)',
+                    background: 'rgba(255,107,53,0.07)',
                     border: emailError
                       ? '1.5px solid #ef4444'
                       : focused
-                      ? '1.5px solid #C9A962'
-                      : '1.5px solid rgba(201,169,98,0.3)',
+                      ? '1.5px solid #FF6B35'
+                      : '1.5px solid rgba(255,107,53,0.3)',
                     borderRadius: 10,
                     padding: '13px 16px',
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: 16,
-                    color: '#F5F3EF',
+                    color: '#FDFCFA',
                     outline: 'none',
                     width: '100%',
                     boxSizing: 'border-box',
@@ -327,8 +327,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   borderRadius: 10,
                   border: 'none',
                   background: submitting
-                    ? 'rgba(201,169,98,0.4)'
-                    : 'linear-gradient(135deg, #C9A962, #B8952E)',
+                    ? 'rgba(255,107,53,0.4)'
+                    : 'linear-gradient(135deg, #FF6B35, #E85520)',
                   color: '#fff',
                   fontFamily: 'Outfit, sans-serif',
                   fontSize: 16,

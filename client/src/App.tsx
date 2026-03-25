@@ -38,8 +38,8 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
       onClick={onExit}
       style={{
         position: 'fixed', top: '20px', left: '20px', zIndex: 1000,
-        background: 'rgba(201,169,98,0.12)', backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(201,169,98,0.35)', color: '#fff',
+        background: 'rgba(255,107,53,0.12)', backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,107,53,0.35)', color: '#fff',
         padding: '8px 16px', borderRadius: '6px', cursor: 'pointer',
         fontSize: '13px', fontFamily: 'Outfit, sans-serif',
         display: 'flex', alignItems: 'center', gap: '6px'

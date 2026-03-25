@@ -64,7 +64,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   return (
     <div
       style={{
-        background: 'linear-gradient(180deg, #0C1220 0%, #1A2332 50%, #2A1A4A 100%)',
+        background: 'linear-gradient(180deg, #0A0A0A 0%, #110805 50%, #1A0808 100%)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -81,20 +81,20 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
         top: '50%', left: '50%',
         transform: 'translate(-50%, -60%)',
         width: '500px', height: '500px',
-        background: 'radial-gradient(ellipse at center, rgba(201,169,98,0.07) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse at center, rgba(255,107,53,0.07) 0%, transparent 65%)',
         pointerEvents: 'none',
       }} />
       {/* Corner glows */}
       <div style={{
         position: 'absolute', top: '-20%', left: '-10%',
         width: '50vw', height: '50vw', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(201,169,98,0.06) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       <div style={{
         position: 'absolute', bottom: '-15%', right: '-10%',
         width: '40vw', height: '40vw', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(184,149,46,0.05) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(232,85,32,0.05) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       {/* Floating particles */}
@@ -104,7 +104,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
           width: i % 3 === 0 ? 2 : 1,
           height: i % 3 === 0 ? 2 : 1,
           borderRadius: '50%',
-          background: i % 4 === 0 ? 'rgba(201,169,98,0.4)' : 'rgba(245,243,239,0.2)',
+          background: i % 4 === 0 ? 'rgba(255,107,53,0.4)' : 'rgba(253,252,250,0.2)',
           left: `${(i * 37 + 11) % 95}%`,
           top: `${(i * 53 + 7) % 90}%`,
           animation: `float${i % 3} ${8 + (i % 5) * 2}s ease-in-out infinite`,
@@ -131,7 +131,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               left: 0,
               right: 0,
               height: 3,
-              background: 'rgba(201,169,98,0.15)',
+              background: 'rgba(255,107,53,0.15)',
             }}
           >
             <motion.div
@@ -139,7 +139,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               transition={{ duration: 0.6, ease: 'easeOut' }}
               style={{
                 height: '100%',
-                background: 'linear-gradient(90deg, #C9A962, #B8952E)',
+                background: 'linear-gradient(90deg, #FF6B35, #E85520)',
                 borderRadius: '0 2px 2px 0',
               }}
             />
@@ -183,7 +183,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 'clamp(22px, 4vw, 32px)',
-                color: '#F5F3EF',
+                color: '#FDFCFA',
                 margin: 0,
                 lineHeight: 1.3,
               }}
@@ -199,7 +199,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 15,
-                color: 'rgba(232,213,163,0.7)',
+                color: 'rgba(255,176,154,0.7)',
                 margin: 0,
                 lineHeight: 1.6,
               }}
@@ -218,21 +218,21 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                background: 'rgba(201,169,98,0.08)',
-                border: '1px solid rgba(201,169,98,0.3)',
+                background: 'rgba(255,107,53,0.08)',
+                border: '1px solid rgba(255,107,53,0.3)',
                 borderRadius: 12,
                 padding: '12px 18px',
                 maxWidth: 420,
               }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                <rect x="9" y="2" width="6" height="11" rx="3" fill="#E8D5A3" />
-                <path d="M5 11a7 7 0 0 0 14 0" stroke="#E8D5A3" strokeWidth="2" strokeLinecap="round" />
-                <line x1="12" y1="18" x2="12" y2="22" stroke="#E8D5A3" strokeWidth="2" strokeLinecap="round" />
-                <line x1="9" y1="22" x2="15" y2="22" stroke="#E8D5A3" strokeWidth="2" strokeLinecap="round" />
+                <rect x="9" y="2" width="6" height="11" rx="3" fill="#FFB09A" />
+                <path d="M5 11a7 7 0 0 0 14 0" stroke="#FFB09A" strokeWidth="2" strokeLinecap="round" />
+                <line x1="12" y1="18" x2="12" y2="22" stroke="#FFB09A" strokeWidth="2" strokeLinecap="round" />
+                <line x1="9" y1="22" x2="15" y2="22" stroke="#FFB09A" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: 'rgba(232,213,163,0.85)', lineHeight: 1.5 }}>
-                <strong style={{ color: '#E8D5A3' }}>Speak your answers</strong> — it's faster and captures more.
+              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: 'rgba(255,176,154,0.85)', lineHeight: 1.5 }}>
+                <strong style={{ color: '#FFB09A' }}>Speak your answers</strong> — it's faster and captures more.
                 Hit the mic button below each question.
               </span>
             </motion.div>
@@ -244,7 +244,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 12,
-                color: 'rgba(232,213,163,0.4)',
+                color: 'rgba(255,176,154,0.4)',
                 letterSpacing: '0.08em',
               }}
             >
@@ -279,7 +279,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 style={{
                   fontFamily: 'Outfit, sans-serif',
                   fontSize: 12,
-                  color: 'rgba(232,213,163,0.45)',
+                  color: 'rgba(255,176,154,0.45)',
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                 }}
@@ -329,7 +329,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 style={{
                   fontFamily: 'Outfit, sans-serif',
                   fontSize: 18,
-                  color: 'rgba(232,213,163,0.6)',
+                  color: 'rgba(255,176,154,0.6)',
                   margin: 0,
                 }}
               >

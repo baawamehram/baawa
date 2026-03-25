@@ -64,8 +64,8 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
           width: 48,
           height: 48,
           borderRadius: '50%',
-          border: `2px solid ${isRecording ? '#E8D5A3' : '#C9A962'}`,
-          background: isRecording ? 'rgba(232,213,163,0.2)' : 'rgba(201,169,98,0.12)',
+          border: `2px solid ${isRecording ? '#FFB09A' : '#FF6B35'}`,
+          background: isRecording ? 'rgba(255,176,154,0.2)' : 'rgba(255,107,53,0.12)',
           cursor: disabled ? 'not-allowed' : 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -87,7 +87,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
                 position: 'absolute',
                 inset: 0,
                 borderRadius: '50%',
-                border: '2px solid #C9A962',
+                border: '2px solid #FF6B35',
                 pointerEvents: 'none',
               }}
             />
@@ -102,11 +102,11 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
             width="6"
             height="11"
             rx="3"
-            fill={isRecording ? '#C9A962' : '#E8D5A3'}
+            fill={isRecording ? '#FF6B35' : '#FFB09A'}
           />
           <path
             d="M5 11a7 7 0 0 0 14 0"
-            stroke={isRecording ? '#C9A962' : '#E8D5A3'}
+            stroke={isRecording ? '#FF6B35' : '#FFB09A'}
             strokeWidth="2"
             strokeLinecap="round"
           />
@@ -115,7 +115,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
             y1="18"
             x2="12"
             y2="22"
-            stroke={isRecording ? '#C9A962' : '#E8D5A3'}
+            stroke={isRecording ? '#FF6B35' : '#FFB09A'}
             strokeWidth="2"
             strokeLinecap="round"
           />
@@ -124,7 +124,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
             y1="22"
             x2="15"
             y2="22"
-            stroke={isRecording ? '#C9A962' : '#E8D5A3'}
+            stroke={isRecording ? '#FF6B35' : '#FFB09A'}
             strokeWidth="2"
             strokeLinecap="round"
           />
@@ -148,7 +148,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
           initial={{ opacity: 0 }}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.2, repeat: Infinity }}
-          style={{ fontSize: 11, color: '#C9A962', fontFamily: 'Outfit, sans-serif' }}
+          style={{ fontSize: 11, color: '#FF6B35', fontFamily: 'Outfit, sans-serif' }}
         >
           Recording… tap to stop
         </motion.span>

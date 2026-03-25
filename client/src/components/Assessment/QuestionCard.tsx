@@ -55,7 +55,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: 'clamp(18px, 3vw, 24px)',
-            color: '#F5F3EF',
+            color: '#FDFCFA',
             lineHeight: 1.55,
             margin: 0,
             textAlign: 'center',
@@ -81,10 +81,10 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
             style={{
               width: '100%',
               boxSizing: 'border-box',
-              background: 'rgba(201,169,98,0.06)',
-              border: '1px solid rgba(201,169,98,0.3)',
+              background: 'rgba(255,107,53,0.06)',
+              border: '1px solid rgba(255,107,53,0.3)',
               borderRadius: 12,
-              color: '#F5F3EF',
+              color: '#FDFCFA',
               fontFamily: 'Outfit, sans-serif',
               fontSize: 15,
               lineHeight: 1.6,
@@ -94,10 +94,10 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
               transition: 'border-color 0.2s',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#C9A962'
+              e.currentTarget.style.borderColor = '#FF6B35'
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201,169,98,0.3)'
+              e.currentTarget.style.borderColor = 'rgba(255,107,53,0.3)'
             }}
           />
 
@@ -110,7 +110,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
             />
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 12, color: 'rgba(232,213,163,0.5)', fontFamily: 'Outfit, sans-serif' }}>
+              <span style={{ fontSize: 12, color: 'rgba(255,176,154,0.5)', fontFamily: 'Outfit, sans-serif' }}>
                 ⌘↵ to send
               </span>
               <motion.button
@@ -121,11 +121,11 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
                 style={{
                   background:
                     !answer.trim() || loading
-                      ? 'rgba(201,169,98,0.2)'
-                      : 'linear-gradient(135deg, #C9A962, #B8952E)',
+                      ? 'rgba(255,107,53,0.2)'
+                      : 'linear-gradient(135deg, #FF6B35, #E85520)',
                   border: 'none',
                   borderRadius: 10,
-                  color: !answer.trim() || loading ? 'rgba(232,213,163,0.4)' : '#0C1220',
+                  color: !answer.trim() || loading ? 'rgba(255,176,154,0.4)' : '#0A0A0A',
                   fontFamily: 'Outfit, sans-serif',
                   fontSize: 14,
                   fontWeight: 600,
