@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baawa — Landing Page Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #fafaf8;
+    color: #0a0a0a;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .wordmark {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #0a0a0a;
+  }
+
+  .nav-cta {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: #0a0a0a;
+    padding: 10px 22px;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6366f1;
+    margin-bottom: 28px;
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: #0a0a0a;
+    margin-bottom: 28px;
+    max-width: 900px;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: #6366f1;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    font-weight: 400;
+    color: #555;
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: #0a0a0a;
+    padding: 18px 36px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .hero-cta:hover { background: #6366f1; }
+
+  .hero-note {
+    margin-top: 16px;
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 0.02em;
+  }
+
+  /* PROOF BAR */
+  .proof-bar {
+    background: #0a0a0a;
+    color: #fff;
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 64px;
+  }
+
+  .proof-item {
+    text-align: center;
+  }
+
+  .proof-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #a5b4fc;
+  }
+
+  .proof-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  /* SECTION BASE */
+  section {
+    padding: 100px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6366f1;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: #0a0a0a;
+    margin-bottom: 20px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: #666;
+    max-width: 540px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+  }
+
+  /* PROBLEM SECTION */
+  .problem-section {
+    background: #0a0a0a;
+    max-width: 100%;
+    padding: 100px 48px;
+  }
+
+  .problem-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .problem-section .section-title { color: #fff; }
+  .problem-section .section-label { color: #6366f1; }
+  .problem-section .section-sub { color: #888; }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: #1a1a1a;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .problem-card {
+    background: #0f0f0f;
+    padding: 40px 32px;
+  }
+
+  .problem-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: #1e1e2e;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+
+  .problem-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .problem-body {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+  }
+
+  /* SERVICES */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .service-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 40px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .service-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.08);
+  }
+
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    background: #f0f0ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .service-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin-bottom: 10px;
+  }
+
+  .service-body {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    background: #fafaf8;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    max-width: 100%;
+    padding: 100px 48px;
+  }
+
+  .how-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+    margin-top: 60px;
+  }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: #e5e5e5;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .step-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin-bottom: 10px;
+  }
+
+  .step-body {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+  }
+
+  /* WHO IT'S FOR */
+  .for-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .for-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .for-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  .for-list li::before {
+    content: '✓';
+    color: #6366f1;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .for-not {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid #eee;
+  }
+
+  .for-not-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+  }
+
+  .for-not p {
+    font-size: 14px;
+    color: #999;
+    line-height: 1.7;
+  }
+
+  .for-quote {
+    background: #0a0a0a;
+    border-radius: 16px;
+    padding: 48px;
+    color: #fff;
+  }
+
+  .for-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-style: italic;
+    line-height: 1.5;
+    color: #e0e7ff;
+    margin-bottom: 24px;
+  }
+
+  .for-quote cite {
+    font-size: 13px;
+    color: #666;
+    font-style: normal;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* FINAL CTA */
+  .final-cta {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1040 100%);
+    max-width: 100%;
+    padding: 120px 48px;
+    text-align: center;
+  }
+
+  .final-cta-inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .final-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+  }
+
+  .final-cta h2 em {
+    color: #a5b4fc;
+    font-style: italic;
+  }
+
+  .final-cta p {
+    font-size: 17px;
+    color: #888;
+    margin-bottom: 48px;
+    line-height: 1.7;
+  }
+
+  .final-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a0a0a;
+    background: #fff;
+    padding: 20px 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .final-note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #444;
+    letter-spacing: 0.05em;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #0a0a0a;
+    padding: 32px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #1a1a1a;
+  }
+
+  footer .wordmark { color: #fff; font-size: 18px; }
+  footer p { font-size: 12px; color: #444; }
+
+  .divider {
+    width: 48px;
+    height: 2px;
+    background: #6366f1;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wordmark">Baawa</div>
+  <button class="nav-cta">Apply to work with us</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Marketing Intelligence for Founders</div>
+  <h1 class="hero-headline">The advisor<br/><em>agencies fear.</em></h1>
+  <p class="hero-sub">We sit between you and every agency you'll ever hire — structuring mandates, writing airtight contracts, and holding them accountable for results.</p>
+  <a href="#" class="hero-cta">
+    Apply to work with us
+    <span>→</span>
+  </a>
+  <p class="hero-note">Selective intake · Assessment required</p>
+</div>
+
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-item">
+    <div class="proof-num">94%</div>
+    <div class="proof-label">of founders waste agency budget</div>
+  </div>
+  <div class="proof-item">
+    <div class="proof-num">£0</div>
+    <div class="proof-label">in hidden retainer fees</div>
+  </div>
+  <div class="proof-item">
+    <div class="proof-num">48h</div>
+    <div class="proof-label">to your first strategic insight</div>
+  </div>
+  <div class="proof-item">
+    <div class="proof-num">100%</div>
+    <div class="proof-label">founder-side, always</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<div class="problem-section">
+  <div class="problem-inner">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title" style="color:#fff;max-width:600px;margin-bottom:16px">Agencies aren't broken.<br/>The relationship is.</h2>
+    <p class="section-sub">You hired an agency. You got decks, calls, and vague metrics. Here's what actually went wrong.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <div class="problem-title">No clear mandate</div>
+        <div class="problem-body">You told them what you wanted. They heard what they could sell you. Nobody wrote it down properly. Nobody was held to it.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <div class="problem-title">Wrong agency, wrong stage</div>
+        <div class="problem-body">You were matched by a referral or a Google search. The agency was great — for someone else's business, at a different stage.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <div class="problem-title">No one held them accountable</div>
+        <div class="problem-body">When results didn't come, they moved the goalposts. You didn't have the language, the contract, or the leverage to push back.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section>
+  <div class="section-label">What We Do</div>
+  <h2 class="section-title">We fix the relationship<br/>between founders and agencies.</h2>
+  <p class="section-sub">Four things. Done properly. For founders who are serious about growth.</p>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">📋</div>
+      <div class="service-title">Structure the mandate</div>
+      <div class="service-body">Before you hire anyone, we define exactly what success looks like — in writing, with metrics, with teeth. No more "brand awareness" as a KPI.</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">⚖️</div>
+      <div class="service-title">Write airtight contracts</div>
+      <div class="service-body">Agency contracts are written by agencies, for agencies. We rewrite the power balance so you're protected from day one.</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🎯</div>
+      <div class="service-title">Hold them accountable</div>
+      <div class="service-body">Monthly reviews. Hard questions. We sit in the room with you and make sure the agency delivers — or you know exactly when to walk away.</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🔍</div>
+      <div class="service-title">Match you with the right agency</div>
+      <div class="service-body">We've seen hundreds of agencies. We know who's right for your stage, your industry, your budget. No more expensive trial and error.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="how-inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Three steps.<br/>No fluff.</h2>
+    <div class="steps">
+      <div>
+        <div class="step-num">01</div>
+        <div class="step-title">You apply</div>
+        <div class="step-body">We run every founder through a deep diagnostic assessment. Not to gatekeep — to understand exactly where you are and what you actually need.</div>
+      </div>
+      <div>
+        <div class="step-num">02</div>
+        <div class="step-body"></div>
+        <div class="step-title">We assess</div>
+        <div class="step-body">Our AI-powered interview asks the questions your last agency never did. Brutal, precise, and honest. You'll see your business differently by the end of it.</div>
+      </div>
+      <div>
+        <div class="step-num">03</div>
+        <div class="step-title">We go to work</div>
+        <div class="step-body">If we're the right fit, we onboard you and get to work immediately. Your first strategic insight within 48 hours.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHO IT'S FOR -->
+<section>
+  <div class="for-section">
+    <div>
+      <div class="section-label">Who This Is For</div>
+      <h2 class="section-title">Founders who are done<br/>being disappointed.</h2>
+      <div class="divider"></div>
+      <ul class="for-list">
+        <li>You've hired at least one agency and felt like you wasted money</li>
+        <li>You have a real business with real revenue — you're not experimenting</li>
+        <li>You want someone on your side who understands agencies from the inside</li>
+        <li>You're ready to be challenged, not just reassured</li>
+        <li>You want growth that's measurable, not just visible</li>
+      </ul>
+      <div class="for-not">
+        <div class="for-not-label">Not for everyone</div>
+        <p>If you're looking for someone to validate a bad strategy or manage your social media, we're not the right fit. We work with founders who want the truth.</p>
+      </div>
+    </div>
+    <div class="for-quote">
+      <blockquote>"The agency had great case studies. But nobody asked whether I was ready for what they were selling."</blockquote>
+      <cite>— The founder we built Baawa for</cite>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+  <div class="final-cta-inner">
+    <h2>Ready to find out<br/><em>where you actually stand?</em></h2>
+    <p>Take the assessment. It takes 10–15 minutes. It will be the most honest conversation you've had about your business.</p>
+    <a href="#" class="final-btn">
+      Begin your assessment →
+    </a>
+    <p class="final-note">SELECTIVE INTAKE · ASSESSMENT REQUIRED · NO SALES CALLS</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wordmark">Baawa</div>
+  <p>© 2026 Baawa. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

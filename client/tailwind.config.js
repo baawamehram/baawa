@@ -3,14 +3,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        'space-bg': '#0a0a0f',
-        'brand-indigo': '#6366f1',
-        'brand-violet': '#8b5cf6',
+        'deep-navy': '#0C1220',
+        'slate': '#1A2332',
+        'antique-gold': '#C9A962',
+        'warm-white': '#F5F3EF',
+        'stone': '#8B8680',
       },
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
-        display: ["'Playfair Display'", 'serif'],
+        display: ["'Cormorant Garamond'", 'serif'],
+        body: ['Outfit', 'sans-serif'],
       },
     },
   },
