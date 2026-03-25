@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from '../../hooks/useSession'
-import { GenieCharacter } from './GenieCharacter'
+import { GoldenOrb } from './GoldenOrb'
 import { QuestionCard } from './QuestionCard'
-import type { GenieState } from './GenieCharacter'
 
 interface AssessmentShellProps {
   onComplete: (sessionId: string) => void
@@ -53,19 +52,19 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
     await submitAnswer(answer)
   }
 
-  const genieState: GenieState = isRecording
+  const orbState = isRecording
     ? 'listening'
-    : impressed
-      ? 'impressed'
-      : state.loading
-        ? 'thinking'
+    : state.loading
+      ? 'processing'
+      : impressed
+        ? 'settled'
         : 'idle'
   const progress = Math.min(state.questionCount / MAX_QUESTIONS, 1)
 
   return (
     <div
       style={{
-        background: '#0a0a0f',
+        background: 'linear-gradient(180deg, #0a1428 0%, #1a1040 50%, #2a1a4a 100%)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -76,31 +75,48 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
         overflow: 'hidden',
       }}
     >
-      {/* Background gradient blobs */}
-      <div
-        style={{
+      {/* Radial golden glow behind where orb sits */}
+      <div style={{
+        position: 'absolute',
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -60%)',
+        width: '500px', height: '500px',
+        background: 'radial-gradient(ellipse at center, rgba(255,215,0,0.07) 0%, transparent 65%)',
+        pointerEvents: 'none',
+      }} />
+      {/* Deep indigo corner glows */}
+      <div style={{
+        position: 'absolute', top: '-20%', left: '-10%',
+        width: '50vw', height: '50vw', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-15%', right: '-10%',
+        width: '40vw', height: '40vw', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      {/* Floating particles */}
+      {Array.from({ length: 24 }).map((_, i) => (
+        <div key={i} style={{
           position: 'absolute',
-          top: '-20%',
-          left: '-10%',
-          width: '50vw',
-          height: '50vw',
+          width: i % 3 === 0 ? 2 : 1,
+          height: i % 3 === 0 ? 2 : 1,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)',
+          background: i % 4 === 0 ? 'rgba(255,215,0,0.4)' : 'rgba(165,180,252,0.3)',
+          left: `${(i * 37 + 11) % 95}%`,
+          top: `${(i * 53 + 7) % 90}%`,
+          animation: `float${i % 3} ${8 + (i % 5) * 2}s ease-in-out infinite`,
+          animationDelay: `${i * 0.4}s`,
           pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '-15%',
-          right: '-10%',
-          width: '40vw',
-          height: '40vw',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }}
-      />
+        }} />
+      ))}
+      <style>{`
+        @keyframes float0 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-12px)} }
+        @keyframes float1 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-18px)} }
+        @keyframes float2 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-8px)} }
+      `}</style>
 
       {/* Progress bar */}
       <AnimatePresence>
@@ -159,7 +175,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               gap: 20,
             }}
           >
-            <GenieCharacter state="idle" />
+            <GoldenOrb state="idle" />
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -251,8 +267,8 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               gap: 32,
             }}
           >
-            {/* Genie */}
-            <GenieCharacter state={genieState} />
+            {/* Golden Orb */}
+            <GoldenOrb state={orbState} />
 
             {/* Question counter */}
             {state.questionCount > 0 && (
