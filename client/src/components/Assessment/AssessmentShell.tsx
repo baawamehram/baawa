@@ -8,30 +8,19 @@ interface AssessmentShellProps {
   onComplete: (sessionId: string) => void
 }
 
-type Phase = 'intro' | 'assessment'
-
 const MAX_QUESTIONS = 25
 
 export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   const { state, startSession, submitAnswer } = useSession()
-  const [phase, setPhase] = useState<Phase>('intro')
   const [isRecording, setIsRecording] = useState(false)
   const [impressed, setImpressed] = useState(false)
 
-  // Auto-advance intro after 6s (or user taps to skip)
+  // Start session immediately on mount — orbital intro already handled the intro UX
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setPhase('assessment')
-    }, 6000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Start session once intro is done
-  useEffect(() => {
-    if (phase === 'assessment' && !state.sessionId && !state.loading) {
+    if (!state.sessionId && !state.loading) {
       void startSession()
     }
-  }, [phase, state.sessionId, state.loading, startSession])
+  }, [state.sessionId, state.loading, startSession])
 
   // Watch for done flag
   useEffect(() => {
@@ -120,7 +109,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
 
       {/* Progress bar */}
       <AnimatePresence>
-        {phase === 'assessment' && state.questionCount > 0 && (
+        {state.questionCount > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -147,146 +136,43 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
         )}
       </AnimatePresence>
 
-      {/* Intro screen */}
-      <AnimatePresence mode="wait">
-        {phase === 'intro' ? (
-          <motion.div
-            key="intro"
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 0.5 }}
-            onClick={() => setPhase('assessment')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setPhase('assessment')
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            style={{
-              textAlign: 'center',
-              cursor: 'pointer',
-              maxWidth: 520,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 20,
-            }}
-          >
-            <GoldenOrb state="idle" />
-            <motion.h1
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              style={{
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: 'clamp(22px, 4vw, 32px)',
-                color: '#FDFCFA',
-                margin: 0,
-                lineHeight: 1.3,
-              }}
-            >
-              This is not a form.
-              <br />
-              This is a conversation.
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              style={{
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: 15,
-                color: 'rgba(255,176,154,0.7)',
-                margin: 0,
-                lineHeight: 1.6,
-              }}
-            >
-              Answer honestly. There are no wrong answers.
-              <br />
-              The more you share, the better we can help.
-            </motion.p>
+      {/* Assessment */}
+      <AnimatePresence>
+        <motion.div
+          key="assessment"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{
+            width: '100%',
+            maxWidth: 680,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 32,
+          }}
+        >
+          {/* Golden Orb */}
+          <GoldenOrb state={orbState} />
 
-            {/* Voice prompt */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                background: 'rgba(255,107,53,0.08)',
-                border: '1px solid rgba(255,107,53,0.3)',
-                borderRadius: 12,
-                padding: '12px 18px',
-                maxWidth: 420,
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                <rect x="9" y="2" width="6" height="11" rx="3" fill="#FFB09A" />
-                <path d="M5 11a7 7 0 0 0 14 0" stroke="#FFB09A" strokeWidth="2" strokeLinecap="round" />
-                <line x1="12" y1="18" x2="12" y2="22" stroke="#FFB09A" strokeWidth="2" strokeLinecap="round" />
-                <line x1="9" y1="22" x2="15" y2="22" stroke="#FFB09A" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: 'rgba(255,176,154,0.85)', lineHeight: 1.5 }}>
-                <strong style={{ color: '#FFB09A' }}>Speak your answers</strong> — it's faster and captures more.
-                Hit the mic button below each question.
-              </span>
-            </motion.div>
-
+          {/* Question counter */}
+          {state.questionCount > 0 && (
             <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.4, 0.8, 0.4] }}
-              transition={{ delay: 1.2, duration: 1.5, repeat: Infinity }}
+              key={state.questionCount}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 12,
-                color: 'rgba(255,176,154,0.4)',
-                letterSpacing: '0.08em',
+                color: 'rgba(255,176,154,0.45)',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
               }}
             >
-              tap anywhere to begin
+              Question {state.questionCount}
             </motion.span>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="assessment"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            style={{
-              width: '100%',
-              maxWidth: 680,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 32,
-            }}
-          >
-            {/* Golden Orb */}
-            <GoldenOrb state={orbState} />
-
-            {/* Question counter */}
-            {state.questionCount > 0 && (
-              <motion.span
-                key={state.questionCount}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: 12,
-                  color: 'rgba(255,176,154,0.45)',
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Question {state.questionCount}
-              </motion.span>
-            )}
+          )}
 
             {/* Loading / Error / Question */}
             {state.error && (
@@ -347,7 +233,6 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               />
             )}
           </motion.div>
-        )}
       </AnimatePresence>
     </div>
   )
