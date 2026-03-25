@@ -50,18 +50,12 @@ ABSOLUTE RULES:
 7. Otherwise output: {"question": "...", "done": false}
 8. Never output anything except valid JSON in one of these two formats.`
 
-  const baseMessages: Anthropic.MessageParam[] = conversation.length > 0
+  const messages: Anthropic.MessageParam[] = conversation.length > 0
     ? conversation.map((turn) => ({
         role: turn.role as 'user' | 'assistant',
         content: turn.content,
       }))
     : [{ role: 'user', content: 'Begin the diagnostic interview.' }]
-
-  // Prefill assistant response with '{' to force JSON output
-  const messages: Anthropic.MessageParam[] = [
-    ...baseMessages,
-    { role: 'assistant', content: '{' },
-  ]
 
   const response = await anthropic.messages.create({
     model,
@@ -71,7 +65,8 @@ ABSOLUTE RULES:
   })
 
   const raw = response.content[0].type === 'text' ? response.content[0].text : ''
-  const text = '{' + raw.trim()
+  // Strip markdown fences if present
+  const text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
 
   try {
     const parsed = JSON.parse(text) as { done: boolean; question?: string }
@@ -81,9 +76,12 @@ ABSOLUTE RULES:
     }
     throw new Error('Unexpected JSON structure')
   } catch {
-    // If Claude fails to return valid JSON, extract a question as fallback
+    // Fallback: extract question from anywhere in the text
     const match = text.match(/"question"\s*:\s*"([^"]+)"/)
     if (match) return { question: match[1], done: false }
+    // Last resort: if the whole response looks like a plain question, use it
+    const plain = text.replace(/[{}"\n]/g, '').trim()
+    if (plain.length > 10 && plain.endsWith('?')) return { question: plain, done: false }
     throw new Error(`Failed to parse question response: ${text}`)
   }
 }
