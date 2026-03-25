@@ -12,6 +12,7 @@ import voiceRouter from './routes/voice'
 import geoRouter from './routes/geo'
 
 const app = express()
+app.set('trust proxy', 1)
 
 // Middleware
 const CLIENT_URL = process.env.CLIENT_URL
