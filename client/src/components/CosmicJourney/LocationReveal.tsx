@@ -1,7 +1,15 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { motion } from 'framer-motion'
+
+const WELCOME_MESSAGES = [
+  "Let's get you to great heights.",
+  "Something great starts right here.",
+  "This is where things start moving.",
+  "Your breakthrough begins now.",
+  "Time to find out what you're truly capable of.",
+]
 
 interface Props {
   city: string
@@ -13,6 +21,7 @@ interface Props {
 
 export function LocationReveal({ city, country, lat, lon, onComplete }: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
+  const [message] = useState(() => WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)])
 
   useEffect(() => {
     const container = mapRef.current
@@ -78,8 +87,15 @@ export function LocationReveal({ city, country, lat, lon, onComplete }: Props) {
           fontFamily: 'Space Grotesk, sans-serif',
         }}
       >
-        <div style={{ fontSize: 28, fontWeight: 700 }}>Hey {city} 👋</div>
-        <div style={{ fontSize: 16, color: '#a5b4fc', marginTop: 4 }}>{country}</div>
+        <div style={{ fontSize: 13, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: 8 }}>
+          {city}{country ? `, ${country}` : ''}
+        </div>
+        <div style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, fontFamily: "'Playfair Display', serif", color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>
+          {message}
+        </div>
+        <div style={{ fontSize: 14, color: 'rgba(165,180,252,0.6)', fontFamily: 'Inter, sans-serif' }}>
+          Your assessment is ready.
+        </div>
       </motion.div>
     </div>
   )

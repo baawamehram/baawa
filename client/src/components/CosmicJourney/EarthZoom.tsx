@@ -26,14 +26,20 @@ export function EarthZoom({ onComplete }: Props) {
     starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
     scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.3 })))
 
-    // Earth
+    // Earth with real texture
+    const textureLoader = new THREE.TextureLoader()
+    const earthTexture = textureLoader.load(
+      'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg'
+    )
     const earth = new THREE.Mesh(
       new THREE.SphereGeometry(10, 64, 64),
-      new THREE.MeshPhongMaterial({ color: 0x2244aa, specular: 0x112244, shininess: 25 })
+      new THREE.MeshPhongMaterial({ map: earthTexture, specular: 0x112244, shininess: 30 })
     )
     scene.add(earth)
-    scene.add(new THREE.AmbientLight(0x404040))
-    scene.add(new THREE.DirectionalLight(0xffffff, 1))
+    scene.add(new THREE.AmbientLight(0x888888))
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2)
+    sun.position.set(5, 3, 5)
+    scene.add(sun)
 
     // Atmosphere glow
     const atmosphere = new THREE.Mesh(

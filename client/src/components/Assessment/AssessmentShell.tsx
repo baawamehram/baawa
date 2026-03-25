@@ -19,11 +19,11 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   const [isRecording, setIsRecording] = useState(false)
   const [impressed, setImpressed] = useState(false)
 
-  // Auto-advance intro after 2s
+  // Auto-advance intro after 6s (or user taps to skip)
   useEffect(() => {
     const timer = setTimeout(() => {
       setPhase('assessment')
-    }, 2000)
+    }, 6000)
     return () => clearTimeout(timer)
   }, [])
 
@@ -192,10 +192,39 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               <br />
               The more you share, the better we can help.
             </motion.p>
+
+            {/* Voice prompt */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                background: 'rgba(99,102,241,0.1)',
+                border: '1px solid rgba(99,102,241,0.3)',
+                borderRadius: 12,
+                padding: '12px 18px',
+                maxWidth: 420,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                <rect x="9" y="2" width="6" height="11" rx="3" fill="#a5b4fc" />
+                <path d="M5 11a7 7 0 0 0 14 0" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" />
+                <line x1="12" y1="18" x2="12" y2="22" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" />
+                <line x1="9" y1="22" x2="15" y2="22" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(165,180,252,0.85)', lineHeight: 1.5 }}>
+                <strong style={{ color: '#a5b4fc' }}>Speak your answers</strong> — it's faster and captures more.
+                Hit the mic button below each question.
+              </span>
+            </motion.div>
+
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: [0.4, 0.8, 0.4] }}
-              transition={{ delay: 1, duration: 1.5, repeat: Infinity }}
+              transition={{ delay: 1.2, duration: 1.5, repeat: Infinity }}
               style={{
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 12,
