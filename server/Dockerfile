@@ -10,5 +10,6 @@ WORKDIR /app
 COPY server/package.json ./
 RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
+COPY server/src/db/schema.sql ./dist/src/db/schema.sql
 EXPOSE 3001
 CMD ["node", "dist/src/index.js"]
