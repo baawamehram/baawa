@@ -13,7 +13,7 @@ export function ThankYou() {
       particleCount: 120,
       spread: 80,
       origin: { y: 0.55 },
-      colors: ['#6366f1', '#8b5cf6', '#a5b4fc', '#c4b5fd', '#e0e7ff', '#ffffff'],
+      colors: ['#C9A962', '#B8952E', '#E8D5A3', '#c4b5fd', '#F5F3EF', '#ffffff'],
       ticks: 200,
       gravity: 0.9,
       scalar: 1.1,
@@ -25,7 +25,7 @@ export function ThankYou() {
         particleCount: 60,
         spread: 50,
         origin: { x: 0.25, y: 0.6 },
-        colors: ['#6366f1', '#8b5cf6', '#a5b4fc'],
+        colors: ['#C9A962', '#B8952E', '#E8D5A3'],
         ticks: 160,
         gravity: 1,
       })
@@ -33,7 +33,7 @@ export function ThankYou() {
         particleCount: 60,
         spread: 50,
         origin: { x: 0.75, y: 0.6 },
-        colors: ['#6366f1', '#8b5cf6', '#a5b4fc'],
+        colors: ['#C9A962', '#B8952E', '#E8D5A3'],
         ticks: 160,
         gravity: 1,
       })
@@ -48,7 +48,7 @@ export function ThankYou() {
   return (
     <div
       style={{
-        background: '#0a0a0f',
+        background: '#0C1220',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -68,7 +68,7 @@ export function ThankYou() {
           width: '55vw',
           height: '55vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(201,169,98,0.1) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -80,7 +80,7 @@ export function ThankYou() {
           width: '45vw',
           height: '45vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.09) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(184,149,46,0.09) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -94,7 +94,7 @@ export function ThankYou() {
           width: '60vw',
           height: '60vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 65%)',
+          background: 'radial-gradient(circle, rgba(201,169,98,0.04) 0%, transparent 65%)',
           pointerEvents: 'none',
         }}
       />
@@ -123,8 +123,8 @@ export function ThankYou() {
             width: 64,
             height: 64,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.25))',
-            border: '1.5px solid rgba(99,102,241,0.35)',
+            background: 'linear-gradient(135deg, rgba(201,169,98,0.2), rgba(184,149,46,0.25))',
+            border: '1.5px solid rgba(201,169,98,0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -140,9 +140,9 @@ export function ThankYou() {
           animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
           transition={reducedMotion ? undefined : { delay: 0.25, duration: 0.55 }}
           style={{
-            fontFamily: 'Space Grotesk, sans-serif',
+            fontFamily: 'Outfit, sans-serif',
             fontSize: 'clamp(24px, 5vw, 38px)',
-            color: '#e0e7ff',
+            color: '#F5F3EF',
             margin: 0,
             lineHeight: 1.25,
             letterSpacing: '-0.01em',
@@ -156,9 +156,9 @@ export function ThankYou() {
           animate={reducedMotion ? undefined : { opacity: 1 }}
           transition={reducedMotion ? undefined : { delay: 0.45, duration: 0.55 }}
           style={{
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'Outfit, sans-serif',
             fontSize: 'clamp(15px, 2.5vw, 18px)',
-            color: 'rgba(165,180,252,0.7)',
+            color: 'rgba(232,213,163,0.7)',
             margin: 0,
             lineHeight: 1.65,
           }}
@@ -174,7 +174,7 @@ export function ThankYou() {
           style={{
             width: 48,
             height: 1,
-            background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.45), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(201,169,98,0.45), transparent)',
             margin: '8px 0',
           }}
         />
@@ -185,15 +185,15 @@ export function ThankYou() {
           animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
           transition={reducedMotion ? undefined : { delay: 0.75, duration: 0.55 }}
           style={{
-            fontFamily: 'Space Grotesk, sans-serif',
+            fontFamily: 'Outfit, sans-serif',
             fontSize: 'clamp(14px, 2vw, 17px)',
-            color: 'rgba(165,180,252,0.5)',
+            color: 'rgba(232,213,163,0.5)',
             margin: 0,
             fontStyle: 'italic',
             lineHeight: 1.6,
             maxWidth: 420,
             padding: '16px 20px',
-            borderLeft: '2px solid rgba(99,102,241,0.3)',
+            borderLeft: '2px solid rgba(201,169,98,0.3)',
             textAlign: 'left',
           }}
         >

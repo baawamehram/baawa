@@ -44,15 +44,15 @@ export function LocationReveal({ city, country, lat, lon, onComplete }: Props) {
       className: '',
       html: `<div style="
         width:20px;height:20px;
-        background:#6366f1;border-radius:50%;
-        box-shadow:0 0 0 0 rgba(99,102,241,0.7);
+        background:#C9A962;border-radius:50%;
+        box-shadow:0 0 0 0 rgba(201,169,98,0.7);
         animation:pulse 1.5s infinite;
       "></div>
       <style>
         @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(99,102,241,0.7); }
-          70% { box-shadow: 0 0 0 15px rgba(99,102,241,0); }
-          100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+          0% { box-shadow: 0 0 0 0 rgba(201,169,98,0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(201,169,98,0); }
+          100% { box-shadow: 0 0 0 0 rgba(201,169,98,0); }
         }
       </style>`,
       iconSize: [20, 20],
@@ -79,21 +79,21 @@ export function LocationReveal({ city, country, lat, lon, onComplete }: Props) {
         style={{
           position: 'absolute', bottom: 80, left: '50%',
           transform: 'translateX(-50%)',
-          background: 'rgba(10,10,15,0.85)',
-          border: '1px solid rgba(99,102,241,0.5)',
+          background: 'rgba(12,18,32,0.9)',
+          border: '1px solid rgba(201,169,98,0.4)',
           borderRadius: 16, padding: '20px 32px',
           textAlign: 'center', backdropFilter: 'blur(10px)',
           color: '#fff',
-          fontFamily: 'Space Grotesk, sans-serif',
+          fontFamily: 'Outfit, sans-serif',
         }}
       >
-        <div style={{ fontSize: 13, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: 8 }}>
+        <div style={{ fontSize: 13, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: 8 }}>
           {city}{country ? `, ${country}` : ''}
         </div>
-        <div style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, fontFamily: "'Playfair Display', serif", color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>
+        <div style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif", color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>
           {message}
         </div>
-        <div style={{ fontSize: 14, color: 'rgba(165,180,252,0.6)', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ fontSize: 14, color: 'rgba(232,213,163,0.6)', fontFamily: 'Outfit, sans-serif' }}>
           Your assessment is ready.
         </div>
       </motion.div>
