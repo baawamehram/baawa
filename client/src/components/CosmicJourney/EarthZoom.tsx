@@ -67,18 +67,21 @@ export function EarthZoom({ lat, lon, onComplete }: Props) {
     })
     scene.add(new THREE.Mesh(new THREE.SphereGeometry(11, 32, 32), atmBlue))
 
-    // Location marker: small glowing sphere at user's lat/lon
+    // Radians
     const latR = lat * Math.PI / 180
     const lonR = lon * Math.PI / 180
+
+    // Location marker in Three.js SphereGeometry local coords:
+    // x = cos(lon)*cos(lat), y = sin(lat), z = -sin(lon)*cos(lat)
     const markerPos = new THREE.Vector3(
-      10.3 * Math.cos(latR) * Math.sin(lonR),
+      10.3 * Math.cos(lonR) * Math.cos(latR),
       10.3 * Math.sin(latR),
-      10.3 * Math.cos(latR) * Math.cos(lonR),
+      -10.3 * Math.sin(lonR) * Math.cos(latR),
     )
     const markerMat = new THREE.MeshBasicMaterial({ color: 0xFF6B35 })
     const marker = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), markerMat)
     marker.position.copy(markerPos)
-    earth.add(marker) // attach to earth so it rotates with it
+    earth.add(marker) // attached to earth — rotates with it
 
     // Lights
     scene.add(new THREE.AmbientLight(0x999999))
@@ -86,11 +89,14 @@ export function EarthZoom({ lat, lon, onComplete }: Props) {
     sun.position.set(5, 3, 8)
     scene.add(sun)
 
-    // Target Y rotation to bring user's longitude to face camera (+Z)
-    // In THREE.js SphereGeometry: lon=0 is at +Z, so target = -lon_radians
-    const targetYRot = -lonR
-    // Latitude tilt (gentle)
-    const targetXRot = -latR * 0.4
+    // Three.js SphereGeometry default front (+Z) shows 90°W longitude.
+    // To bring longitude `lon` to face the camera: targetYRot = -π/2 - lonR
+    // Normalise to [-π, π] so the globe takes the shortest rotation path.
+    let targetYRot = -Math.PI / 2 - lonR
+    if (targetYRot < -Math.PI) targetYRot += 2 * Math.PI
+    if (targetYRot > Math.PI) targetYRot -= 2 * Math.PI
+    // Tilt X to centre the latitude (positive = tilt northern hemisphere toward camera)
+    const targetXRot = latR
 
     const clock = new THREE.Clock()
     let elapsed = 0
