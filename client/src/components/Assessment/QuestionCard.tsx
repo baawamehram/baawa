@@ -53,9 +53,9 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.4 }}
           style={{
-            fontFamily: 'Space Grotesk, sans-serif',
+            fontFamily: "'Cormorant Garamond', serif",
             fontSize: 'clamp(18px, 3vw, 24px)',
-            color: '#e0e7ff',
+            color: '#F5F3EF',
             lineHeight: 1.55,
             margin: 0,
             textAlign: 'center',
@@ -81,11 +81,11 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
             style={{
               width: '100%',
               boxSizing: 'border-box',
-              background: 'rgba(99,102,241,0.07)',
-              border: '1px solid rgba(99,102,241,0.35)',
+              background: 'rgba(201,169,98,0.06)',
+              border: '1px solid rgba(201,169,98,0.3)',
               borderRadius: 12,
-              color: '#e0e7ff',
-              fontFamily: 'Inter, sans-serif',
+              color: '#F5F3EF',
+              fontFamily: 'Outfit, sans-serif',
               fontSize: 15,
               lineHeight: 1.6,
               padding: '14px 16px',
@@ -94,10 +94,10 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
               transition: 'border-color 0.2s',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#6366f1'
+              e.currentTarget.style.borderColor = '#C9A962'
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)'
+              e.currentTarget.style.borderColor = 'rgba(201,169,98,0.3)'
             }}
           />
 
@@ -110,7 +110,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
             />
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 12, color: 'rgba(165,180,252,0.5)', fontFamily: 'Inter, sans-serif' }}>
+              <span style={{ fontSize: 12, color: 'rgba(232,213,163,0.5)', fontFamily: 'Outfit, sans-serif' }}>
                 ⌘↵ to send
               </span>
               <motion.button
@@ -121,12 +121,12 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
                 style={{
                   background:
                     !answer.trim() || loading
-                      ? 'rgba(99,102,241,0.2)'
-                      : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                      ? 'rgba(201,169,98,0.2)'
+                      : 'linear-gradient(135deg, #C9A962, #B8952E)',
                   border: 'none',
                   borderRadius: 10,
-                  color: !answer.trim() || loading ? 'rgba(165,180,252,0.4)' : '#fff',
-                  fontFamily: 'Space Grotesk, sans-serif',
+                  color: !answer.trim() || loading ? 'rgba(232,213,163,0.4)' : '#0C1220',
+                  fontFamily: 'Outfit, sans-serif',
                   fontSize: 14,
                   fontWeight: 600,
                   padding: '10px 24px',

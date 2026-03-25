@@ -64,7 +64,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
   return (
     <div
       style={{
-        background: 'linear-gradient(180deg, #0a1428 0%, #1a1040 50%, #2a1a4a 100%)',
+        background: 'linear-gradient(180deg, #0C1220 0%, #1A2332 50%, #2A1A4A 100%)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -81,20 +81,20 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
         top: '50%', left: '50%',
         transform: 'translate(-50%, -60%)',
         width: '500px', height: '500px',
-        background: 'radial-gradient(ellipse at center, rgba(255,215,0,0.07) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse at center, rgba(201,169,98,0.07) 0%, transparent 65%)',
         pointerEvents: 'none',
       }} />
-      {/* Deep indigo corner glows */}
+      {/* Corner glows */}
       <div style={{
         position: 'absolute', top: '-20%', left: '-10%',
         width: '50vw', height: '50vw', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(201,169,98,0.06) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       <div style={{
         position: 'absolute', bottom: '-15%', right: '-10%',
         width: '40vw', height: '40vw', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(184,149,46,0.05) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       {/* Floating particles */}
@@ -104,7 +104,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
           width: i % 3 === 0 ? 2 : 1,
           height: i % 3 === 0 ? 2 : 1,
           borderRadius: '50%',
-          background: i % 4 === 0 ? 'rgba(255,215,0,0.4)' : 'rgba(165,180,252,0.3)',
+          background: i % 4 === 0 ? 'rgba(201,169,98,0.4)' : 'rgba(245,243,239,0.2)',
           left: `${(i * 37 + 11) % 95}%`,
           top: `${(i * 53 + 7) % 90}%`,
           animation: `float${i % 3} ${8 + (i % 5) * 2}s ease-in-out infinite`,
@@ -131,7 +131,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               left: 0,
               right: 0,
               height: 3,
-              background: 'rgba(99,102,241,0.15)',
+              background: 'rgba(201,169,98,0.15)',
             }}
           >
             <motion.div
@@ -139,7 +139,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               transition={{ duration: 0.6, ease: 'easeOut' }}
               style={{
                 height: '100%',
-                background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                background: 'linear-gradient(90deg, #C9A962, #B8952E)',
                 borderRadius: '0 2px 2px 0',
               }}
             />
@@ -181,9 +181,9 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'Outfit, sans-serif',
                 fontSize: 'clamp(22px, 4vw, 32px)',
-                color: '#e0e7ff',
+                color: '#F5F3EF',
                 margin: 0,
                 lineHeight: 1.3,
               }}
@@ -197,9 +197,9 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
               style={{
-                fontFamily: 'Inter, sans-serif',
+                fontFamily: 'Outfit, sans-serif',
                 fontSize: 15,
-                color: 'rgba(165,180,252,0.7)',
+                color: 'rgba(232,213,163,0.7)',
                 margin: 0,
                 lineHeight: 1.6,
               }}
@@ -218,21 +218,21 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                background: 'rgba(99,102,241,0.1)',
-                border: '1px solid rgba(99,102,241,0.3)',
+                background: 'rgba(201,169,98,0.08)',
+                border: '1px solid rgba(201,169,98,0.3)',
                 borderRadius: 12,
                 padding: '12px 18px',
                 maxWidth: 420,
               }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                <rect x="9" y="2" width="6" height="11" rx="3" fill="#a5b4fc" />
-                <path d="M5 11a7 7 0 0 0 14 0" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" />
-                <line x1="12" y1="18" x2="12" y2="22" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" />
-                <line x1="9" y1="22" x2="15" y2="22" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" />
+                <rect x="9" y="2" width="6" height="11" rx="3" fill="#E8D5A3" />
+                <path d="M5 11a7 7 0 0 0 14 0" stroke="#E8D5A3" strokeWidth="2" strokeLinecap="round" />
+                <line x1="12" y1="18" x2="12" y2="22" stroke="#E8D5A3" strokeWidth="2" strokeLinecap="round" />
+                <line x1="9" y1="22" x2="15" y2="22" stroke="#E8D5A3" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(165,180,252,0.85)', lineHeight: 1.5 }}>
-                <strong style={{ color: '#a5b4fc' }}>Speak your answers</strong> — it's faster and captures more.
+              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: 'rgba(232,213,163,0.85)', lineHeight: 1.5 }}>
+                <strong style={{ color: '#E8D5A3' }}>Speak your answers</strong> — it's faster and captures more.
                 Hit the mic button below each question.
               </span>
             </motion.div>
@@ -242,9 +242,9 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
               animate={{ opacity: [0.4, 0.8, 0.4] }}
               transition={{ delay: 1.2, duration: 1.5, repeat: Infinity }}
               style={{
-                fontFamily: 'Inter, sans-serif',
+                fontFamily: 'Outfit, sans-serif',
                 fontSize: 12,
-                color: 'rgba(165,180,252,0.4)',
+                color: 'rgba(232,213,163,0.4)',
                 letterSpacing: '0.08em',
               }}
             >
@@ -277,9 +277,9 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 style={{
-                  fontFamily: 'Inter, sans-serif',
+                  fontFamily: 'Outfit, sans-serif',
                   fontSize: 12,
-                  color: 'rgba(165,180,252,0.45)',
+                  color: 'rgba(232,213,163,0.45)',
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                 }}
@@ -294,7 +294,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
-                  fontFamily: 'Inter, sans-serif',
+                  fontFamily: 'Outfit, sans-serif',
                   fontSize: 14,
                   color: '#f87171',
                   textAlign: 'center',
@@ -313,7 +313,7 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                     borderRadius: 6,
                     padding: '4px 12px',
                     cursor: 'pointer',
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: 'Outfit, sans-serif',
                     fontSize: 13,
                   }}
                 >
@@ -327,9 +327,9 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
                 animate={{ opacity: [0.4, 0.9, 0.4] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
                 style={{
-                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontFamily: 'Outfit, sans-serif',
                   fontSize: 18,
-                  color: 'rgba(165,180,252,0.6)',
+                  color: 'rgba(232,213,163,0.6)',
                   margin: 0,
                 }}
               >
