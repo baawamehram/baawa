@@ -10,7 +10,7 @@ function escapeHtml(text: string): string {
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = process.env.EMAIL_FROM ?? 'assessment@baawa-mehram.com'
+const FROM = process.env.EMAIL_FROM ?? 'assessment@baawa.com'
 const FOUNDER_EMAIL = process.env.FOUNDER_EMAIL ?? ''
 
 // 1. Prospect acknowledgement (sent immediately after assessment completes)

@@ -16,8 +16,8 @@ export async function generateDeferEmail(
     .map((t) => `${t.role === 'user' ? 'Founder' : 'Interviewer'}: ${t.content}`)
     .join('\n\n')
 
-  const systemPrompt = `You are writing a warm, personal holding email from a boutique digital marketing agency to a founder who completed their business assessment.
-The agency wants to work with them eventually but the timing is not right.
+  const systemPrompt = `You are writing a warm, personal holding email from Baawa — a boutique digital marketing agency — to a founder who completed their business assessment.
+Baawa wants to work with them eventually but the timing is not right.
 The email must feel personal and specific — reference actual things they shared.
 
 Tone: Warm, direct, respectful. No corporate filler. No false promises. No generic lines.
