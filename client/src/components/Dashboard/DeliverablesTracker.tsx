@@ -111,7 +111,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
           </div>
         ))}
         {deliverables.length === 0 && (
-          <p className="text-gray-600 font-body text-sm">No deliverables yet.</p>
+          <p className="text-gray-400 font-body text-sm">No deliverables yet.</p>
         )}
       </div>
 

@@ -35,36 +35,6 @@ export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJou
     return () => clearTimeout(timer)
   }, [reducedMotion, onComplete])
 
-  if (reducedMotion) {
-    return (
-      <div
-        style={{
-          background: '#0a0a0f',
-          width: '100vw',
-          height: '100vh',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        {STATIC_STARS.map((s, i) => (
-          <span
-            key={i}
-            style={{
-              position: 'absolute',
-              top: s.top,
-              left: s.left,
-              width: i % 3 === 0 ? 3 : 2,
-              height: i % 3 === 0 ? 3 : 2,
-              borderRadius: '50%',
-              background: '#ffffff',
-              opacity: 0.6 + (i % 4) * 0.1,
-            }}
-          />
-        ))}
-      </div>
-    )
-  }
-
   const advance = () => {
     setPhase((p) => {
       if (p === 'solar') return 'earth'
@@ -74,32 +44,58 @@ export function CosmicJourney({ city, country, lat, lon, onComplete }: CosmicJou
     })
   }
 
+  const skipButton = (
+    <button
+      onClick={onComplete}
+      style={{
+        position: 'absolute', top: 16, right: 16,
+        background: 'rgba(99,102,241,0.2)', border: '1px solid #6366f1',
+        color: '#a5b4fc', padding: '8px 16px', borderRadius: 8,
+        cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 14,
+        zIndex: 100,
+      }}
+    >
+      Skip →
+    </button>
+  )
+
   return (
     <div style={{ background: '#0a0a0f', width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
-      {phase === 'solar' && <SolarSystem onComplete={advance} />}
-      {phase === 'earth' && <EarthZoom onComplete={advance} />}
-      {phase === 'location' && (
-        <LocationReveal
-          city={city ?? 'Your City'}
-          country={country ?? ''}
-          lat={lat ?? 51.5}
-          lon={lon ?? -0.1}
-          onComplete={advance}
-        />
+      {reducedMotion ? (
+        <>
+          {STATIC_STARS.map((s, i) => (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                top: s.top,
+                left: s.left,
+                width: i % 3 === 0 ? 3 : 2,
+                height: i % 3 === 0 ? 3 : 2,
+                borderRadius: '50%',
+                background: '#ffffff',
+                opacity: 0.6 + (i % 4) * 0.1,
+              }}
+            />
+          ))}
+        </>
+      ) : (
+        <>
+          {phase === 'solar' && <SolarSystem onComplete={advance} />}
+          {phase === 'earth' && <EarthZoom onComplete={advance} />}
+          {phase === 'location' && (
+            <LocationReveal
+              city={city ?? 'Your City'}
+              country={country ?? ''}
+              lat={lat ?? 51.5}
+              lon={lon ?? -0.1}
+              onComplete={advance}
+            />
+          )}
+        </>
       )}
 
-      <button
-        onClick={onComplete}
-        style={{
-          position: 'absolute', top: 16, right: 16,
-          background: 'rgba(99,102,241,0.2)', border: '1px solid #6366f1',
-          color: '#a5b4fc', padding: '8px 16px', borderRadius: 8,
-          cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 14,
-          zIndex: 100,
-        }}
-      >
-        Skip →
-      </button>
+      {skipButton}
     </div>
   )
 }

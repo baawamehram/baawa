@@ -62,7 +62,7 @@ export function RevenueOverview({ token, on401 }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Total Phase 1 Revenue</p>
           <p className="text-3xl font-heading text-white">{fmt(totalPhase1)}</p>

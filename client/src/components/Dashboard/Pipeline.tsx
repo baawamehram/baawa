@@ -85,7 +85,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {STAGES.map((stage) => {
           const stageClients = clients.filter((c) => c.stage === stage.key)
           return (
