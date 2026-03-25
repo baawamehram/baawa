@@ -22,7 +22,13 @@ export async function retrieveRelevantChunks(
   queryText: string,
   topK = 3
 ): Promise<string[]> {
-  const embedding = await getEmbedding(queryText)
+  let embedding: number[]
+  try {
+    embedding = await getEmbedding(queryText)
+  } catch (err) {
+    console.warn('RAG embedding failed, skipping knowledge context:', (err as Error).message)
+    return []
+  }
 
   const result = await db.query<{ content: string }>(
     `SELECT content
