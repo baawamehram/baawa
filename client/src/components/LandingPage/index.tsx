@@ -6,61 +6,61 @@ interface Props {
 
 export function LandingPage({ onStart }: Props) {
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif', background: '#fafaf8', color: '#0a0a0a' }}>
+    <div style={{ fontFamily: 'Outfit, sans-serif', background: '#F5F3EF', color: '#0C1220' }}>
 
       {/* Section 1 — Navigation */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        background: 'rgba(250,250,248,0.9)', backdropFilter: 'blur(12px)',
+        background: 'rgba(245,243,239,0.9)', backdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(0,0,0,0.06)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 48px', height: '64px'
       }}>
-        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '22px', fontWeight: 700, color: '#0a0a0a' }}>Baawa</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 700, color: '#0C1220', letterSpacing: '0.1em' }}>Baawa</span>
         <button onClick={onStart} style={{
-          background: '#0a0a0a', color: '#fff', border: 'none', cursor: 'pointer',
+          background: '#C9A962', color: '#0C1220', border: 'none', cursor: 'pointer',
           padding: '10px 24px', borderRadius: '6px', fontSize: '14px',
-          fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600
+          fontFamily: 'Outfit, sans-serif', fontWeight: 600
         }}>Apply to work with us</button>
       </nav>
 
       {/* Section 2 — Hero */}
       <section style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        paddingTop: '64px', background: '#fafaf8',
-        backgroundImage: 'radial-gradient(ellipse at 50% 40%, rgba(99,102,241,0.08) 0%, transparent 70%)'
+        paddingTop: '64px', background: '#F5F3EF',
+        backgroundImage: 'radial-gradient(ellipse at 50% 40%, rgba(201,169,98,0.08) 0%, transparent 70%)'
       }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', padding: '0 24px' }}>
           <div style={{
             fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase',
-            color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '24px'
+            color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '24px'
           }}>Advisor · Consultant · Coach</div>
           <h1 style={{ margin: '0 0 24px', lineHeight: 1.1 }}>
             <div style={{
-              fontFamily: "'Playfair Display', serif", fontSize: 'clamp(40px, 7vw, 84px)',
-              fontWeight: 400, color: '#0a0a0a', display: 'block'
+              fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(40px, 7vw, 84px)',
+              fontWeight: 400, color: '#0C1220', display: 'block'
             }}>Everyone has that one person</div>
             <div style={{
-              fontFamily: "'Playfair Display', serif", fontSize: 'clamp(40px, 7vw, 84px)',
-              fontWeight: 700, fontStyle: 'italic', color: '#6366f1', display: 'block'
+              fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(40px, 7vw, 84px)',
+              fontWeight: 700, fontStyle: 'italic', color: '#C9A962', display: 'block'
             }}>they call first.</div>
           </h1>
-          <p style={{ fontSize: '18px', color: '#555', lineHeight: 1.7, marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
+          <p style={{ fontSize: '18px', color: '#8B8680', lineHeight: 1.7, marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
             Strategy, agencies, mindset, momentum — whatever's blocking you, we clear it.
           </p>
           <button onClick={onStart} style={{
-            background: '#0a0a0a', color: '#fff', border: 'none', cursor: 'pointer',
+            background: '#C9A962', color: '#0C1220', border: 'none', cursor: 'pointer',
             padding: '16px 36px', borderRadius: '8px', fontSize: '16px',
-            fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, marginBottom: '16px', display: 'block', margin: '0 auto 16px'
+            fontFamily: 'Outfit, sans-serif', fontWeight: 600, marginBottom: '16px', display: 'block', margin: '0 auto 16px'
           }}>Apply to work with us →</button>
-          <div style={{ fontSize: '12px', color: '#999', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div style={{ fontSize: '12px', color: 'rgba(139,134,128,0.7)', fontFamily: 'Outfit, sans-serif' }}>
             Selective intake · Assessment required
           </div>
         </div>
       </section>
 
       {/* Section 3 — Proof Bar */}
-      <section style={{ background: '#0a0a0a', padding: '64px 48px' }}>
+      <section style={{ background: '#0C1220', padding: '64px 48px' }}>
         <div style={{
           maxWidth: '1200px', margin: '0 auto',
           display: 'flex', justifyContent: 'center', gap: '80px', flexWrap: 'wrap'
@@ -72,29 +72,29 @@ export function LandingPage({ onStart }: Props) {
             { num: '100%', label: 'founder-side, always' },
           ].map(({ num, label }) => (
             <div key={num} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '32px', fontWeight: 700, color: '#a5b4fc', marginBottom: '8px' }}>{num}</div>
-              <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#aaa', fontFamily: 'Space Grotesk, sans-serif' }}>{label}</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', fontWeight: 700, color: '#E8D5A3', marginBottom: '8px' }}>{num}</div>
+              <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(139,134,128,0.7)', fontFamily: 'Outfit, sans-serif' }}>{label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Section 4 — The Problem */}
-      <section style={{ background: '#f5f5f0', padding: '96px 48px' }}>
+      <section style={{ background: '#F0EDE8', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>The Problem</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px', margin: '0 0 16px' }}>Most founders have the vision. Everything else gets in the way.</h2>
-          <p style={{ fontSize: '18px', color: '#555', marginBottom: '48px', maxWidth: '620px' }}>The strategy felt generic. The agencies underdelivered. The momentum never came. Here's why.</p>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>The Problem</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0C1220', marginBottom: '16px', margin: '0 0 16px' }}>Most founders have the vision. Everything else gets in the way.</h2>
+          <p style={{ fontSize: '18px', color: '#8B8680', marginBottom: '48px', maxWidth: '620px' }}>The strategy felt generic. The agencies underdelivered. The momentum never came. Here's why.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {[
               { num: '01', title: 'No one actually on your side', body: "You have advisors, agencies, investors. But when something stalls, everyone points at someone else. Nobody is actually fighting for your outcomes." },
               { num: '02', title: 'Momentum keeps dying', body: "You know what needs to happen. But decisions drag, agencies underdeliver, and your energy gets eaten by the wrong things. Nothing moves at the pace it should." },
               { num: '03', title: "You're carrying it alone", body: "The business can only move as fast as you can think clearly and execute boldly. Nobody's helping you do that. And it shows." },
             ].map(({ num, title, body }) => (
-              <div key={num} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '52px', fontWeight: 900, color: '#6366f1', lineHeight: 1, marginBottom: '16px' }}>{num}</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: '#0a0a0a', marginBottom: '12px', fontFamily: 'Space Grotesk, sans-serif' }}>{title}</div>
-                <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>{body}</div>
+              <div key={num} style={{ background: '#fff', border: '1px solid #E8E0D5', borderRadius: '12px', padding: '40px' }}>
+                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '52px', fontWeight: 900, color: '#C9A962', lineHeight: 1, marginBottom: '16px' }}>{num}</div>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: '#0C1220', marginBottom: '12px', fontFamily: 'Outfit, sans-serif' }}>{title}</div>
+                <div style={{ fontSize: '15px', color: '#8B8680', lineHeight: 1.7 }}>{body}</div>
               </div>
             ))}
           </div>
@@ -102,28 +102,28 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* Section 5 — Two Ways We Work */}
-      <section style={{ background: '#fafaf8', padding: '96px 48px' }}>
+      <section style={{ background: '#F5F3EF', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>How We Work</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '48px', margin: '0 0 48px' }}>One firm. Three ways in. One assessment.</h2>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>How We Work</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0C1220', marginBottom: '48px', margin: '0 0 48px' }}>One firm. Three ways in. One assessment.</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '32px' }}>
-            <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who need clarity and direction</div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Business Consultancy</div>
-              <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>Before anything else, we get clear on where you are, where you're going, and what's actually blocking you. Then we build the plan that gets you there.</div>
+            <div style={{ background: '#fff', border: '1px solid #E8E0D5', borderRadius: '12px', padding: '40px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>For founders who need clarity and direction</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 700, color: '#0C1220', marginBottom: '16px' }}>Business Consultancy</div>
+              <div style={{ fontSize: '15px', color: '#8B8680', lineHeight: 1.7 }}>Before anything else, we get clear on where you are, where you're going, and what's actually blocking you. Then we build the plan that gets you there.</div>
             </div>
-            <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who work with agencies</div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Agency Advisory</div>
-              <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>We structure your mandates, write airtight contracts, hold agencies accountable for results, and match you with the right partner for your stage.</div>
+            <div style={{ background: '#fff', border: '1px solid #E8E0D5', borderRadius: '12px', padding: '40px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>For founders who work with agencies</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 700, color: '#0C1220', marginBottom: '16px' }}>Agency Advisory</div>
+              <div style={{ fontSize: '15px', color: '#8B8680', lineHeight: 1.7 }}>We structure your mandates, write airtight contracts, hold agencies accountable for results, and match you with the right partner for your stage.</div>
             </div>
-            <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>For founders who need to unlock their own potential</div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px' }}>Founder Coaching</div>
-              <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>Strategy only works when the person behind it is at their best. We work directly with you — your thinking, your confidence, your ability to move when it matters.</div>
+            <div style={{ background: '#fff', border: '1px solid #E8E0D5', borderRadius: '12px', padding: '40px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>For founders who need to unlock their own potential</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 700, color: '#0C1220', marginBottom: '16px' }}>Founder Coaching</div>
+              <div style={{ fontSize: '15px', color: '#8B8680', lineHeight: 1.7 }}>Strategy only works when the person behind it is at their best. We work directly with you — your thinking, your confidence, your ability to move when it matters.</div>
             </div>
           </div>
-          <div style={{ textAlign: 'center', fontSize: '14px', color: '#999', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div style={{ textAlign: 'center', fontSize: '14px', color: 'rgba(139,134,128,0.7)', fontFamily: 'Outfit, sans-serif' }}>
             Not sure which applies to you? One assessment figures it out.
           </div>
         </div>
@@ -132,9 +132,9 @@ export function LandingPage({ onStart }: Props) {
       {/* Section 6 — What We Do */}
       <section style={{ background: '#fff', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>What We Do</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '16px', margin: '0 0 16px' }}>We get founders moving.</h2>
-          <p style={{ fontSize: '18px', color: '#555', marginBottom: '48px' }}>Strategy, agencies, momentum — whatever's blocking you, we clear it.</p>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>What We Do</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0C1220', marginBottom: '16px', margin: '0 0 16px' }}>We get founders moving.</h2>
+          <p style={{ fontSize: '18px', color: '#8B8680', marginBottom: '48px' }}>Strategy, agencies, momentum — whatever's blocking you, we clear it.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {[
               { icon: '🧭', title: 'Consulting & strategy', body: "We get clear on where you are, where you need to go, and what's in the way. Then we build the plan and move with you." },
@@ -142,10 +142,10 @@ export function LandingPage({ onStart }: Props) {
               { icon: '⚖️', title: 'Agency contracts', body: "Agency contracts are written by agencies, for agencies. We rewrite the power balance so you're protected from day one." },
               { icon: '🎯', title: 'Accountability & results', body: 'Monthly reviews. Hard questions. We make sure whoever you\'re working with delivers — or you know exactly when to walk.' },
             ].map(({ icon, title, body }) => (
-              <div key={title} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '40px' }}>
+              <div key={title} style={{ background: '#fff', border: '1px solid #E8E0D5', borderRadius: '12px', padding: '40px' }}>
                 <div style={{ fontSize: '36px', marginBottom: '20px' }}>{icon}</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: '#0a0a0a', marginBottom: '12px', fontFamily: 'Space Grotesk, sans-serif' }}>{title}</div>
-                <div style={{ fontSize: '15px', color: '#555', lineHeight: 1.7 }}>{body}</div>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: '#0C1220', marginBottom: '12px', fontFamily: 'Outfit, sans-serif' }}>{title}</div>
+                <div style={{ fontSize: '15px', color: '#8B8680', lineHeight: 1.7 }}>{body}</div>
               </div>
             ))}
           </div>
@@ -153,10 +153,10 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* Section 7 — How It Works */}
-      <section style={{ background: '#0a0a0a', padding: '96px 48px' }}>
+      <section style={{ background: '#0C1220', padding: '96px 48px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>How It Works</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#fff', marginBottom: '64px', margin: '0 0 64px' }}>Three steps. No fluff.</h2>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>How It Works</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#fff', marginBottom: '64px', margin: '0 0 64px' }}>Three steps. No fluff.</h2>
           <div>
             {[
               { num: '1', title: 'You apply', body: 'Every founder goes through our diagnostic assessment. Brutal, honest, illuminating.' },
@@ -166,12 +166,12 @@ export function LandingPage({ onStart }: Props) {
               <div key={num} style={{
                 display: 'flex', gap: '32px', alignItems: 'flex-start',
                 padding: i === 0 ? '0 0 48px' : i === 2 ? '48px 0 0' : '48px 0',
-                borderBottom: i < 2 ? '1px solid #1a1a1a' : 'none'
+                borderBottom: i < 2 ? '1px solid #1A2332' : 'none'
               }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(48px, 6vw, 80px)', fontWeight: 900, color: '#6366f1', lineHeight: 0.85, flexShrink: 0, width: '80px' }}>{num}</div>
+                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(48px, 6vw, 80px)', fontWeight: 900, color: '#C9A962', lineHeight: 0.85, flexShrink: 0, width: '80px' }}>{num}</div>
                 <div style={{ paddingTop: '8px' }}>
-                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginBottom: '8px', fontFamily: 'Space Grotesk, sans-serif' }}>{title}</div>
-                  <div style={{ fontSize: '15px', color: '#888', lineHeight: 1.7 }}>{body}</div>
+                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginBottom: '8px', fontFamily: 'Outfit, sans-serif' }}>{title}</div>
+                  <div style={{ fontSize: '15px', color: '#8B8680', lineHeight: 1.7 }}>{body}</div>
                 </div>
               </div>
             ))}
@@ -180,10 +180,10 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* Section 8 — Who This Is For */}
-      <section style={{ background: '#fafaf8', padding: '96px 48px' }}>
+      <section style={{ background: '#F5F3EF', padding: '96px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6366f1', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '16px' }}>Who This Is For</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0a0a0a', marginBottom: '48px', margin: '0 0 48px' }}>Founders who are done waiting for things to move.</h2>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A962', fontFamily: 'Outfit, sans-serif', marginBottom: '16px' }}>Who This Is For</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: '#0C1220', marginBottom: '48px', margin: '0 0 48px' }}>Founders who are done waiting for things to move.</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px', alignItems: 'start' }}>
             <div>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px' }}>
@@ -194,55 +194,55 @@ export function LandingPage({ onStart }: Props) {
                   "You're ready to be challenged — in your thinking, your decisions, your execution",
                   "You want growth that's measurable, not just visible",
                 ].map((item) => (
-                  <li key={item} style={{ display: 'flex', gap: '12px', marginBottom: '16px', fontSize: '16px', color: '#333', lineHeight: 1.5 }}>
-                    <span style={{ color: '#6366f1', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                  <li key={item} style={{ display: 'flex', gap: '12px', marginBottom: '16px', fontSize: '16px', color: '#4A4540', lineHeight: 1.5 }}>
+                    <span style={{ color: '#C9A962', fontWeight: 700, flexShrink: 0 }}>✓</span>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <div style={{ borderTop: '1px solid #eee', paddingTop: '24px' }}>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#999', fontFamily: 'Space Grotesk, sans-serif', marginBottom: '12px' }}>Not for everyone</div>
-                <p style={{ fontSize: '14px', color: '#555', lineHeight: 1.7, margin: 0 }}>If you're looking for someone to validate a bad strategy or just manage your social media, we're not the right fit. We work with founders who want the truth.</p>
+              <div style={{ borderTop: '1px solid #E8E0D5', paddingTop: '24px' }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(139,134,128,0.7)', fontFamily: 'Outfit, sans-serif', marginBottom: '12px' }}>Not for everyone</div>
+                <p style={{ fontSize: '14px', color: '#8B8680', lineHeight: 1.7, margin: 0 }}>If you're looking for someone to validate a bad strategy or just manage your social media, we're not the right fit. We work with founders who want the truth.</p>
               </div>
             </div>
-            <div style={{ background: '#0a0a0a', borderRadius: '16px', padding: '56px 48px' }}>
-              <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '26px', fontStyle: 'italic', color: '#e0e7ff', lineHeight: 1.5, margin: '0 0 24px' }}>
+            <div style={{ background: '#0C1220', borderRadius: '16px', padding: '56px 48px' }}>
+              <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontStyle: 'italic', color: '#E8D5A3', lineHeight: 1.5, margin: '0 0 24px' }}>
                 "He asked me three questions in twenty minutes that none of my advisors had asked in six months."
               </p>
-              <div style={{ fontSize: '13px', color: '#555', fontFamily: 'Space Grotesk, sans-serif' }}>— The founder we built Baawa for</div>
+              <div style={{ fontSize: '13px', color: '#8B8680', fontFamily: 'Outfit, sans-serif' }}>— The founder we built Baawa for</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Section 9 — Final CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1040 100%)', padding: '120px 48px', textAlign: 'center' }}>
+      <section style={{ background: 'linear-gradient(135deg, #0C1220 0%, #1A2332 100%)', padding: '120px 48px', textAlign: 'center' }}>
         <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 700, lineHeight: 1.1, marginBottom: '24px', margin: '0 0 24px' }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 700, lineHeight: 1.1, marginBottom: '24px', margin: '0 0 24px' }}>
             <span style={{ color: '#fff', display: 'block' }}>Ready to find out</span>
             <span style={{ color: '#fff', display: 'block' }}>
               where you{' '}
-              <span style={{ color: '#6366f1', fontStyle: 'italic' }}>actually stand?</span>
+              <span style={{ color: '#C9A962', fontStyle: 'italic' }}>actually stand?</span>
             </span>
           </h2>
-          <p style={{ fontSize: '18px', color: '#888', lineHeight: 1.7, marginBottom: '40px' }}>
+          <p style={{ fontSize: '18px', color: '#8B8680', lineHeight: 1.7, marginBottom: '40px' }}>
             Take the assessment. 10–15 minutes. The most honest conversation you'll have about your business.
           </p>
           <button onClick={onStart} style={{
-            background: '#fff', color: '#0a0a0a', border: 'none', cursor: 'pointer',
+            background: '#C9A962', color: '#0C1220', border: 'none', cursor: 'pointer',
             padding: '18px 40px', borderRadius: '8px', fontSize: '16px',
-            fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, marginBottom: '20px', display: 'block', margin: '0 auto 20px'
+            fontFamily: 'Outfit, sans-serif', fontWeight: 700, marginBottom: '20px', display: 'block', margin: '0 auto 20px'
           }}>Begin your assessment →</button>
-          <div style={{ fontSize: '11px', color: '#333', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div style={{ fontSize: '11px', color: '#4A4540', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
             Selective intake · Assessment required · No sales calls
           </div>
         </div>
       </section>
 
       {/* Section 10 — Footer */}
-      <footer style={{ background: '#0a0a0a', borderTop: '1px solid #111', padding: '32px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '18px', fontWeight: 700, color: '#fff' }}>Baawa</span>
-        <span style={{ fontSize: '12px', color: '#444', fontFamily: 'Space Grotesk, sans-serif' }}>© 2026 Baawa. All rights reserved.</span>
+      <footer style={{ background: '#0C1220', borderTop: '1px solid #111', padding: '32px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '18px', fontWeight: 700, color: '#C9A962', letterSpacing: '0.1em' }}>Baawa</span>
+        <span style={{ fontSize: '12px', color: '#5A5550', fontFamily: 'Outfit, sans-serif' }}>© 2026 Baawa. All rights reserved.</span>
       </footer>
 
     </div>
