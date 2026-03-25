@@ -2,7 +2,7 @@ import { db } from '../db/client'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 function getEmbeddingClient() {
-  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '').getGenerativeModel({ model: 'embedding-001' })
+  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '', { apiVersion: 'v1' } as any).getGenerativeModel({ model: 'text-embedding-004' })
 }
 
 export async function retrieveRelevantChunks(
