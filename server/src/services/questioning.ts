@@ -50,12 +50,18 @@ ABSOLUTE RULES:
 7. Otherwise output: {"question": "...", "done": false}
 8. Never output anything except valid JSON in one of these two formats.`
 
-  const messages: Anthropic.MessageParam[] = conversation.length > 0
+  const baseMessages: Anthropic.MessageParam[] = conversation.length > 0
     ? conversation.map((turn) => ({
         role: turn.role as 'user' | 'assistant',
         content: turn.content,
       }))
-    : [{ role: 'user', content: 'Begin the diagnostic interview. Ask your first question.' }]
+    : [{ role: 'user', content: 'Begin the diagnostic interview.' }]
+
+  // Prefill assistant response with '{' to force JSON output
+  const messages: Anthropic.MessageParam[] = [
+    ...baseMessages,
+    { role: 'assistant', content: '{' },
+  ]
 
   const response = await anthropic.messages.create({
     model,
@@ -64,10 +70,11 @@ ABSOLUTE RULES:
     messages,
   })
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : ''
+  const raw = response.content[0].type === 'text' ? response.content[0].text : ''
+  const text = '{' + raw.trim()
 
   try {
-    const parsed = JSON.parse(text.trim()) as { done: boolean; question?: string }
+    const parsed = JSON.parse(text) as { done: boolean; question?: string }
     if (parsed.done) return { question: '', done: true }
     if (typeof parsed.question === 'string' && parsed.question.length > 0) {
       return { question: parsed.question, done: false }
