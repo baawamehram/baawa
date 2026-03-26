@@ -5,11 +5,12 @@ import { API_URL } from '../../lib/api'
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void
+  onVoiceUnavailable?: () => void
   disabled?: boolean
   onRecordingChange?: (isRecording: boolean) => void
 }
 
-export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }: VoiceInputProps) {
+export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false, onRecordingChange }: VoiceInputProps) {
   const { recorderState, startRecording, stopRecording, audioBlob, error } = useVoiceRecorder()
   const [transcriptionError, setTranscriptionError] = useState<string | null>(null)
 
@@ -40,7 +41,8 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
         const data = (await res.json()) as { transcript: string }
         onTranscriptRef.current(data.transcript)
       } catch {
-        setTranscriptionError('Transcription failed. Please type your answer.')
+        setTranscriptionError(null)
+        onVoiceUnavailable?.()
       }
     }
 
@@ -52,7 +54,7 @@ export function VoiceInput({ onTranscript, disabled = false, onRecordingChange }
       stopRecording()
     } else {
       setTranscriptionError(null)
-      void startRecording()
+      startRecording().catch(() => onVoiceUnavailable?.())
     }
   }
 
