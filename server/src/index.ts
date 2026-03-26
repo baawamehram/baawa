@@ -55,7 +55,47 @@ process.on('unhandledRejection', (reason) => {
   console.error('Unhandled rejection:', reason)
 })
 
-const PORT = process.env.PORT ?? 3001
-app.listen(PORT, () => console.log(`Server listening on :${PORT}`))
+async function startServer() {
+  // Run any pending structural migrations before accepting traffic
+  try {
+    await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS journey_config_version INT`)
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS journey_config (
+        id          SERIAL PRIMARY KEY,
+        version     INT NOT NULL,
+        status      TEXT NOT NULL DEFAULT 'proposed',
+        risk_level  TEXT NOT NULL DEFAULT 'low',
+        system_prompt      TEXT NOT NULL,
+        intro_messages     JSONB NOT NULL DEFAULT '[]',
+        scoring_weights    JSONB NOT NULL DEFAULT '{}',
+        change_summary     TEXT,
+        activated_at       TIMESTAMPTZ,
+        created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS session_analytics (
+        id                     SERIAL PRIMARY KEY,
+        session_id             INT NOT NULL REFERENCES sessions(id),
+        journey_config_version INT,
+        total_score            INT,
+        answer_count           INT,
+        avg_answer_length      INT,
+        completed              BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS session_analytics_session_id ON session_analytics (session_id)`)
+    await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS journey_config_one_active ON journey_config ((1)) WHERE status = 'active'`)
+    console.log('Startup migrations OK')
+  } catch (err) {
+    console.error('Startup migration error:', err)
+  }
+
+  const PORT = process.env.PORT ?? 3001
+  app.listen(PORT, () => console.log(`Server listening on :${PORT}`))
+}
+
+void startServer()
 
 export default app
