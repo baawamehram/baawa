@@ -123,3 +123,35 @@ export async function sendOptimizerFailure(errorMessage: string): Promise<void> 
     console.error('Failed to send optimizer failure email:', err)
   }
 }
+
+// 7. Magic link for portal login
+export async function sendMagicLink(to: string, magicLink: string): Promise<void> {
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject: 'Your Baawa portal link',
+      html: `<p>Click the link below to access your assessment results. This link expires in 15 minutes.</p>
+<p><a href="${magicLink}">Access my results →</a></p>
+<p style="color:#888;font-size:12px">If you didn't request this, you can ignore this email.</p>`,
+    })
+  } catch (err) {
+    throw new Error(`Failed to send magic link to ${to}: ${String(err)}`)
+  }
+}
+
+// 8. Notify prospect that the Baawa team has sent them a portal message
+export async function sendMessageNotification(to: string, loginUrl: string): Promise<void> {
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject: 'You have a message from the Baawa team',
+      html: `<p>The Baawa team has left you a message regarding your assessment.</p>
+<p><a href="${loginUrl}">Log in to read it and reply →</a></p>`,
+    })
+  } catch (err) {
+    // Non-critical — log but don't propagate
+    console.error(`sendMessageNotification failed for ${to}:`, err)
+  }
+}
