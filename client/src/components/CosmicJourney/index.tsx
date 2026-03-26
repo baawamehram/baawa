@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { useReducedMotion } from 'framer-motion'
+import { API_URL } from '../../lib/api'
 
 // Props kept for API compatibility with App.tsx
 interface CosmicJourneyProps {
@@ -362,27 +363,25 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
     return () => clearInterval(id)
   }, [])
 
-  // Forex (Frankfurter — free, CORS ok)
+  // Forex (via backend market-data — avoids CORS)
   useEffect(() => {
     async function fetch_forex() {
       try {
-        const r = await fetch(
-          'https://api.frankfurter.app/latest?from=EUR&to=USD,INR,AED',
-          { cache: 'no-store' },
-        )
-        const d = await r.json() as { rates: { USD: number; INR: number; AED: number } }
-        const eu = d.rates.USD
-        const ir = d.rates.INR / eu
-        const ae = d.rates.AED / eu
-        setEurusd(eu.toFixed(4))
-        setUsdinr(ir.toFixed(2))
-        setUsdaed(ae.toFixed(4))
+        const r = await fetch(`${API_URL}/api/market-data`, { cache: 'no-store' })
+        const d = await r.json() as { tickers: Array<{ symbol: string; price: string }> }
+        const find = (sym: string) => d.tickers.find(t => t.symbol === sym)?.price ?? ''
+        const eu = find('EUR/USD')
+        const ir = find('USD/INR')
+        const ae = find('USD/AED')
+        if (eu) setEurusd(eu)
+        if (ir) setUsdinr(ir)
+        if (ae) setUsdaed(ae)
         const nEu = nodesRef.current.find(x => x.id === 'eurusd')
         const nIr = nodesRef.current.find(x => x.id === 'usdinr')
         const nAe = nodesRef.current.find(x => x.id === 'usdaed')
-        if (nEu) nEu.val = eu.toFixed(4)
-        if (nIr) nIr.val = ir.toFixed(2)
-        if (nAe) nAe.val = ae.toFixed(4)
+        if (nEu && eu) nEu.val = eu
+        if (nIr && ir) nIr.val = ir
+        if (nAe && ae) nAe.val = ae
       } catch { /* silent */ }
     }
     void fetch_forex()

@@ -23,7 +23,10 @@ if (!CLIENT_URL && process.env.NODE_ENV === 'production') {
   console.error('FATAL: CLIENT_URL must be set in production')
   process.exit(1)
 }
-app.use(cors({ origin: CLIENT_URL ?? '*' }))
+const allowedOrigins = CLIENT_URL
+  ? [CLIENT_URL, CLIENT_URL.replace('https://www.', 'https://'), CLIENT_URL.replace('https://', 'https://www.')]
+  : ['*']
+app.use(cors({ origin: CLIENT_URL ? allowedOrigins : '*' }))
 app.use(rateLimit({ windowMs: 60_000, max: 60 }))
 app.use(express.json())
 
