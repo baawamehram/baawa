@@ -7,5 +7,15 @@
   "deploy": {
     "startCommand": "node server/dist/src/index.js",
     "restartPolicyType": "ON_FAILURE"
-  }
+  },
+  "crons": [
+    {
+      "schedule": "0 3 * * 0",
+      "command": "node server/dist/src/scripts/runOptimizer.js"
+    },
+    {
+      "schedule": "0 2 * * *",
+      "command": "node server/dist/src/scripts/backfillAnalytics.js"
+    }
+  ]
 }
