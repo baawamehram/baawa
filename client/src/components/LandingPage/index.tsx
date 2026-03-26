@@ -1,4 +1,4 @@
-// No state needed — static component
+import { LogoLight, LogoDark } from '../Logo'
 
 interface Props {
   onStart: () => void
@@ -16,7 +16,7 @@ export function LandingPage({ onStart }: Props) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 48px', height: '64px'
       }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 700, color: '#0A0A0A', letterSpacing: '0.1em' }}>Baawa</span>
+        <LogoLight height={32} />
         <button onClick={onStart} style={{
           background: '#FF6B35', color: '#FAFAFA', border: 'none', cursor: 'pointer',
           padding: '10px 24px', borderRadius: '6px', fontSize: '14px',
@@ -241,7 +241,7 @@ export function LandingPage({ onStart }: Props) {
 
       {/* Section 10 — Footer */}
       <footer style={{ background: '#0A0A0A', borderTop: '1px solid #1A1A1A', padding: '32px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '18px', fontWeight: 700, color: '#FF6B35', letterSpacing: '0.1em' }}>Baawa</span>
+        <LogoDark height={28} />
         <span style={{ fontSize: '12px', color: '#4A4540', fontFamily: 'Outfit, sans-serif' }}>© 2026 Baawa. All rights reserved.</span>
       </footer>
 

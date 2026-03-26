@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { LogoDark, LogoIcon } from '../Logo'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SubmissionList } from './SubmissionList'
 import { SubmissionDetail } from './SubmissionDetail'
@@ -168,9 +169,7 @@ export default function Dashboard() {
     <div className="flex h-screen bg-space-bg">
       {/* Mobile header bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-space-bg border-b border-gray-800">
-        <h1 className="text-lg font-heading text-white">
-          <span className="text-brand-indigo">baawa</span> mehram
-        </h1>
+        <LogoIcon height={28} />
         <button
           onClick={() => setMobileNavOpen((o) => !o)}
           className="text-gray-400 hover:text-white text-2xl leading-none"
@@ -202,9 +201,9 @@ export default function Dashboard() {
 
       {/* Sidebar — desktop only */}
       <aside className="hidden md:flex w-64 border-r border-gray-800 flex-col py-6 px-4 shrink-0">
-        <h1 className="text-xl font-heading text-white mb-8 px-2">
-          <span className="text-brand-indigo">baawa</span> mehram
-        </h1>
+        <div className="mb-8 px-2">
+          <LogoDark height={32} />
+        </div>
         <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <button
