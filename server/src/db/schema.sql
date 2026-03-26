@@ -102,3 +102,56 @@ CREATE INDEX IF NOT EXISTS idx_assessment_created ON assessments(created_at DESC
 CREATE INDEX IF NOT EXISTS idx_client_stage ON clients(stage);
 CREATE INDEX IF NOT EXISTS idx_deliverable_client ON deliverables(client_id);
 CREATE INDEX IF NOT EXISTS idx_assessment_session ON assessments(session_id);
+
+-- Add journey_config_version to sessions (idempotent)
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS journey_config_version INT;
+
+-- Versioned snapshots of all runtime-configurable funnel content
+-- status: 'proposed' | 'active' | 'archived' | 'dismissed'
+CREATE TABLE IF NOT EXISTS journey_config (
+  id              SERIAL PRIMARY KEY,
+  version         INT NOT NULL,
+  status          VARCHAR(20) NOT NULL DEFAULT 'proposed',
+  system_prompt   TEXT NOT NULL,
+  intro_messages  JSONB NOT NULL,
+  scoring_weights JSONB NOT NULL,
+  change_summary  TEXT NOT NULL,
+  risk_level      VARCHAR(10) NOT NULL,
+  reasoning       TEXT NOT NULL,
+  metrics_snapshot JSONB,
+  activated_at    TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_journey_config_status ON journey_config (status);
+CREATE INDEX IF NOT EXISTS idx_journey_config_version ON journey_config (version DESC);
+
+-- Only one active config at a time (DB-enforced via partial unique index)
+CREATE UNIQUE INDEX IF NOT EXISTS journey_config_one_active
+  ON journey_config ((1)) WHERE status = 'active';
+
+-- Derived signals per session, computed server-side
+CREATE TABLE IF NOT EXISTS session_analytics (
+  id                      SERIAL PRIMARY KEY,
+  session_id              UUID NOT NULL REFERENCES sessions(id),
+  assessment_id           INT REFERENCES assessments(id),
+  completed               BOOLEAN NOT NULL DEFAULT FALSE,
+  question_count          INT NOT NULL DEFAULT 0,
+  avg_answer_words        FLOAT,
+  min_answer_words        INT,
+  max_answer_words        INT,
+  drop_off_at_question    INT,
+  score                   INT,
+  score_breakdown         JSONB,
+  journey_config_version  INT,
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS session_analytics_session_id
+  ON session_analytics (session_id);
+CREATE INDEX IF NOT EXISTS idx_session_analytics_completed
+  ON session_analytics (completed);
+CREATE INDEX IF NOT EXISTS idx_session_analytics_created
+  ON session_analytics (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_session_analytics_config_version
+  ON session_analytics (journey_config_version);

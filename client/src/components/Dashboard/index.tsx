@@ -6,9 +6,10 @@ import { Pipeline } from './Pipeline'
 import { ClientDetail } from './ClientDetail'
 import { RevenueOverview } from './RevenueOverview'
 import { KnowledgeBase } from './KnowledgeBase'
+import { Intelligence } from './Intelligence'
 import { API_URL } from '../../lib/api'
 
-type Section = 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge'
+type Section = 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge' | 'intelligence'
 
 const NAV_ITEMS: { key: Section; label: string }[] = [
   { key: 'assessments', label: 'Assessments' },
@@ -16,6 +17,7 @@ const NAV_ITEMS: { key: Section; label: string }[] = [
   { key: 'clients', label: 'Clients' },
   { key: 'revenue', label: 'Revenue' },
   { key: 'knowledge', label: 'Knowledge Base' },
+  { key: 'intelligence', label: 'Intelligence' },
 ]
 
 function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
@@ -148,6 +150,9 @@ export default function Dashboard() {
     }
     if (section === 'knowledge') {
       return <KnowledgeBase token={token} on401={handle401} />
+    }
+    if (section === 'intelligence') {
+      return <Intelligence token={token} on401={handle401} />
     }
     return null
   }

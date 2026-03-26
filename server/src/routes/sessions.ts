@@ -5,6 +5,7 @@ import { geolocateIP } from '../services/geo'
 import { generateNextQuestion, ConversationTurn } from '../services/questioning'
 import { scoreConversation } from '../services/scoring'
 import { sendProspectAck, sendFounderNotification } from '../services/email'
+import { getActiveConfig } from '../services/journeyConfig'
 
 const router = Router()
 
@@ -25,6 +26,13 @@ router.post('/start', async (req: Request, res: Response) => {
       [ip, geo?.city ?? null, geo?.country ?? null, geo?.lat ?? null, geo?.lon ?? null]
     )
     const sessionId = sessionResult.rows[0].id
+
+    // Stamp the active config version before generating Q1
+    const config = await getActiveConfig()
+    await db.query(
+      `UPDATE sessions SET journey_config_version = $1 WHERE id = $2`,
+      [config.version, sessionId]
+    )
 
     const { question } = await generateNextQuestion([], 'Start the interview.')
 
@@ -178,10 +186,67 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
     ).catch((e) => console.error('Founder notification failed:', e))
 
     res.json({ assessmentId: assessmentResult.rows[0].id })
+
+    // Insert session_analytics row — non-blocking, non-critical
+    void (async () => {
+      try {
+        const sessionFull = await db.query<{
+          conversation: ConversationTurn[]
+          journey_config_version: number | null
+        }>(
+          'SELECT conversation, journey_config_version FROM sessions WHERE id = $1',
+          [id]
+        )
+        const s = sessionFull.rows[0]
+        if (!s) return
+
+        const stats = computeAnswerStats(s.conversation)
+        await db.query(
+          `INSERT INTO session_analytics
+           (session_id, assessment_id, completed, question_count,
+            avg_answer_words, min_answer_words, max_answer_words,
+            drop_off_at_question, score, score_breakdown, journey_config_version)
+           VALUES ($1, $2, true, $3, $4, $5, $6, NULL, $7, $8, $9)
+           ON CONFLICT (session_id) DO NOTHING`,
+          [
+            id,
+            assessmentResult.rows[0].id,
+            stats.question_count,
+            stats.avg_answer_words,
+            stats.min_answer_words,
+            stats.max_answer_words,
+            scoring.score,
+            JSON.stringify(scoring.breakdown),
+            s.journey_config_version,
+          ]
+        )
+      } catch (e) {
+        console.error('session_analytics insert failed (non-critical):', e)
+      }
+    })()
   } catch (err) {
     console.error('POST /sessions/:id/complete error:', err)
     res.status(500).json({ error: 'Failed to complete session' })
   }
 })
+
+function computeAnswerStats(conversation: ConversationTurn[]): {
+  question_count: number
+  avg_answer_words: number | null
+  min_answer_words: number | null
+  max_answer_words: number | null
+} {
+  const userTurns = conversation.filter((t) => t.role === 'user')
+  if (userTurns.length === 0) {
+    return { question_count: 0, avg_answer_words: null, min_answer_words: null, max_answer_words: null }
+  }
+  const wordCounts = userTurns.map((t) => t.content.trim().split(/\s+/).length)
+  return {
+    question_count: userTurns.length,
+    avg_answer_words: wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length,
+    min_answer_words: Math.min(...wordCounts),
+    max_answer_words: Math.max(...wordCounts),
+  }
+}
 
 export default router
