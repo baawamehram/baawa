@@ -8,6 +8,7 @@
     "ingest": "tsx scripts/ingest-knowledge.ts",
     "migrate": "tsx src/db/migrate.ts",
     "seed": "tsx src/db/seeds/runSeed.ts",
+    "backfill": "tsx src/scripts/backfillAnalytics.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
