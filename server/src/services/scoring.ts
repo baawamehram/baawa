@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { getFullKnowledgeText } from './knowledge'
+import { getActiveConfig } from './journeyConfig'
 import { ConversationTurn } from './questioning'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -24,32 +25,38 @@ export async function scoreConversation(
   conversation: ConversationTurn[]
 ): Promise<ScoringResult> {
   const model = process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001'
-  const fullKnowledge = await getFullKnowledgeText()
+  const [config, fullKnowledge] = await Promise.all([
+    getActiveConfig(),
+    getFullKnowledgeText(),
+  ])
 
   const transcript = conversation
     .map((t) => `${t.role === 'user' ? 'Founder' : 'Interviewer'}: ${t.content}`)
     .join('\n\n')
 
+  const { pmf, validation, growth, mindset, revenue } = config.scoring_weights
+  const totalCap = pmf + validation + growth + mindset + revenue
+
   const systemPrompt = `You are analyzing a founder's responses from a business diagnostic interview.
 Think like a senior partner reviewing a new client engagement.
 
-Score on 5 dimensions (0-20 each):
-1. PMF Clarity — how clearly does the product, customer, and problem map together?
-2. Customer Validation — how strong is the external evidence (revenue, retention, referrals)?
-3. Growth Readiness — is there a repeatable motion or a clear hypothesis to test?
-4. Founder Mindset — how coachable, data-oriented, and realistic is this founder?
-5. Revenue Potential — how strong are the unit economics or the path to them?
+Score on 5 dimensions:
+1. PMF Clarity — 0 to ${pmf}
+2. Customer Validation — 0 to ${validation}
+3. Growth Readiness — 0 to ${growth}
+4. Founder Mindset — 0 to ${mindset}
+5. Revenue Potential — 0 to ${revenue}
 
-High score = this founder is most ready to see fast, measurable results.
-Low score = this founder needs more groundwork before they will move fast.
+Maximum total score: ${totalCap}. High score = most ready for fast, measurable results.
+Low score = needs more groundwork before moving fast.
 
 [KNOWLEDGE BASE]
 ${fullKnowledge}
 
 Output ONLY valid JSON in this exact format:
 {
-  "score": <total 0-100>,
-  "breakdown": {"pmf": <0-20>, "validation": <0-20>, "growth": <0-20>, "mindset": <0-20>, "revenue": <0-20>},
+  "score": <total 0-${totalCap}>,
+  "breakdown": {"pmf": <0-${pmf}>, "validation": <0-${validation}>, "growth": <0-${growth}>, "mindset": <0-${mindset}>, "revenue": <0-${revenue}>},
   "summary": "<2-3 sentence honest portrait of where this founder is right now>",
   "biggest_opportunity": "<one sentence — what is most likely to unlock growth>",
   "biggest_risk": "<one sentence — what could slow or stop progress>"
@@ -67,16 +74,24 @@ Output ONLY valid JSON in this exact format:
 
   try {
     const parsed = JSON.parse(text) as ScoringResult
-    if (typeof parsed.score !== 'number' || parsed.score < 0 || parsed.score > 100) {
+    if (typeof parsed.score !== 'number' || parsed.score < 0 || parsed.score > totalCap) {
       throw new Error('Invalid score value')
     }
     if (!parsed.breakdown) throw new Error('Missing breakdown')
-    const { pmf, validation, growth, mindset, revenue } = parsed.breakdown
-    for (const [key, val] of Object.entries({ pmf, validation, growth, mindset, revenue })) {
-      if (typeof val !== 'number' || val < 0 || val > 20) {
+
+    // Clamp breakdown values to their caps instead of throwing
+    const dims = { pmf, validation, growth, mindset, revenue }
+    for (const [key, cap] of Object.entries(dims)) {
+      const val = parsed.breakdown[key as keyof ScoreBreakdown]
+      if (typeof val !== 'number' || val < 0) {
         throw new Error(`Invalid breakdown value for ${key}: ${val}`)
       }
+      if (val > cap) {
+        console.warn(`Score breakdown ${key}=${val} exceeds cap ${cap} — clamping`)
+        parsed.breakdown[key as keyof ScoreBreakdown] = cap
+      }
     }
+
     if (typeof parsed.summary !== 'string' || !parsed.summary.trim()) {
       throw new Error('Missing summary')
     }
