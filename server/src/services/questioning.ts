@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { getFullKnowledgeText } from './knowledge'
 import { retrieveRelevantChunks } from './rag'
+import { getActiveConfig } from './journeyConfig'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -21,7 +22,8 @@ export async function generateNextQuestion(
   const model = process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001'
 
   // Get knowledge base content
-  const [fullKnowledge, relevantChunks] = await Promise.all([
+  const [config, fullKnowledge, relevantChunks] = await Promise.all([
+    getActiveConfig(),
     getFullKnowledgeText(),
     retrieveRelevantChunks(latestAnswer),
   ])
@@ -30,25 +32,9 @@ export async function generateNextQuestion(
     ? `\n\n[RELEVANT PRINCIPLES]\n${relevantChunks.join('\n\n')}`
     : ''
 
-  const systemPrompt = `You are the intelligence behind an elite business diagnostic for Baawa — a world-class digital marketing agency.
-Your role is to conduct a deep, adaptive interview with a founder about their business.
-
-Think like a partner at KPMG, Ogilvy, and a Rory Sutherland-trained behavioral strategist — all in one.
-You are strategic, diagnostic, and deeply curious. You ask questions that make founders feel truly seen.
-
-[KNOWLEDGE BASE]
-${fullKnowledge}
-${ragContext}
-
-ABSOLUTE RULES:
-1. You ONLY ask questions. Never provide advice, analysis, validation, or answers.
-2. Never affirm answers ("great", "interesting", "exactly"). Just ask the next question.
-3. Detect the business stage in your first 3-4 questions. Then follow that thread.
-4. Each question should follow directly from the founder's last answer — probe what's underneath.
-5. Ask ONE question per response.
-6. When you have a complete picture of the business (after ~15-20 exchanges), output: {"done": true}
-7. Otherwise output: {"question": "...", "done": false}
-8. Never output anything except valid JSON in one of these two formats.`
+  const systemPrompt = config.system_prompt
+    .replace('{{KNOWLEDGE_BASE}}', fullKnowledge)
+    .replace('{{RAG_CONTEXT}}', ragContext)
 
   const messages: Anthropic.MessageParam[] = conversation.length > 0
     ? conversation.map((turn) => ({
