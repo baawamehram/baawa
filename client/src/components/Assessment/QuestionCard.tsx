@@ -106,7 +106,6 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
             <VoiceInput
               onTranscript={(text) => {
                 const trimmed = text.trim()
-                setAnswer(trimmed)
                 if (trimmed && !loading) onSubmit(trimmed)
               }}
               disabled={loading}
