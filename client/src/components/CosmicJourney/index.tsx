@@ -53,11 +53,11 @@ const BOOT_STEPS = [
 
 const MSGS = [
   'Hello.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.\n\nThis assessment gives us a critical, foundational understanding of whether we can genuinely help you.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.\n\nThis assessment gives us a critical, foundational understanding of whether we can genuinely help you.\n\nHonest answers serve you — you will leave with a detailed score and real insight about yourself.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.\n\nThis assessment gives us a critical, foundational understanding of whether we can genuinely help you.\n\nHonest answers serve you — you will leave with a detailed score and real insight about yourself.\n\nWe might not be the right fit. That is okay. You will know more about your own business than when you arrived.\n\nShall we begin?',
+  'Hello.\n\nEverything you share here stays between us.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.\n\nWe may not be the right fit. Either way, you leave with more clarity about your business than when you arrived.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.\n\nWe may not be the right fit. Either way, you leave with more clarity about your business than when you arrived.\n\nSpeak from the place that actually keeps you up at night.\n\nThat is where we begin.',
 ]
 
 function fmtPct(p: number) { return (p >= 0 ? '+' : '') + p.toFixed(2) + '%' }
@@ -551,6 +551,10 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           0%,100%{opacity:1;transform:scale(1);}
           50%    {opacity:0.5;transform:scale(0.88);}
         }
+        @keyframes textGlow {
+          0%,100%{text-shadow:0 0 40px rgba(255,107,53,0.04);}
+          50%    {text-shadow:0 0 70px rgba(255,107,53,0.13),0 0 30px rgba(255,150,60,0.07);}
+        }
       `}</style>
 
       {/* ── TICKER ── */}
@@ -712,14 +716,16 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
 
         {/* Scrollable typed text */}
         <div ref={textScrollRef} style={{
-          flex: 1, overflowY: 'auto', width: '100%', maxWidth: 580,
-          padding: '0 28px',
+          flex: 1, overflowY: 'auto', width: '100%', maxWidth: 560,
+          padding: '0 32px',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(255,107,53,0.05) 0%, transparent 65%)',
         }}>
           <div style={{
             fontFamily: 'Georgia, serif',
-            fontSize: 'clamp(15px, 2vw, 19px)',
-            color: '#FDFCFA', lineHeight: 1.6, textAlign: 'center',
-            whiteSpace: 'pre-wrap',
+            fontSize: 'clamp(14px, 1.9vw, 18px)',
+            color: 'rgba(253,252,250,0.8)', lineHeight: 1.75, textAlign: 'center',
+            whiteSpace: 'pre-wrap', letterSpacing: '0.018em',
+            animation: 'textGlow 4s ease-in-out infinite',
           }}>
             {twText}
             <span style={{

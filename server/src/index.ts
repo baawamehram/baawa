@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { V1_INTRO_MESSAGES } from './db/seeds/journeyConfigV1'
 import express from 'express'
 import cors from 'cors'
 import { rateLimit } from 'express-rate-limit'
@@ -87,6 +88,11 @@ async function startServer() {
     `)
     await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS session_analytics_session_id ON session_analytics (session_id)`)
     await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS journey_config_one_active ON journey_config ((1)) WHERE status = 'active'`)
+    // Keep v1 intro messages current with the codebase
+    await db.query(
+      `UPDATE journey_config SET intro_messages = $1 WHERE version = 1`,
+      [JSON.stringify(V1_INTRO_MESSAGES)]
+    )
     console.log('Startup migrations OK')
   } catch (err) {
     console.error('Startup migration error:', err)

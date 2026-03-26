@@ -24,11 +24,11 @@ ABSOLUTE RULES:
 
 export const V1_INTRO_MESSAGES: string[] = [
   'Hello.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.\n\nThis assessment gives us a critical, foundational understanding of whether we can genuinely help you.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.\n\nThis assessment gives us a critical, foundational understanding of whether we can genuinely help you.\n\nHonest answers serve you — you will leave with a detailed score and real insight about yourself.',
-  'Hello.\n\nSpeak your answers out loud — I would prefer that.\n\nSpeak from the heart.\n\nThis assessment gives us a critical, foundational understanding of whether we can genuinely help you.\n\nHonest answers serve you — you will leave with a detailed score and real insight about yourself.\n\nWe might not be the right fit. That is okay. You will know more about your own business than when you arrived.\n\nShall we begin?',
+  'Hello.\n\nEverything you share here stays between us.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.\n\nWe may not be the right fit. Either way, you leave with more clarity about your business than when you arrived.',
+  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.\n\nWe may not be the right fit. Either way, you leave with more clarity about your business than when you arrived.\n\nSpeak from the place that actually keeps you up at night.\n\nThat is where we begin.',
 ]
 
 export const V1_SCORING_WEIGHTS = {
