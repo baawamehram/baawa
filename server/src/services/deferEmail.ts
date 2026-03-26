@@ -1,7 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { ConversationTurn } from './questioning'
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+import { callLLM } from './llm-provider'
 
 export async function generateDeferEmail(
   conversation: ConversationTurn[],
@@ -10,7 +8,6 @@ export async function generateDeferEmail(
   if (!founderEmail || !founderEmail.includes('@')) {
     throw new Error('Invalid founderEmail for defer email generation')
   }
-  const model = process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001'
 
   const transcript = conversation
     .map((t) => `${t.role === 'user' ? 'Founder' : 'Interviewer'}: ${t.content}`)
@@ -25,19 +22,12 @@ Length: 3-4 short paragraphs.
 Do not use placeholders like [Name] or [Agency Name].
 Output only the email body text, no subject line, no headers.`
 
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 512,
-    system: systemPrompt,
-    messages: [
-      {
-        role: 'user',
-        content: `Founder email: ${founderEmail}\n\nInterview transcript:\n${transcript}\n\nWrite the defer email.`,
-      },
-    ],
+  const { text } = await callLLM({
+    messages: [{ role: 'user', content: `Founder email: ${founderEmail}\n\nInterview transcript:\n${transcript}\n\nWrite the defer email.` }],
+    systemPrompt,
+    chain: 'assessment',
+    maxTokens: 512,
   })
-
-  const text = response.content[0].type === 'text' ? response.content[0].text : ''
   if (!text.trim()) throw new Error('Empty defer email generated')
   return text.trim()
 }

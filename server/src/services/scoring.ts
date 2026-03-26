@@ -1,9 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { getFullKnowledgeText } from './knowledge'
 import { getActiveConfig } from './journeyConfig'
 import { ConversationTurn } from './questioning'
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+import { callLLM } from './llm-provider'
 
 export interface ScoreBreakdown {
   pmf: number
@@ -24,7 +22,6 @@ export interface ScoringResult {
 export async function scoreConversation(
   conversation: ConversationTurn[]
 ): Promise<ScoringResult> {
-  const model = process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001'
   const [config, fullKnowledge] = await Promise.all([
     getActiveConfig(),
     getFullKnowledgeText(),
@@ -62,14 +59,12 @@ Output ONLY valid JSON in this exact format:
   "biggest_risk": "<one sentence — what could slow or stop progress>"
 }`
 
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 512,
-    system: systemPrompt,
+  const { text: raw } = await callLLM({
     messages: [{ role: 'user', content: transcript }],
+    systemPrompt,
+    chain: 'assessment',
+    maxTokens: 512,
   })
-
-  const raw = response.content[0].type === 'text' ? response.content[0].text : ''
   const text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
 
   try {

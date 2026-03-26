@@ -1,9 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db/client'
 import { getActiveConfig, invalidateConfigCache } from './journeyConfig'
 import { sendOptimizerProposal, sendOptimizerFailure } from './email'
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+import { callLLM, LLMMessage } from './llm-provider'
 
 const OPTIMIZER_LOCK_ID = 7_387_261
 
@@ -139,17 +137,19 @@ Return JSON only, no markdown:
   "reasoning": "Full analytical rationale."
 }`
 
+    const optimizerSystemPrompt = 'You are a senior conversion strategist, behavioural psychologist, and Ogilvy-trained copywriter specialising in founder qualification funnels. Your job is to diagnose underperformance and produce a strictly improved configuration.'
+
     let rawResponse: string
     try {
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        system: 'You are a senior conversion strategist, behavioural psychologist, and Ogilvy-trained copywriter specialising in founder qualification funnels. Your job is to diagnose underperformance and produce a strictly improved configuration.',
+      const { text } = await callLLM({
         messages: [{ role: 'user', content: userMessage }],
+        systemPrompt: optimizerSystemPrompt,
+        chain: 'optimizer',
+        maxTokens: 4096,
       })
-      rawResponse = response.content[0].type === 'text' ? response.content[0].text : ''
+      rawResponse = text
     } catch (err) {
-      const msg = `Claude API error: ${String(err)}`
+      const msg = `LLM API error: ${String(err)}`
       void sendOptimizerFailure(msg)
       throw new Error(msg)
     }
@@ -169,27 +169,27 @@ Return JSON only, no markdown:
       parsed = JSON.parse(jsonText)
     } catch {
       try {
-        const retryResponse = await anthropic.messages.create({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 4096,
-          system: 'You are a senior conversion strategist, behavioural psychologist, and Ogilvy-trained copywriter specialising in founder qualification funnels.',
-          messages: [
-            { role: 'user', content: userMessage },
-            { role: 'assistant', content: rawResponse },
-            { role: 'user', content: 'Your response was not valid JSON. Please return ONLY valid JSON, no markdown, no explanation.' },
-          ],
+        const retryMessages: LLMMessage[] = [
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: rawResponse },
+          { role: 'user', content: 'Your response was not valid JSON. Please return ONLY valid JSON, no markdown, no explanation.' },
+        ]
+        const { text: retryText } = await callLLM({
+          messages: retryMessages,
+          systemPrompt: optimizerSystemPrompt,
+          chain: 'optimizer',
+          maxTokens: 4096,
         })
-        const retryText = retryResponse.content[0].type === 'text' ? retryResponse.content[0].text : ''
         parsed = JSON.parse(retryText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim())
       } catch {
-        const msg = 'Claude returned malformed JSON on both attempts'
+        const msg = 'LLM returned malformed JSON on both attempts'
         void sendOptimizerFailure(msg)
         throw new Error(msg)
       }
     }
 
     if (!parsed.system_prompt.includes('{{KNOWLEDGE_BASE}}') || !parsed.system_prompt.includes('{{RAG_CONTEXT}}')) {
-      const msg = 'Claude removed required placeholders from system_prompt'
+      const msg = 'LLM removed required placeholders from system_prompt'
       void sendOptimizerFailure(msg)
       throw new Error(msg)
     }

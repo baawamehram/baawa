@@ -1,9 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { getFullKnowledgeText } from './knowledge'
 import { retrieveRelevantChunks } from './rag'
 import { getActiveConfig } from './journeyConfig'
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+import { callLLM, LLMMessage } from './llm-provider'
 
 export interface ConversationTurn {
   role: 'user' | 'assistant'
@@ -19,8 +17,6 @@ export async function generateNextQuestion(
   conversation: ConversationTurn[],
   latestAnswer: string
 ): Promise<QuestionResult> {
-  const model = process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001'
-
   // Get knowledge base content
   const [config, fullKnowledge, relevantChunks] = await Promise.all([
     getActiveConfig(),
@@ -36,21 +32,11 @@ export async function generateNextQuestion(
     .replace('{{KNOWLEDGE_BASE}}', fullKnowledge)
     .replace('{{RAG_CONTEXT}}', ragContext)
 
-  const messages: Anthropic.MessageParam[] = conversation.length > 0
-    ? conversation.map((turn) => ({
-        role: turn.role as 'user' | 'assistant',
-        content: turn.content,
-      }))
+  const messages: LLMMessage[] = conversation.length > 0
+    ? conversation.map((turn) => ({ role: turn.role, content: turn.content }))
     : [{ role: 'user', content: 'Begin the diagnostic interview.' }]
 
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 256,
-    system: systemPrompt,
-    messages,
-  })
-
-  const raw = response.content[0].type === 'text' ? response.content[0].text : ''
+  const { text: raw } = await callLLM({ messages, systemPrompt, chain: 'assessment', maxTokens: 256 })
   // Strip markdown fences if present
   const text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
 
