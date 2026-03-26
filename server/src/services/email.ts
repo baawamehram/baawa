@@ -83,3 +83,43 @@ export async function sendDeferEmail(to: string, body: string): Promise<void> {
     throw new Error(`Failed to send defer email to ${to}: ${String(err)}`)
   }
 }
+
+// 5. Optimizer proposed a high-risk config change — held for approval
+export async function sendOptimizerProposal(
+  changeSummary: string,
+  dashboardUrl: string
+): Promise<void> {
+  if (!FOUNDER_EMAIL) return
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: FOUNDER_EMAIL,
+      subject: 'Journey agent: new config proposal awaiting approval',
+      html: `<h2>Journey Agent — Config Proposal</h2>
+<p>The journey optimizer has proposed a high-risk configuration change that requires your approval before activation.</p>
+<p><strong>Summary:</strong> ${escapeHtml(changeSummary)}</p>
+<p><a href="${escapeHtml(dashboardUrl)}/dashboard/intelligence">Review and approve in dashboard →</a></p>`,
+    })
+  } catch (err) {
+    throw new Error(`Failed to send optimizer proposal email: ${String(err)}`)
+  }
+}
+
+// 6. Optimizer run failed — alert founder
+export async function sendOptimizerFailure(errorMessage: string): Promise<void> {
+  if (!FOUNDER_EMAIL) return
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: FOUNDER_EMAIL,
+      subject: 'Journey agent: optimizer run failed',
+      html: `<h2>Journey Optimizer — Run Failed</h2>
+<p>The weekly journey optimizer encountered an error and did not produce a new config.</p>
+<p><strong>Error:</strong> ${escapeHtml(errorMessage)}</p>
+<p>Check server logs for full details.</p>`,
+    })
+  } catch (err) {
+    // Log but don't re-throw — failure email failing is not actionable
+    console.error('Failed to send optimizer failure email:', err)
+  }
+}
