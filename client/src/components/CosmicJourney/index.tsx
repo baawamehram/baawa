@@ -131,6 +131,30 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
   const [micVisible, setMicVisible] = useState(false)
   const [micTapped, setMicTapped] = useState(false)
   const twTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [msgs, setMsgs] = useState<string[]>(MSGS)
+
+  // Fetch live intro messages from API (falls back to hardcoded MSGS on any failure)
+  useEffect(() => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+    fetch('/api/journey/intro', { signal: controller.signal })
+      .then((res) => res.json())
+      .then((data: { messages?: string[] }) => {
+        if (Array.isArray(data.messages) && data.messages.length >= 2) {
+          setMsgs(data.messages)
+        }
+      })
+      .catch(() => {
+        // Silently fall back to hardcoded MSGS
+      })
+      .finally(() => clearTimeout(timeoutId))
+
+    return () => {
+      controller.abort()
+      clearTimeout(timeoutId)
+    }
+  }, [])
 
   // Reduced motion: skip straight to assessment
   useEffect(() => {
@@ -399,11 +423,11 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
     let text = ''
 
     function typeNext() {
-      if (msgIdx >= MSGS.length) {
+      if (msgIdx >= msgs.length) {
         twTimerRef.current = setTimeout(() => setMicVisible(true), 400)
         return
       }
-      const full = MSGS[msgIdx]
+      const full = msgs[msgIdx]
       const toAdd = full.slice(text.length)
       let i = 0
 
