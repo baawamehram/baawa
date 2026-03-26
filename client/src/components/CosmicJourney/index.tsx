@@ -131,6 +131,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
   const [micVisible, setMicVisible] = useState(false)
   const [micTapped, setMicTapped] = useState(false)
   const twTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const textScrollRef = useRef<HTMLDivElement>(null)
   const [msgs, setMsgs] = useState<string[]>(MSGS)
 
   // Fetch live intro messages from API (falls back to hardcoded MSGS on any failure)
@@ -451,6 +452,18 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
   // Cleanup typewriter timers on unmount
   useEffect(() => () => { if (twTimerRef.current) clearTimeout(twTimerRef.current) }, [])
 
+  // Auto-scroll text to bottom while typing
+  useEffect(() => {
+    if (!textScrollRef.current || micVisible) return
+    textScrollRef.current.scrollTop = textScrollRef.current.scrollHeight
+  }, [twText, micVisible])
+
+  // Scroll to top when message finishes, so user reads from the start
+  useEffect(() => {
+    if (!micVisible || !textScrollRef.current) return
+    textScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [micVisible])
+
   // Orb tap handler
   const handleOrbTap = useCallback(() => {
     tapsRef.current += 1
@@ -687,74 +700,62 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
       <div style={{
         ...fadeStyle(showTypewriter),
         position: 'fixed', inset: 0, background: '#04040E', zIndex: 100,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
       }}>
-        {/* Orb */}
+        {/* Orb — pinned at top */}
         <div style={{
-          width: 130, height: 130, borderRadius: '50%', flexShrink: 0,
+          width: 100, height: 100, borderRadius: '50%', flexShrink: 0,
           background: 'radial-gradient(circle at 36% 32%, #FFAA80, #FF6B35 45%, #B83010)',
           animation: 'opulse2 2.4s ease-in-out infinite',
-          marginBottom: 44,
+          marginTop: 40, marginBottom: 28,
         }} />
 
-        {/* Typed text */}
-        <div style={{
-          fontFamily: 'Georgia, serif',
-          fontSize: 'clamp(17px, 2.4vw, 23px)',
-          color: '#FDFCFA', lineHeight: 1.85, textAlign: 'center',
-          maxWidth: 580, padding: '0 28px', minHeight: 150,
-          whiteSpace: 'pre-wrap',
+        {/* Scrollable typed text */}
+        <div ref={textScrollRef} style={{
+          flex: 1, overflowY: 'auto', width: '100%', maxWidth: 580,
+          padding: '0 28px',
         }}>
-          {twText}
-          <span style={{
-            display: 'inline-block', width: 2, height: '1em',
-            background: '#FF6B35', verticalAlign: 'middle',
-            animation: 'blink 0.75s step-end infinite', marginLeft: 3,
-          }} />
+          <div style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 'clamp(15px, 2vw, 19px)',
+            color: '#FDFCFA', lineHeight: 1.6, textAlign: 'center',
+            whiteSpace: 'pre-wrap',
+          }}>
+            {twText}
+            <span style={{
+              display: 'inline-block', width: 2, height: '1em',
+              background: '#FF6B35', verticalAlign: 'middle',
+              animation: 'blink 0.75s step-end infinite', marginLeft: 3,
+            }} />
+          </div>
         </div>
 
-        {/* Mic CTA */}
+        {/* Let's Begin */}
         <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
-          marginTop: 48,
+          flexShrink: 0, padding: '28px 28px 40px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
           opacity: micVisible ? 1 : 0,
-          transition: 'opacity 1s ease',
+          transition: 'opacity 0.8s ease',
           pointerEvents: micVisible ? 'auto' : 'none',
         }}>
-          <div
-            role="button"
-            tabIndex={0}
+          <button
             onClick={handleMicTap}
-            onKeyDown={e => { if (e.key === 'Enter') handleMicTap() }}
             style={{
-              width: 72, height: 72, borderRadius: '50%',
-              background: micTapped ? 'rgba(255,107,53,0.25)' : 'rgba(255,107,53,0.12)',
-              border: `1.5px solid rgba(255,107,53,${micTapped ? 0.9 : 0.5})`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', position: 'relative',
+              background: micTapped ? 'rgba(255,107,53,0.6)' : '#FF6B35',
+              color: '#FDFCFA', border: 'none', cursor: 'pointer',
+              padding: '14px 44px', borderRadius: '8px',
+              fontFamily: 'Outfit, sans-serif', fontSize: 16, fontWeight: 600,
+              letterSpacing: '0.04em', transition: 'background 0.2s',
             }}
           >
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{
-                position: 'absolute', inset: 0, borderRadius: '50%',
-                border: '1.5px solid rgba(255,107,53,0.4)',
-                animation: `micPulse 2s ease-out ${i * 0.6}s infinite`,
-                opacity: 0,
-              }} />
-            ))}
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style={{ position: 'relative', zIndex: 2 }}>
-              <rect x="9" y="2" width="6" height="11" rx="3" fill="#FF6B35" />
-              <path d="M5 11a7 7 0 0 0 14 0" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" />
-              <line x1="12" y1="18" x2="12" y2="22" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" />
-              <line x1="9" y1="22" x2="15" y2="22" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </div>
+            {micTapped ? 'Starting…' : "Let's Begin →"}
+          </button>
           <div style={{
             fontFamily: 'Courier New, monospace', fontSize: 10,
             letterSpacing: '0.18em', textTransform: 'uppercase',
-            color: micTapped ? 'rgba(255,107,53,0.7)' : 'rgba(253,252,250,0.35)',
+            color: 'rgba(253,252,250,0.3)',
           }}>
-            {micTapped ? 'Starting...' : 'Tap to begin'}
+            Your assessment awaits
           </div>
         </div>
       </div>
