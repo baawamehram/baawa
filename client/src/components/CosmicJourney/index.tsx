@@ -140,7 +140,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-    fetch('/api/journey/intro', { signal: controller.signal })
+    fetch(`${API_URL}/api/journey/intro`, { signal: controller.signal })
       .then((res) => res.json())
       .then((data: { messages?: string[] }) => {
         if (Array.isArray(data.messages) && data.messages.length >= 2) {
