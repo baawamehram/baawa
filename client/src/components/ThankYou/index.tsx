@@ -148,7 +148,7 @@ export function ThankYou() {
             letterSpacing: '-0.01em',
           }}
         >
-          Our founder is reviewing your answers personally.
+          Your assessment is under review.
         </motion.h1>
 
         <motion.p
@@ -163,7 +163,7 @@ export function ThankYou() {
             lineHeight: 1.65,
           }}
         >
-          You'll hear from us within 48 hours.
+          Our experts — not AI — go through every submission personally. We use a stringent scoring process across five dimensions. You'll receive your full score and feedback directly from us.
         </motion.p>
 
         {/* Divider */}

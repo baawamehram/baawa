@@ -131,10 +131,13 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
 router.post('/:id/complete', async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const parsed = z.object({ email: z.string().email() }).safeParse(req.body)
+    const parsed = z.object({
+      email: z.string().email(),
+      phone: z.string().optional(),
+    }).safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: 'Invalid email' })
 
-    const { email } = parsed.data
+    const { email, phone } = parsed.data
 
     const sessionResult = await db.query<{
       conversation: ConversationTurn[]
@@ -161,12 +164,13 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
 
     const assessmentResult = await db.query<{ id: number }>(
       `INSERT INTO assessments
-       (session_id, email, city, country, conversation, score, score_breakdown, score_summary, biggest_opportunity, biggest_risk)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       (session_id, email, phone, city, country, conversation, score, score_breakdown, score_summary, biggest_opportunity, biggest_risk)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING id`,
       [
         id,
         email,
+        phone ?? null,
         session.city,
         session.country,
         JSON.stringify(session.conversation),

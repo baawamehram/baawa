@@ -14,10 +14,11 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
   const reducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<Phase>('analyzing')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [emailError, setEmailError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [apiError, setApiError] = useState('')
-  const [focused, setFocused] = useState(false)
+  const [focused, setFocused] = useState<'email' | 'phone' | null>(null)
 
   // Advance from loader to form after 3 seconds
   useEffect(() => {
@@ -46,7 +47,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
       const res = await fetch(`${API_URL}/api/sessions/${sessionId}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, phone: phone.trim() || undefined }),
       })
 
       if (res.status === 409) {
@@ -224,7 +225,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 lineHeight: 1.6,
               }}
             >
-              Enter your email to receive your personalised insights.
+              Where should we send your results?
             </motion.p>
 
             <motion.form
@@ -268,7 +269,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                     background: 'rgba(255,107,53,0.07)',
                     border: emailError
                       ? '1.5px solid #ef4444'
-                      : focused
+                      : focused === 'email'
                       ? '1.5px solid #FF6B35'
                       : '1.5px solid rgba(255,107,53,0.3)',
                     borderRadius: 10,
@@ -281,8 +282,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                     boxSizing: 'border-box',
                     transition: 'border-color 0.2s',
                   }}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
+                  onFocus={() => setFocused('email')}
+                  onBlur={() => setFocused(null)}
                 />
                 {emailError && (
                   <motion.p
@@ -298,6 +299,47 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                     {emailError}
                   </motion.p>
                 )}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label
+                  htmlFor="phone-input"
+                  style={{
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: 13,
+                    color: 'rgba(255,176,154,0.6)',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  WhatsApp / Phone <span style={{ opacity: 0.5, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
+                </label>
+                <input
+                  id="phone-input"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  autoComplete="tel"
+                  disabled={submitting}
+                  style={{
+                    background: 'rgba(255,107,53,0.07)',
+                    border: focused === 'phone'
+                      ? '1.5px solid #FF6B35'
+                      : '1.5px solid rgba(255,107,53,0.3)',
+                    borderRadius: 10,
+                    padding: '13px 16px',
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: 16,
+                    color: '#FDFCFA',
+                    outline: 'none',
+                    width: '100%',
+                    boxSizing: 'border-box' as const,
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={() => setFocused('phone')}
+                  onBlur={() => setFocused(null)}
+                />
               </div>
 
               {apiError && (

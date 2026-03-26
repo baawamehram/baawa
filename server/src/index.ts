@@ -72,6 +72,7 @@ async function startServer() {
   // Run any pending structural migrations before accepting traffic
   try {
     await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS journey_config_version INT`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`)
     await db.query(`
       CREATE TABLE IF NOT EXISTS journey_config (
         id          SERIAL PRIMARY KEY,
