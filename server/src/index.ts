@@ -24,9 +24,18 @@ if (!CLIENT_URL && process.env.NODE_ENV === 'production') {
   process.exit(1)
 }
 const allowedOrigins = CLIENT_URL
-  ? [CLIENT_URL, CLIENT_URL.replace('https://www.', 'https://'), CLIENT_URL.replace('https://', 'https://www.')]
-  : ['*']
-app.use(cors({ origin: CLIENT_URL ? allowedOrigins : '*' }))
+  ? Array.from(new Set([
+      CLIENT_URL,
+      CLIENT_URL.replace(/^https:\/\/www\./, 'https://'),
+      CLIENT_URL.replace(/^https:\/\/(?!www\.)/, 'https://www.'),
+    ]))
+  : null
+const corsOptions = {
+  origin: allowedOrigins ?? '*',
+  credentials: true,
+}
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(rateLimit({ windowMs: 60_000, max: 60 }))
 app.use(express.json())
 
