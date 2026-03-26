@@ -142,7 +142,7 @@ Return JSON only, no markdown:
     let rawResponse: string
     try {
       const response = await anthropic.messages.create({
-        model: 'claude-opus-4-6',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4096,
         system: 'You are a senior conversion strategist, behavioural psychologist, and Ogilvy-trained copywriter specialising in founder qualification funnels. Your job is to diagnose underperformance and produce a strictly improved configuration.',
         messages: [{ role: 'user', content: userMessage }],
@@ -170,7 +170,7 @@ Return JSON only, no markdown:
     } catch {
       try {
         const retryResponse = await anthropic.messages.create({
-          model: 'claude-opus-4-6',
+          model: 'claude-sonnet-4-6',
           max_tokens: 4096,
           system: 'You are a senior conversion strategist, behavioural psychologist, and Ogilvy-trained copywriter specialising in founder qualification funnels.',
           messages: [
