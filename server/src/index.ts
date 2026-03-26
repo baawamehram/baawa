@@ -13,6 +13,8 @@ import voiceRouter from './routes/voice'
 import geoRouter from './routes/geo'
 import marketRouter from './routes/market'
 import journeyRouter from './routes/journey'
+import cookieParser from 'cookie-parser'
+import portalRouter from './routes/portal'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -38,6 +40,7 @@ app.use(cors(corsOptions))
 app.options('*', cors(corsOptions))
 app.use(rateLimit({ windowMs: 60_000, max: 60 }))
 app.use(express.json())
+app.use(cookieParser())
 
 // Routes
 app.use('/api/sessions', sessionsRouter)
@@ -49,6 +52,7 @@ app.use('/api/voice', voiceRouter)
 app.use('/api/geo', geoRouter)
 app.use('/api/market-data', marketRouter)
 app.use('/api/journey', journeyRouter)
+app.use('/api/portal', portalRouter)
 
 // Health
 app.get('/health', async (_req, res) => {
@@ -106,6 +110,33 @@ async function startServer() {
       `UPDATE journey_config SET intro_messages = $1 WHERE version = 1`,
       [JSON.stringify(V1_INTRO_MESSAGES)]
     )
+
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS results_unlocked BOOLEAN NOT NULL DEFAULT false`)
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS portal_tokens (
+        id            SERIAL PRIMARY KEY,
+        assessment_id INT NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+        token         VARCHAR(64) UNIQUE NOT NULL,
+        expires_at    TIMESTAMPTZ NOT NULL,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_tokens_token ON portal_tokens (token)`)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_tokens_expires ON portal_tokens (expires_at)`)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_tokens_assessment ON portal_tokens (assessment_id)`)
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS portal_messages (
+        id            SERIAL PRIMARY KEY,
+        assessment_id INT NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+        sender        VARCHAR(20) NOT NULL CHECK (sender IN ('team', 'prospect')),
+        body          TEXT NOT NULL,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_messages_assessment ON portal_messages (assessment_id, created_at)`)
+
     console.log('Startup migrations OK')
   } catch (err) {
     console.error('Startup migration error:', err)
