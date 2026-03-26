@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { GoogleGenerativeAI, GoogleGenerativeAIFetchError } from '@google/generative-ai'
+import Groq from 'groq-sdk'
 
 export type ModelChain = 'assessment' | 'optimizer'
 
@@ -17,7 +18,7 @@ export interface LLMRequest {
 
 export interface LLMResponse {
   text: string
-  provider: 'claude' | 'gemini' | 'ollama'
+  provider: 'claude' | 'gemini' | 'groq'
 }
 
 export class AllProvidersFailedError extends Error {
@@ -72,16 +73,18 @@ async function callGemini(req: LLMRequest, model: string): Promise<string> {
   return result.response.text()
 }
 
-async function callOllama(req: LLMRequest, model: string): Promise<string> {
-  const baseURL = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434') + '/v1'
-  const anthropic = new Anthropic({ baseURL, apiKey: 'ollama' })
-  const response = await anthropic.messages.create({
+async function callGroq(req: LLMRequest, model: string): Promise<string> {
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  const messages = [
+    { role: 'system' as const, content: req.systemPrompt },
+    ...req.messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+  ]
+  const response = await groq.chat.completions.create({
     model,
     max_tokens: req.maxTokens,
-    system: req.systemPrompt,
-    messages: req.messages,
+    messages,
   })
-  return response.content[0].type === 'text' ? response.content[0].text : ''
+  return response.choices[0]?.message?.content ?? ''
 }
 
 export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
@@ -95,18 +98,18 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
       ? (process.env.GEMINI_OPTIMIZER_MODEL ?? 'gemini-1.5-pro')
       : (process.env.GEMINI_ASSESSMENT_MODEL ?? 'gemini-1.5-flash')
 
-  const ollamaModel =
+  const groqModel =
     req.chain === 'optimizer'
-      ? (process.env.OLLAMA_OPTIMIZER_MODEL ?? 'llama3.3:70b')
-      : (process.env.OLLAMA_MODEL ?? 'qwen2.5:7b')
+      ? (process.env.GROQ_OPTIMIZER_MODEL ?? 'llama-3.3-70b-versatile')
+      : (process.env.GROQ_ASSESSMENT_MODEL ?? 'llama-3.1-8b-instant')
 
   const providers: Array<{
-    name: 'claude' | 'gemini' | 'ollama'
+    name: 'claude' | 'gemini' | 'groq'
     fn: () => Promise<string>
   }> = [
     { name: 'claude', fn: () => callClaude(req, claudeModel) },
     { name: 'gemini', fn: () => callGemini(req, geminiModel) },
-    { name: 'ollama', fn: () => callOllama(req, ollamaModel) },
+    { name: 'groq', fn: () => callGroq(req, groqModel) },
   ]
 
   const failures: Array<{ provider: string; error: string }> = []
