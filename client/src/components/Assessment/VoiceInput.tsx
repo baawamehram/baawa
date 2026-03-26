@@ -59,7 +59,7 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
       <motion.button
         onClick={handleClick}
         disabled={disabled}
@@ -149,7 +149,7 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
         </span>
       )}
 
-      {isRecording && (
+      {isRecording ? (
         <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: [0.5, 1, 0.5] }}
@@ -158,6 +158,10 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
         >
           Recording… tap to stop
         </motion.span>
+      ) : (
+        <span style={{ fontSize: 10, color: 'rgba(255,176,154,0.4)', fontFamily: 'Outfit, sans-serif' }}>
+          any language
+        </span>
       )}
     </div>
   )
