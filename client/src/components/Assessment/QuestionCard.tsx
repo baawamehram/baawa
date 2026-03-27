@@ -13,6 +13,7 @@ interface QuestionCardProps {
 export function QuestionCard({ question, questionKey, loading, onSubmit, onRecordingChange }: QuestionCardProps) {
   const [answer, setAnswer] = useState('')
   const [showTextarea, setShowTextarea] = useState(false)
+  const [isVoiceRecording, setIsVoiceRecording] = useState(false)
 
   useEffect(() => {
     setAnswer('')
@@ -109,9 +110,12 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
                 }}
                 onVoiceUnavailable={() => setShowTextarea(true)}
                 disabled={loading}
-                onRecordingChange={onRecordingChange}
+                onRecordingChange={(isRec) => {
+                  setIsVoiceRecording(isRec)
+                  if (onRecordingChange) onRecordingChange(isRec)
+                }}
               />
-              {!showTextarea && (
+              {!showTextarea && !isVoiceRecording && (
                 <motion.button
                   onClick={() => setShowTextarea(true)}
                   whileHover={{ color: '#FFFFFF' }}

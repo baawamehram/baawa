@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export interface IntakeData {
@@ -27,37 +27,78 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
     setIntake((prev: IntakeData) => ({ ...prev, [name]: value }));
   };
 
+  const bootLines = [
+    { text: "INITIALIZING DIAGNOSTIC INTERFACE V1.4...", delay: 100 },
+    { text: "Kicking off intelligence servers..........[OK]", delay: 600 },
+    { text: "Calibrating strategy models...............[OK]", delay: 1200 },
+    { text: "Diagnostic Nodes..........................[READY]", delay: 1800 },
+    { text: "Connecting to Global Market Sync..........[SYNCED]", delay: 2400 },
+    { text: "Scanning correlation metrics..............[OK]", delay: 2900 },
+    { text: "All nodes active. Ingestion ready.", delay: 3500 }
+  ];
+
+  const [visibleLines, setVisibleLines] = useState<number>(0);
+
+  useEffect(() => {
+    if (step === 'dashboard') {
+      const timers = bootLines.map((line, index) => {
+        return setTimeout(() => {
+          setVisibleLines(index + 1);
+        }, line.delay);
+      });
+      return () => timers.forEach(clearTimeout);
+    }
+  }, [step]);
+
   const renderDashboard = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '16px', maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
+    <div style={{ 
+      background: '#0a0a0a', 
+      border: '1px solid #333', 
+      borderRadius: '8px', 
+      padding: '24px', 
+      maxWidth: '600px', 
+      margin: '0 auto', 
+      fontFamily: 'monospace',
+      fontSize: '14px',
+      minHeight: '300px',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: '0 0 20px rgba(0,0,0,0.8) inset'
+    }}>
+      {/* Scanline Overlay */}
       <motion.div
         animate={{ top: ['0%', '100%'] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-        style={{ position: 'absolute', left: 0, right: 0, height: '2px', background: 'rgba(255,107,53,0.2)', zIndex: 5, pointerEvents: 'none' }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        style={{ position: 'absolute', left: 0, right: 0, height: '4px', background: 'rgba(255,107,53,0.1)', zIndex: 5, pointerEvents: 'none' }}
       />
       
-      <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Intelligence Node 04</strong>
-        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Kicking off intelligence servers...</p>
-      </div>
-      <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Strategy Engine</strong>
-        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Calibrating strategy models...</p>
-      </div>
-      <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Ingestion Pipeline</strong>
-        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Diagnostic Nodes: <span style={{ color: '#ff6b35' }}>READY</span></p>
-      </div>
-      <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Global Market Sync</strong>
-        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Stability Alert: <span style={{ color: '#0f0' }}>SYNCED</span></p>
-      </div>
-      <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Risk Correlation</strong>
-        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Scanning correlation metrics...</p>
-      </div>
-      <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>System Status</strong>
-        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>All nodes active. Ingestion ready.</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 10, position: 'relative' }}>
+        {bootLines.slice(0, visibleLines).map((line, i) => {
+          const isOK = line.text.includes('[OK]');
+          const isReady = line.text.includes('[READY]');
+          const isSynced = line.text.includes('[SYNCED]');
+          
+          let color = '#ccc';
+          if (isOK) color = '#fff';
+          if (isReady) color = '#ff6b35';
+          if (isSynced) color = '#0f0';
+
+          return (
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, x: -5 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              transition={{ duration: 0.1 }}
+              style={{ color }}
+            >
+              <span style={{ color: '#ff6b35', marginRight: '8px' }}>&gt;</span>
+              {line.text}
+            </motion.div>
+          );
+        })}
+        {visibleLines < bootLines.length && (
+          <motion.div animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} style={{ width: '10px', height: '16px', background: '#ff6b35', marginTop: '4px' }} />
+        )}
       </div>
     </div>
   );
@@ -165,14 +206,16 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
         <div style={{ padding: '20px' }}>
           <h1 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '32px', fontFamily: 'Cormorant Garamond, serif', fontWeight: '300' }}>Diagnostic Interface <span style={{ color: '#ff6b35' }}>v1.4</span></h1>
           {renderDashboard()}
-          <div style={{ textAlign: 'center', marginTop: '48px' }}>
-            <button
-              onClick={() => setStep('intake')}
-              style={{ padding: '12px 32px', background: '#ff6b35', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}
-            >
-              INITIALIZE INTAKE
-            </button>
-          </div>
+          {visibleLines === bootLines.length && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginTop: '48px' }}>
+              <button
+                onClick={() => setStep('intake')}
+                style={{ padding: '14px 40px', background: '#ff6b35', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.05em' }}
+              >
+                INITIALIZE INTAKE
+              </button>
+            </motion.div>
+          )}
         </div>
       )}
       {step === 'intake' && renderIntake()}
