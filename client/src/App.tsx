@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CosmicJourney } from './components/CosmicJourney'
 import { AssessmentShell } from './components/Assessment/AssessmentShell'
 import { EmailCapture } from './components/EmailCapture'
@@ -7,6 +7,9 @@ import { ThankYou } from './components/ThankYou'
 import Dashboard from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
 import { API_URL } from './lib/api'
+import { PortalLogin } from './components/Portal/Login'
+import { PortalVerify } from './components/Portal/Verify'
+import { PortalResults } from './components/Portal/Results'
 
 type FunnelPhase = 'journey' | 'assessment' | 'email' | 'thankyou'
 
@@ -109,6 +112,10 @@ export default function App() {
           }
         />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/portal" element={<Navigate to="/portal/login" replace />} />
+        <Route path="/portal/login" element={<PortalLogin />} />
+        <Route path="/portal/verify" element={<PortalVerify />} />
+        <Route path="/portal/results" element={<PortalResults />} />
       </Routes>
     </BrowserRouter>
   )
