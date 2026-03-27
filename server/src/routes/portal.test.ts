@@ -66,6 +66,19 @@ describe('POST /api/portal/verify', () => {
     const res = await request(app).post('/api/portal/verify').send({ token: validToken })
     expect(res.status).toBe(400)
   })
+
+  it('sets portal_token cookie and returns ok:true on valid token', async () => {
+    const validToken = 'a'.repeat(64)
+    mockDb.query
+      .mockResolvedValueOnce({ rows: [{ id: 1, assessment_id: 42 }] } as any)
+      .mockResolvedValueOnce({ rows: [{ email: 'user@test.com' }] } as any)
+      .mockResolvedValueOnce({ rows: [] } as any)
+
+    const res = await request(app).post('/api/portal/verify').send({ token: validToken })
+    expect(res.status).toBe(200)
+    expect(res.body.ok).toBe(true)
+    expect(res.headers['set-cookie']).toBeDefined()
+  })
 })
 
 describe('GET /api/portal/me', () => {
