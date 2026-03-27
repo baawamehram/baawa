@@ -163,4 +163,18 @@ router.post('/:id/message', async (req: Request, res: Response) => {
   }
 })
 
+// GET /api/assessments/:id/messages — admin view of portal message thread
+router.get('/:id/messages', async (req: Request, res: Response) => {
+  try {
+    const result = await db.query(
+      `SELECT id, sender, body, created_at FROM portal_messages WHERE assessment_id = $1 ORDER BY created_at ASC`,
+      [req.params.id]
+    )
+    res.json(result.rows)
+  } catch (err) {
+    console.error('GET /assessments/:id/messages error:', err)
+    res.status(500).json({ error: 'Failed to load messages' })
+  }
+})
+
 export default router

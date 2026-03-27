@@ -13,6 +13,7 @@ interface Assessment {
   founder_notes: string
   conversation: Array<{ role: 'user' | 'assistant'; content: string }>
   created_at: string
+  results_unlocked?: boolean
 }
 
 interface Props {
@@ -37,6 +38,11 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const [saving, setSaving] = useState(false)
   const [actionMsg, setActionMsg] = useState('')
   const [error, setError] = useState('')
+  const [messages, setMessages] = useState<Array<{ id: number; sender: string; body: string; created_at: string }>>([])
+  const [messageBody, setMessageBody] = useState('')
+  const [sendingMsg, setSendingMsg] = useState(false)
+  const [msgError, setMsgError] = useState('')
+  const [unlocking, setUnlocking] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -50,6 +56,13 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         const data = await res.json()
         setAssessment(data)
         setNotes(data.founder_notes || '')
+        try {
+          const msgsRes = await authFetch(`${API_URL}/api/assessments/${id}/messages`, token, on401)
+          if (msgsRes?.ok) {
+            const msgsData = await msgsRes.json()
+            setMessages(msgsData)
+          }
+        } catch { /* non-critical */ }
       } catch {
         setError('Network error. Please check your connection.')
       } finally {
@@ -126,6 +139,25 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
           </p>
         </div>
         <div className="flex gap-3">
+          {!assessment.results_unlocked && (
+            <button
+              onClick={async () => {
+                setUnlocking(true)
+                try {
+                  const res = await authFetch(`${API_URL}/api/assessments/${id}/unlock-results`, token, on401, { method: 'POST' })
+                  if (res?.ok) {
+                    setAssessment((prev) => prev ? { ...prev, results_unlocked: true } : prev)
+                    setActionMsg('Results unlocked — the prospect can now see their score.')
+                  }
+                } catch { setError('Failed to unlock results.') }
+                finally { setUnlocking(false) }
+              }}
+              disabled={unlocking}
+              className="bg-orange-600 hover:bg-orange-500 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {unlocking ? 'Unlocking…' : 'Unlock Results'}
+            </button>
+          )}
           <button
             onClick={() => handleAction('onboard')}
             className="bg-green-600 hover:bg-green-500 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors"
@@ -223,6 +255,62 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
             <p className="text-gray-400 font-body text-sm">No conversation data.</p>
           )}
         </div>
+      </div>
+
+      {/* Portal Messages */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mt-6">
+        <h3 className="text-lg font-heading text-white mb-4">Portal Messages</h3>
+
+        {/* Thread */}
+        <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto pr-1">
+          {messages.length === 0 && (
+            <p className="text-gray-400 font-body text-sm">No messages yet.</p>
+          )}
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.sender === 'prospect' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[75%] px-3 py-2 rounded-xl font-body text-sm ${msg.sender === 'team' ? 'bg-orange-900/30 text-orange-200' : 'bg-gray-800 text-gray-300'}`}>
+                <div className="text-xs opacity-60 mb-1">{msg.sender === 'team' ? 'You' : 'Prospect'}</div>
+                {msg.body}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Send form */}
+        <div className="flex gap-2">
+          <textarea
+            value={messageBody}
+            onChange={(e) => setMessageBody(e.target.value)}
+            placeholder="Write a message to this prospect…"
+            rows={2}
+            className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 resize-none"
+          />
+          <button
+            onClick={async () => {
+              if (!messageBody.trim()) return
+              setSendingMsg(true)
+              setMsgError('')
+              try {
+                const res = await authFetch(`${API_URL}/api/assessments/${id}/message`, token, on401, {
+                  method: 'POST',
+                  body: JSON.stringify({ body: messageBody.trim() }),
+                })
+                if (res?.ok) {
+                  setMessages((prev) => [...prev, { id: Date.now(), sender: 'team', body: messageBody.trim(), created_at: new Date().toISOString() }])
+                  setMessageBody('')
+                } else {
+                  setMsgError('Failed to send. Try again.')
+                }
+              } catch { setMsgError('Network error.') }
+              finally { setSendingMsg(false) }
+            }}
+            disabled={sendingMsg || !messageBody.trim()}
+            className="bg-orange-600 hover:bg-orange-500 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
+          >
+            {sendingMsg ? '…' : 'Send'}
+          </button>
+        </div>
+        {msgError && <p className="text-red-400 font-body text-xs mt-2">{msgError}</p>}
       </div>
     </div>
   )
