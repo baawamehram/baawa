@@ -40,7 +40,7 @@ export function RevenueOverview({ token, on401 }: Props) {
     load()
   }, [token, on401])
 
-  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
+  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
 
   const totalPhase1 = clients.reduce((sum, c) => sum + (c.phase1_fee || 0), 0)
   const activeMRR = clients
@@ -53,55 +53,55 @@ export function RevenueOverview({ token, on401 }: Props) {
   const fmt = (n: number) => `$${n.toLocaleString()}`
 
   return (
-    <div>
-      <h2 className="text-2xl font-heading text-white mb-6">Revenue</h2>
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 24px 0' }}>Revenue</h2>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-          <p className="text-slate-400 font-body text-xs uppercase tracking-wider mb-1">Total Phase 1 Revenue</p>
-          <p className="text-3xl font-heading text-white">{fmt(totalPhase1)}</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
+        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
+          <p style={{ color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Total Phase 1 Revenue</p>
+          <p style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', margin: 0 }}>{fmt(totalPhase1)}</p>
         </div>
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-          <p className="text-slate-400 font-body text-xs uppercase tracking-wider mb-1">Active MRR</p>
-          <p className="text-3xl font-heading text-orange-400">{fmt(activeMRR)}</p>
+        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
+          <p style={{ color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Active MRR</p>
+          <p style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', margin: 0 }}>{fmt(activeMRR)}</p>
         </div>
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-          <p className="text-slate-400 font-body text-xs uppercase tracking-wider mb-1">Pipeline Value</p>
-          <p className="text-3xl font-heading text-orange-400">{fmt(pipelineValue)}</p>
+        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
+          <p style={{ color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Pipeline Value</p>
+          <p style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', margin: 0 }}>{fmt(pipelineValue)}</p>
         </div>
       </div>
 
-      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-        <table className="w-full">
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b border-slate-700 text-left">
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Client</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Stage</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Phase 1 Fee</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Monthly Fee</th>
+            <tr style={{ borderBottom: '1px solid #333333', textAlign: 'left' }}>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Client</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Stage</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Phase 1 Fee</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Monthly Fee</th>
             </tr>
           </thead>
           <tbody>
             {clients.map((c) => (
-              <tr key={c.id} className="border-b border-slate-700/50">
-                <td className="px-6 py-4">
-                  <p className="text-white font-body text-sm">{c.founder_name}</p>
-                  <p className="text-slate-400 font-body text-xs">{c.company_name}</p>
+              <tr key={c.id} style={{ borderBottom: '1px solid #222222' }}>
+                <td style={{ padding: '16px 24px' }}>
+                  <p style={{ color: '#ffffff', fontSize: '14px', margin: '0 0 2px 0' }}>{c.founder_name}</p>
+                  <p style={{ color: '#aaaaaa', fontSize: '12px', margin: 0 }}>{c.company_name}</p>
                 </td>
-                <td className="px-6 py-4 text-slate-400 font-body text-sm">{c.stage}</td>
-                <td className="px-6 py-4 text-white font-body text-sm">{fmt(c.phase1_fee || 0)}</td>
-                <td className="px-6 py-4 text-white font-body text-sm">{fmt(c.phase2_monthly_fee || 0)}</td>
+                <td style={{ padding: '16px 24px', color: '#aaaaaa', fontSize: '14px' }}>{c.stage}</td>
+                <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px' }}>{fmt(c.phase1_fee || 0)}</td>
+                <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px' }}>{fmt(c.phase2_monthly_fee || 0)}</td>
               </tr>
             ))}
             {clients.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 font-body text-sm">
+                <td colSpan={4} style={{ padding: '32px 24px', textAlign: 'center', color: '#aaaaaa', fontSize: '14px' }}>
                   No clients yet.
                 </td>
               </tr>

@@ -16,10 +16,10 @@ interface Props {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-500/20 text-yellow-400',
-  reviewing: 'bg-blue-500/20 text-blue-400',
-  onboarded: 'bg-green-500/20 text-green-400',
-  deferred: 'bg-slate-700 text-slate-400',
+  pending: '#facc15',
+  reviewing: '#60a5fa',
+  onboarded: '#4ade80',
+  deferred: '#aaaaaa',
 }
 
 export function SubmissionList({ token, on401, onSelect }: Props) {
@@ -54,30 +54,30 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
     .filter((a) => a.email.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => b.score - a.score)
 
-  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
+  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
 
   return (
-    <div>
-      <h2 className="text-2xl font-heading text-white mb-6">Assessments</h2>
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 24px 0' }}>Assessments</h2>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
-      <div className="flex gap-4 mb-6">
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by email..."
-          className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 flex-1 max-w-xs"
+          style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', flex: 1, maxWidth: '300px', fontFamily: "'Outfit', sans-serif" }}
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
+          style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', fontFamily: "'Outfit', sans-serif" }}
         >
           <option value="all">All statuses</option>
           <option value="pending">Pending</option>
@@ -87,14 +87,14 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
         </select>
       </div>
 
-      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-        <table className="w-full">
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b border-slate-700 text-left">
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Score</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Date</th>
+            <tr style={{ borderBottom: '1px solid #333333', textAlign: 'left' }}>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Name</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Score</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Status</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Date</th>
             </tr>
           </thead>
           <tbody>
@@ -102,23 +102,25 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
               <tr
                 key={a.id}
                 onClick={() => onSelect(a.id)}
-                className="border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition-colors"
+                style={{ borderBottom: '1px solid #222222', cursor: 'pointer' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = '#1a1a1a' }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent' }}
               >
-                <td className="px-6 py-4 text-white font-body text-sm">{a.email}</td>
-                <td className="px-6 py-4 text-white font-heading text-sm">{a.score}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-body ${STATUS_COLORS[a.status] || ''}`}>
+                <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px' }}>{a.email}</td>
+                <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px', fontWeight: 600 }}>{a.score}</td>
+                <td style={{ padding: '16px 24px' }}>
+                  <span style={{ fontSize: '12px', color: STATUS_COLORS[a.status] || '#aaaaaa' }}>
                     {a.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-slate-400 font-body text-sm">
+                <td style={{ padding: '16px 24px', color: '#aaaaaa', fontSize: '14px' }}>
                   {new Date(a.created_at).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 font-body text-sm">
+                <td colSpan={4} style={{ padding: '32px 24px', textAlign: 'center', color: '#aaaaaa', fontSize: '14px' }}>
                   No assessments found.
                 </td>
               </tr>

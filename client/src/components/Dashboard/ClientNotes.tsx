@@ -44,41 +44,41 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
   }
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-      <h3 className="text-lg font-heading text-white mb-4">Notes</h3>
+    <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', fontFamily: "'Outfit', sans-serif" }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Notes</h3>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-4 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
-      <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '300px', overflowY: 'auto' }}>
         {notes.map((note) => (
-          <div key={note.id} className="bg-slate-800 rounded-lg px-4 py-3">
-            <p className="text-slate-300 font-body text-sm whitespace-pre-wrap">{note.content}</p>
-            <p className="text-slate-500 font-body text-xs mt-2">
+          <div key={note.id} style={{ background: '#1a1a1a', borderRadius: '6px', padding: '12px 16px' }}>
+            <p style={{ color: '#aaaaaa', fontSize: '14px', whiteSpace: 'pre-wrap', margin: '0 0 8px 0' }}>{note.content}</p>
+            <p style={{ color: '#666666', fontSize: '12px', margin: 0 }}>
               {new Date(note.created_at).toLocaleString()}
             </p>
           </div>
         ))}
         {notes.length === 0 && (
-          <p className="text-slate-500 font-body text-sm">No notes yet.</p>
+          <p style={{ color: '#666666', fontSize: '14px', margin: 0 }}>No notes yet.</p>
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div style={{ display: 'flex', gap: '8px' }}>
         <textarea
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Add a note..."
-          className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 resize-none"
+          style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', resize: 'none', outline: 'none', fontFamily: "'Outfit', sans-serif" }}
           rows={2}
         />
         <button
           onClick={addNote}
           disabled={adding}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
+          style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: adding ? 'default' : 'pointer', opacity: adding ? 0.5 : 1, alignSelf: 'flex-end', fontFamily: "'Outfit', sans-serif" }}
         >
           Add
         </button>

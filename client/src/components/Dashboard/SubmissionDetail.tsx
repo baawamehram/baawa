@@ -104,7 +104,6 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         return
       }
       setActionMsg(action === 'onboard' ? 'Client onboarded successfully!' : 'Assessment deferred. Email sent.')
-      // refresh
       try {
         const updated = await authFetch(`${API_URL}/api/assessments/${id}`, token, on401)
         if (updated?.ok) {
@@ -119,26 +118,26 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
     }
   }
 
-  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
-  if (!assessment) return <p className="text-slate-400 font-body">Assessment not found.</p>
+  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
+  if (!assessment) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Assessment not found.</p>
 
   const breakdown = assessment.score_breakdown || {}
 
   return (
-    <div>
-      <button onClick={onBack} className="text-orange-400 hover:text-orange-400 font-body text-sm mb-6 inline-block">
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <button onClick={onBack} style={{ color: '#aaaaaa', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', marginBottom: '24px', display: 'inline-block', padding: 0 }}>
         &larr; Back to list
       </button>
 
-      <div className="flex items-center justify-between mb-6">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
-          <h2 className="text-2xl font-heading text-white">{assessment.email}</h2>
-          <p className="text-slate-400 font-body text-sm mt-1">
-            Score: <span className="text-white font-heading">{assessment.score}</span> &middot; Status:{' '}
-            <span className="text-orange-400">{assessment.status}</span>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 4px 0' }}>{assessment.email}</h2>
+          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>
+            Score: <span style={{ color: '#ffffff', fontWeight: 600 }}>{assessment.score}</span> &middot; Status:{' '}
+            <span style={{ color: '#ffffff' }}>{assessment.status}</span>
           </p>
         </div>
-        <div className="flex gap-3">
+        <div style={{ display: 'flex', gap: '12px' }}>
           {!assessment.results_unlocked && (
             <button
               onClick={async () => {
@@ -153,20 +152,20 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                 finally { setUnlocking(false) }
               }}
               disabled={unlocking}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+              style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: unlocking ? 'default' : 'pointer', opacity: unlocking ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
             >
               {unlocking ? 'Unlocking…' : 'Unlock Results'}
             </button>
           )}
           <button
             onClick={() => handleAction('onboard')}
-            className="bg-green-600 hover:bg-green-500 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors"
+            style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
           >
             Onboard
           </button>
           <button
             onClick={() => handleAction('defer')}
-            className="bg-slate-800 hover:bg-white/10 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors"
+            style={{ background: '#333333', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
           >
             Defer
           </button>
@@ -174,102 +173,106 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
       </div>
 
       {actionMsg && (
-        <div className="bg-green-900/30 border border-green-700/50 text-green-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {actionMsg}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
       {/* Score Breakdown */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6">
-        <h3 className="text-lg font-heading text-white mb-4">Score Breakdown</h3>
-        <div className="space-y-3">
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Score Breakdown</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {Object.entries(breakdown).map(([key, value]) => (
-            <div key={key} className="flex items-center gap-4">
-              <span className="text-slate-400 font-body text-sm w-36">{DIMENSION_LABELS[key] || key}</span>
-              <div className="flex-1 bg-slate-800 rounded-full h-3 overflow-hidden">
+            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <span style={{ color: '#aaaaaa', fontSize: '14px', width: '144px', flexShrink: 0 }}>{DIMENSION_LABELS[key] || key}</span>
+              <div style={{ flex: 1, background: '#1a1a1a', borderRadius: '999px', height: '12px', overflow: 'hidden' }}>
                 <div
-                  className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full transition-all"
-                  style={{ width: `${value}%` }}
+                  style={{ height: '100%', background: '#ffffff', borderRadius: '999px', width: `${value}%`, transition: 'width 0.3s' }}
                 />
               </div>
-              <span className="text-white font-heading text-sm w-8 text-right">{value}</span>
+              <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, width: '32px', textAlign: 'right' }}>{value}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Opportunity & Risk */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-sm font-heading text-green-400 mb-2">Biggest Opportunity</h3>
-          <p className="text-slate-300 font-body text-sm">{assessment.biggest_opportunity || 'N/A'}</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#4ade80', margin: '0 0 8px 0' }}>Biggest Opportunity</h3>
+          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>{assessment.biggest_opportunity || 'N/A'}</p>
         </div>
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-sm font-heading text-red-400 mb-2">Biggest Risk</h3>
-          <p className="text-slate-300 font-body text-sm">{assessment.biggest_risk || 'N/A'}</p>
+        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#f87171', margin: '0 0 8px 0' }}>Biggest Risk</h3>
+          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>{assessment.biggest_risk || 'N/A'}</p>
         </div>
       </div>
 
       {/* Notes */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6">
-        <h3 className="text-lg font-heading text-white mb-4">Founder Notes</h3>
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Founder Notes</h3>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white font-body text-sm focus:outline-none focus:border-orange-500 min-h-[100px] resize-y"
+          style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '12px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', minHeight: '100px', resize: 'vertical', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
           placeholder="Add notes about this assessment..."
         />
         <button
           onClick={saveNotes}
           disabled={saving}
-          className="mt-3 bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          style={{ marginTop: '12px', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
         >
           {saving ? 'Saving...' : 'Save Notes'}
         </button>
       </div>
 
       {/* Conversation Transcript */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-lg font-heading text-white mb-4">Conversation</h3>
-        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Conversation</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '500px', overflowY: 'auto', paddingRight: '8px' }}>
           {(assessment.conversation || []).map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
               <div
-                className={`max-w-[75%] px-4 py-3 rounded-2xl font-body text-sm ${
-                  msg.role === 'user'
-                    ? 'bg-orange-500/20 text-white rounded-br-md'
-                    : 'bg-slate-800 text-slate-300 rounded-bl-md'
-                }`}
+                style={{
+                  maxWidth: '75%',
+                  padding: '12px 16px',
+                  borderRadius: '16px',
+                  fontSize: '14px',
+                  background: msg.role === 'user' ? '#333333' : '#1a1a1a',
+                  color: msg.role === 'user' ? '#ffffff' : '#aaaaaa',
+                  borderBottomRightRadius: msg.role === 'user' ? '4px' : '16px',
+                  borderBottomLeftRadius: msg.role === 'user' ? '16px' : '4px',
+                }}
               >
                 {msg.content}
               </div>
             </div>
           ))}
           {(!assessment.conversation || assessment.conversation.length === 0) && (
-            <p className="text-slate-400 font-body text-sm">No conversation data.</p>
+            <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>No conversation data.</p>
           )}
         </div>
       </div>
 
       {/* Portal Messages */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mt-6">
-        <h3 className="text-lg font-heading text-white mb-4">Portal Messages</h3>
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginTop: '24px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Portal Messages</h3>
 
         {/* Thread */}
-        <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto pr-1">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '300px', overflowY: 'auto', paddingRight: '4px' }}>
           {messages.length === 0 && (
-            <p className="text-slate-400 font-body text-sm">No messages yet.</p>
+            <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>No messages yet.</p>
           )}
           {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.sender === 'prospect' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] px-3 py-2 rounded-xl font-body text-sm ${msg.sender === 'team' ? 'bg-orange-500/10 text-orange-400' : 'bg-slate-800 text-slate-300'}`}>
-                <div className="text-xs opacity-60 mb-1">{msg.sender === 'team' ? 'You' : 'Prospect'}</div>
+            <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'prospect' ? 'flex-end' : 'flex-start' }}>
+              <div style={{ maxWidth: '75%', padding: '8px 12px', borderRadius: '12px', fontSize: '14px', background: msg.sender === 'team' ? '#1a1a1a' : '#333333', color: '#aaaaaa' }}>
+                <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '4px' }}>{msg.sender === 'team' ? 'You' : 'Prospect'}</div>
                 {msg.body}
               </div>
             </div>
@@ -277,13 +280,13 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         </div>
 
         {/* Send form */}
-        <div className="flex gap-2">
+        <div style={{ display: 'flex', gap: '8px' }}>
           <textarea
             value={messageBody}
             onChange={(e) => setMessageBody(e.target.value)}
             placeholder="Write a message to this prospect…"
             rows={2}
-            className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 resize-none"
+            style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', resize: 'none', fontFamily: "'Outfit', sans-serif" }}
           />
           <button
             onClick={async () => {
@@ -305,12 +308,12 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
               finally { setSendingMsg(false) }
             }}
             disabled={sendingMsg || !messageBody.trim()}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
+            style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: (sendingMsg || !messageBody.trim()) ? 'default' : 'pointer', opacity: (sendingMsg || !messageBody.trim()) ? 0.5 : 1, alignSelf: 'flex-end', fontFamily: "'Outfit', sans-serif" }}
           >
             {sendingMsg ? '…' : 'Send'}
           </button>
         </div>
-        {msgError && <p className="text-red-400 font-body text-xs mt-2">{msgError}</p>}
+        {msgError && <p style={{ color: '#f87171', fontSize: '12px', marginTop: '8px' }}>{msgError}</p>}
       </div>
     </div>
   )

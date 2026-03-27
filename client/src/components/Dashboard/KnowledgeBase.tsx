@@ -103,45 +103,45 @@ export function KnowledgeBase({ token, on401 }: Props) {
     }
   }
 
-  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
+  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
 
   return (
-    <div>
-      <h2 className="text-2xl font-heading text-white mb-6">Knowledge Base</h2>
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 24px 0' }}>Knowledge Base</h2>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
       {/* Upload */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6">
-        <h3 className="text-sm font-heading text-white mb-4">Upload Source</h3>
-        <div className="flex gap-3 items-end">
-          <div className="flex-1">
-            <label className="text-slate-400 font-body text-xs mb-1 block">Source Name</label>
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Upload Source</h3>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ color: '#aaaaaa', fontSize: '12px', marginBottom: '4px', display: 'block' }}>Source Name</label>
             <input
               type="text"
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               placeholder="e.g. pricing-guide"
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
+              style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
             />
           </div>
           <div>
-            <label className="text-slate-400 font-body text-xs mb-1 block">File (.md)</label>
+            <label style={{ color: '#aaaaaa', fontSize: '12px', marginBottom: '4px', display: 'block' }}>File (.md)</label>
             <input
               type="file"
               accept=".md"
               onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-              className="text-slate-400 font-body text-sm file:mr-3 file:bg-slate-800 file:border-0 file:rounded file:px-3 file:py-2 file:text-white file:font-body file:text-sm file:cursor-pointer"
+              style={{ color: '#aaaaaa', fontSize: '14px', fontFamily: "'Outfit', sans-serif" }}
             />
           </div>
           <button
             onClick={handleUpload}
             disabled={uploading || !uploadFile || !uploadName.trim()}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: (uploading || !uploadFile || !uploadName.trim()) ? 'default' : 'pointer', opacity: (uploading || !uploadFile || !uploadName.trim()) ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
           >
             {uploading ? 'Uploading...' : 'Upload'}
           </button>
@@ -149,37 +149,37 @@ export function KnowledgeBase({ token, on401 }: Props) {
       </div>
 
       {/* Sources List */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-        <table className="w-full">
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b border-slate-700 text-left">
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Source</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Chunks</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Actions</th>
+            <tr style={{ borderBottom: '1px solid #333333', textAlign: 'left' }}>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Source</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Chunks</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Status</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {sources.map((s) => (
-              <tr key={s.source_name} className="border-b border-slate-700/50">
-                <td className="px-6 py-4 text-white font-body text-sm">{s.source_name}</td>
-                <td className="px-6 py-4 text-slate-400 font-body text-sm">{s.chunk_count}</td>
-                <td className="px-6 py-4">
-                  <span className={`text-xs font-body ${s.is_active ? 'text-green-400' : 'text-slate-400'}`}>
+              <tr key={s.source_name} style={{ borderBottom: '1px solid #222222' }}>
+                <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px' }}>{s.source_name}</td>
+                <td style={{ padding: '16px 24px', color: '#aaaaaa', fontSize: '14px' }}>{s.chunk_count}</td>
+                <td style={{ padding: '16px 24px' }}>
+                  <span style={{ fontSize: '12px', color: s.is_active ? '#4ade80' : '#aaaaaa' }}>
                     {s.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
+                <td style={{ padding: '16px 24px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                       onClick={() => toggleActive(s.source_name, s.is_active)}
-                      className="text-xs font-body px-2.5 py-1 rounded bg-slate-800 hover:bg-white/10 text-slate-300 transition-colors"
+                      style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '4px', background: '#333333', color: '#ffffff', border: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       {s.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => deleteSource(s.source_name)}
-                      className="text-xs font-body px-2.5 py-1 rounded bg-red-900/30 hover:bg-red-900/50 text-red-400 transition-colors"
+                      style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '4px', background: 'rgba(248,113,113,0.1)', color: '#f87171', border: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       Delete
                     </button>
@@ -189,7 +189,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
             ))}
             {sources.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 font-body text-sm">
+                <td colSpan={4} style={{ padding: '32px 24px', textAlign: 'center', color: '#aaaaaa', fontSize: '14px' }}>
                   No knowledge sources yet.
                 </td>
               </tr>

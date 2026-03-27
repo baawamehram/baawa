@@ -64,12 +64,12 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
   }
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-      <h3 className="text-lg font-heading text-white mb-4">Client Profile</h3>
-      <div className="grid grid-cols-2 gap-4">
+    <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', fontFamily: "'Outfit', sans-serif" }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Client Profile</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         {FIELDS.map((f) => (
           <div key={f.key}>
-            <label className="text-slate-400 font-body text-xs mb-1 block">{f.label}</label>
+            <label style={{ color: '#aaaaaa', fontSize: '12px', marginBottom: '4px', display: 'block' }}>{f.label}</label>
             <input
               type={f.type}
               value={form[f.key] ?? ''}
@@ -79,20 +79,20 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
                   [f.key]: f.type === 'number' ? Number(e.target.value) : e.target.value,
                 }))
               }
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
+              style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
             />
           </div>
         ))}
       </div>
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mt-4 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginTop: '16px', fontSize: '14px' }}>
           {error}
         </div>
       )}
       <button
         onClick={handleSave}
         disabled={saving}
-        className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+        style={{ marginTop: '16px', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
       >
         {saving ? 'Saving...' : 'Save Profile'}
       </button>

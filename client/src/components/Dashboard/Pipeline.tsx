@@ -73,50 +73,50 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
     return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
   }
 
-  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
+  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
 
   return (
-    <div>
-      <h2 className="text-2xl font-heading text-white mb-6">Pipeline</h2>
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 24px 0' }}>Pipeline</h2>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         {STAGES.map((stage) => {
           const stageClients = clients.filter((c) => c.stage === stage.key)
           return (
-            <div key={stage.key} className="bg-slate-900/50 border border-slate-700 rounded-xl p-4">
-              <h3 className="text-sm font-heading text-orange-400 mb-4 uppercase tracking-wider">
-                {stage.label} <span className="text-slate-400">({stageClients.length})</span>
+            <div key={stage.key} style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '16px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {stage.label} <span style={{ color: '#666666' }}>({stageClients.length})</span>
               </h3>
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {stageClients.map((client) => (
                   <div
                     key={client.id}
-                    className="bg-slate-800 border border-slate-700/50 rounded-lg p-4 hover:border-orange-500/30 transition-colors"
+                    style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '16px' }}
                   >
                     <div
-                      className="cursor-pointer"
+                      style={{ cursor: 'pointer' }}
                       onClick={() => onSelectClient(client.id)}
                     >
-                      <p className="text-white font-heading text-sm">{client.founder_name}</p>
-                      <p className="text-slate-400 font-body text-xs mt-0.5">{client.company_name}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs font-body text-slate-400">
+                      <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 2px 0' }}>{client.founder_name}</p>
+                      <p style={{ color: '#aaaaaa', fontSize: '12px', margin: '0 0 8px 0' }}>{client.company_name}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: '#666666' }}>
                         <span>Score: {client.score ?? 'N/A'}</span>
                         <span>{daysSince(client.start_date)}d</span>
                         {client.phase2_monthly_fee > 0 && <span>${client.phase2_monthly_fee}/mo</span>}
                       </div>
                     </div>
-                    <div className="flex gap-2 mt-3">
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                       {STAGES.filter((s) => s.key !== client.stage).map((s) => (
                         <button
                           key={s.key}
                           onClick={() => moveClient(client.id, s.key)}
-                          className="text-xs font-body px-2.5 py-1 rounded bg-slate-800 hover:bg-orange-500/30 text-slate-300 hover:text-white transition-colors"
+                          style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '4px', background: '#333333', color: '#ffffff', border: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                         >
                           → {s.label}
                         </button>
@@ -125,7 +125,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                   </div>
                 ))}
                 {stageClients.length === 0 && (
-                  <p className="text-slate-500 font-body text-xs text-center py-4">No clients</p>
+                  <p style={{ color: '#666666', fontSize: '12px', textAlign: 'center', padding: '16px 0', margin: 0 }}>No clients</p>
                 )}
               </div>
             </div>

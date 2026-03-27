@@ -43,27 +43,27 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950 flex items-center justify-center z-50">
+    <div style={{ position: 'fixed', inset: 0, background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, fontFamily: "'Outfit', sans-serif" }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-slate-900 border border-orange-500/20 rounded-2xl p-8 w-full max-w-md"
+        style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '420px' }}
       >
-        <h2 className="text-2xl font-heading text-white mb-2">Dashboard Access</h2>
-        <p className="text-slate-400 mb-6 font-body text-sm">Enter your founder API key to continue.</p>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 8px 0' }}>Dashboard Access</h2>
+        <p style={{ color: '#aaaaaa', fontSize: '14px', margin: '0 0 24px 0' }}>Enter your founder API key to continue.</p>
         <form onSubmit={handleSubmit}>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="API Key"
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white font-body focus:outline-none focus:border-orange-500 mb-4"
+            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '12px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', marginBottom: '16px', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
             autoFocus
           />
-          {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+          {error && <p style={{ color: '#f87171', fontSize: '14px', marginBottom: '16px' }}>{error}</p>}
           <button
             type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 transition-colors text-white font-heading py-3 rounded-lg"
+            style={{ width: '100%', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '12px', fontSize: '16px', fontWeight: 700, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
           >
             Enter Dashboard
           </button>
@@ -166,13 +166,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-950">
+    <div style={{ display: 'flex', height: '100vh', background: '#000000', fontFamily: "'Outfit', sans-serif" }}>
       {/* Mobile header bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-slate-950 border-b border-slate-700">
+      <div style={{ display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#000000', borderBottom: '1px solid #333333' }}
+        className="mobile-header">
         <LogoIcon height={28} />
         <button
           onClick={() => setMobileNavOpen((o) => !o)}
-          className="text-slate-400 hover:text-white text-2xl leading-none"
+          style={{ color: '#aaaaaa', background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}
           aria-label="Toggle navigation"
           aria-expanded={mobileNavOpen}
         >
@@ -182,16 +183,22 @@ export default function Dashboard() {
 
       {/* Mobile dropdown nav */}
       {mobileNavOpen && (
-        <div className="md:hidden fixed top-12 left-0 right-0 z-30 bg-slate-900 border-b border-slate-700 px-4 py-3 flex flex-col gap-1">
+        <div style={{ position: 'fixed', top: '48px', left: 0, right: 0, zIndex: 30, background: '#111111', borderBottom: '1px solid #333333', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
               onClick={() => handleNavSelect(item.key)}
-              className={`text-left px-4 py-2.5 rounded-lg font-body text-sm transition-colors ${
-                section === item.key
-                  ? 'bg-orange-500/10 text-orange-400'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
+              style={{
+                textAlign: 'left',
+                padding: '10px 16px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                border: 'none',
+                cursor: 'pointer',
+                background: section === item.key ? '#ffffff' : 'transparent',
+                color: section === item.key ? '#000000' : '#aaaaaa',
+                fontFamily: "'Outfit', sans-serif",
+              }}
             >
               {item.label}
             </button>
@@ -200,20 +207,26 @@ export default function Dashboard() {
       )}
 
       {/* Sidebar — desktop only */}
-      <aside className="hidden md:flex w-64 border-r border-slate-700 flex-col py-6 px-4 shrink-0 bg-slate-900">
-        <div className="mb-8 px-2">
+      <aside style={{ width: '256px', background: '#111111', borderRight: '1px solid #333333', display: 'flex', flexDirection: 'column', padding: '24px 16px', flexShrink: 0 }}>
+        <div style={{ marginBottom: '32px', padding: '0 8px' }}>
           <LogoDark height={32} />
         </div>
-        <nav className="flex flex-col gap-1">
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
               onClick={() => handleNavSelect(item.key)}
-              className={`text-left px-4 py-2.5 rounded-lg font-body text-sm transition-colors ${
-                section === item.key
-                  ? 'bg-orange-500/10 text-orange-400'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
+              style={{
+                textAlign: 'left',
+                padding: '10px 16px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                border: 'none',
+                cursor: 'pointer',
+                background: section === item.key ? '#ffffff' : 'transparent',
+                color: section === item.key ? '#000000' : '#aaaaaa',
+                fontFamily: "'Outfit', sans-serif",
+              }}
             >
               {item.label}
             </button>
@@ -222,7 +235,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto p-8 pt-20 md:pt-8 bg-slate-950">
+      <main style={{ flex: 1, overflowY: 'auto', padding: '32px', background: '#000000' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={`${section}-${selectedAssessmentId}-${selectedClientId}`}

@@ -56,34 +56,34 @@ export function ClientDetail({ id, token, on401, onBack }: Props) {
 
   useEffect(() => { fetchClient() }, [fetchClient])
 
-  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
+  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
   if (!client) return (
-    <div>
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
-      <p className="text-slate-400 font-body">Client not found.</p>
+      <p style={{ color: '#aaaaaa' }}>Client not found.</p>
     </div>
   )
 
   return (
-    <div>
-      <button onClick={onBack} className="text-orange-400 hover:text-orange-400 font-body text-sm mb-6 inline-block">
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <button onClick={onBack} style={{ color: '#aaaaaa', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', marginBottom: '24px', display: 'inline-block', padding: 0 }}>
         &larr; Back to pipeline
       </button>
 
-      <h2 className="text-2xl font-heading text-white mb-1">{client.founder_name}</h2>
-      <p className="text-slate-400 font-body text-sm mb-6">{client.company_name} &middot; {client.stage}</p>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 4px 0' }}>{client.founder_name}</h2>
+      <p style={{ color: '#aaaaaa', fontSize: '14px', margin: '0 0 24px 0' }}>{client.company_name} &middot; {client.stage}</p>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <ClientProfile client={client} token={token} on401={on401} onUpdate={fetchClient} />
         <DeliverablesTracker
           clientId={client.id}

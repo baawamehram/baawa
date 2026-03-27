@@ -25,9 +25,9 @@ const STATUS_OPTIONS: { value: Deliverable['status']; label: string }[] = [
 ]
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'text-yellow-400',
-  in_progress: 'text-blue-400',
-  completed: 'text-green-400',
+  pending: '#facc15',
+  in_progress: '#60a5fa',
+  completed: '#4ade80',
 }
 
 export function DeliverablesTracker({ clientId, deliverables, token, on401, onUpdate }: Props) {
@@ -79,22 +79,22 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
   }
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-      <h3 className="text-lg font-heading text-white mb-4">Deliverables</h3>
+    <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', fontFamily: "'Outfit', sans-serif" }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Deliverables</h3>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-4 font-body text-sm">
+        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
-      <div className="space-y-3 mb-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
         {deliverables.map((d) => (
-          <div key={d.id} className="flex items-center justify-between bg-slate-800 rounded-lg px-4 py-3">
+          <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1a1a1a', borderRadius: '6px', padding: '12px 16px' }}>
             <div>
-              <p className="text-white font-body text-sm">{d.title}</p>
+              <p style={{ color: '#ffffff', fontSize: '14px', margin: '0 0 2px 0' }}>{d.title}</p>
               {d.due_date && (
-                <p className="text-slate-400 font-body text-xs mt-0.5">
+                <p style={{ color: '#aaaaaa', fontSize: '12px', margin: 0 }}>
                   Due: {new Date(d.due_date).toLocaleDateString()}
                 </p>
               )}
@@ -102,7 +102,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
             <select
               value={d.status}
               onChange={(e) => updateStatus(d.id, e.target.value as Deliverable['status'])}
-              className={`bg-slate-800 border-0 rounded px-2 py-1 font-body text-xs focus:outline-none ${STATUS_COLORS[d.status] || 'text-slate-300'}`}
+              style={{ background: '#1a1a1a', border: 'none', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: STATUS_COLORS[d.status] || '#aaaaaa', outline: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -111,28 +111,28 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
           </div>
         ))}
         {deliverables.length === 0 && (
-          <p className="text-slate-400 font-body text-sm">No deliverables yet.</p>
+          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>No deliverables yet.</p>
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div style={{ display: 'flex', gap: '8px' }}>
         <input
           type="text"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="New deliverable..."
-          className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
+          style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', fontFamily: "'Outfit', sans-serif" }}
         />
         <input
           type="date"
           value={newDueDate}
           onChange={(e) => setNewDueDate(e.target.value)}
-          className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
+          style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', fontFamily: "'Outfit', sans-serif" }}
         />
         <button
           onClick={addDeliverable}
           disabled={adding}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: adding ? 'default' : 'pointer', opacity: adding ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
         >
           Add
         </button>

@@ -47,17 +47,17 @@ function fmt(n: number | null, suffix = '') {
 
 function ScoreBar({ label, pct }: { label: string; pct: number }) {
   return (
-    <div className="mb-1.5">
-      <div className="flex justify-between mb-0.5">
-        <span className="text-[11px] text-slate-500">{label}</span>
-        <span className="text-[11px] text-slate-500">{pct}</span>
+    <div style={{ marginBottom: '6px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+        <span style={{ fontSize: '11px', color: '#666666' }}>{label}</span>
+        <span style={{ fontSize: '11px', color: '#666666' }}>{pct}</span>
       </div>
-      <div className="h-1 bg-slate-700 rounded-sm">
+      <div style={{ height: '4px', background: '#333333', borderRadius: '2px', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(pct * 2, 100)}%` }}
           transition={{ duration: 0.6 }}
-          className="h-full bg-orange-500 rounded-sm"
+          style={{ height: '100%', background: '#ffffff', borderRadius: '2px' }}
         />
       </div>
     </div>
@@ -143,20 +143,20 @@ export function Intelligence({ token, on401 }: Props) {
 
   if (loading) {
     return (
-      <div className="py-8 text-center text-slate-500">
+      <div style={{ padding: '32px 0', textAlign: 'center', color: '#666666', fontFamily: "'Outfit', sans-serif" }}>
         Loading intelligence data…
       </div>
     )
   }
 
   return (
-    <div className="py-6 max-w-[900px]">
+    <div style={{ paddingTop: '24px', paddingBottom: '24px', maxWidth: '900px', fontFamily: "'Outfit', sans-serif" }}>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h2 className="text-white text-xl font-semibold">Journey Intelligence</h2>
+          <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 600, margin: 0 }}>Journey Intelligence</h2>
           {activeConfig && (
-            <p className="text-slate-500 text-xs mt-1">
+            <p style={{ color: '#666666', fontSize: '12px', margin: '4px 0 0 0' }}>
               Config v{activeConfig.version} active
               {metrics?.active_config_activated_at
                 ? ` · activated ${new Date(metrics.active_config_activated_at).toLocaleDateString()}`
@@ -167,7 +167,7 @@ export function Intelligence({ token, on401 }: Props) {
         <button
           onClick={() => void handleOptimize()}
           disabled={optimizing}
-          className={`${optimizing ? 'bg-orange-500/30' : 'bg-orange-500'} text-white border-0 rounded-lg px-4 py-2 text-[13px] font-semibold cursor-pointer transition-colors disabled:cursor-default`}
+          style={{ background: optimizing ? 'rgba(255,255,255,0.2)' : '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: optimizing ? 'default' : 'pointer', fontFamily: "'Outfit', sans-serif" }}
         >
           {optimizing ? 'Running…' : 'Run Optimizer'}
         </button>
@@ -177,38 +177,43 @@ export function Intelligence({ token, on401 }: Props) {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-orange-500/10 border border-orange-500/20 rounded-lg px-3.5 py-2.5 mb-5 text-orange-300 text-[13px]"
+          style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '10px 14px', marginBottom: '20px', color: '#aaaaaa', fontSize: '13px' }}
         >
           {optimizeResult}
         </motion.div>
       )}
 
       {/* Metrics strip */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
         {[
           { label: 'Completion Rate', value: fmt(w?.completion_rate ?? null, '%') },
           { label: 'Avg Answer Depth', value: fmt(w?.avg_answer_words ?? null, ' words') },
           { label: 'Score Mean', value: fmt(w?.score_mean ?? null, '/100') },
           { label: 'Score Std Dev', value: fmt(w?.score_std ?? null, '') },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-slate-900 border border-slate-700 rounded-[10px] px-4 py-3.5">
-            <p className="text-slate-500 text-[11px] mb-1.5 uppercase tracking-[0.06em]">{label}</p>
-            <p className="text-white text-[22px] font-bold">{value}</p>
+          <div key={label} style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '14px 16px' }}>
+            <p style={{ color: '#666666', fontSize: '11px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px 0' }}>{label}</p>
+            <p style={{ color: '#ffffff', fontSize: '22px', fontWeight: 700, margin: 0 }}>{value}</p>
           </div>
         ))}
       </div>
 
       {/* Window selector */}
-      <div className="flex gap-2 mb-5">
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
         {(['30d', '60d', '90d'] as const).map((d) => (
           <button
             key={d}
             onClick={() => setWindow(d)}
-            className={`${
-              window === d
-                ? 'bg-orange-500/20 border-orange-500/50 text-orange-400'
-                : 'bg-white/5 border-white/10 text-slate-500'
-            } border rounded-md px-3 py-1 text-xs cursor-pointer transition-colors`}
+            style={{
+              background: window === d ? '#ffffff' : '#1a1a1a',
+              color: window === d ? '#000000' : '#666666',
+              border: `1px solid ${window === d ? '#ffffff' : '#333333'}`,
+              borderRadius: '6px',
+              padding: '4px 12px',
+              fontSize: '12px',
+              cursor: 'pointer',
+              fontFamily: "'Outfit', sans-serif",
+            }}
           >
             {d}
           </button>
@@ -217,8 +222,8 @@ export function Intelligence({ token, on401 }: Props) {
 
       {/* Score distribution */}
       {w?.score_distribution && (
-        <div className="bg-slate-900 border border-slate-700 rounded-[10px] p-4 mb-5">
-          <p className="text-slate-500 text-xs uppercase tracking-[0.06em] mb-3">Score Distribution</p>
+        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+          <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px', margin: '0 0 12px 0' }}>Score Distribution</p>
           {Object.entries(w.score_distribution).map(([bucket, count]) => (
             <ScoreBar key={bucket} label={bucket} pct={count} />
           ))}
@@ -232,37 +237,37 @@ export function Intelligence({ token, on401 }: Props) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="bg-orange-500/[0.06] border border-orange-500/25 rounded-xl p-5 mb-5"
+            style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '20px', marginBottom: '20px' }}
           >
-            <div className="flex justify-between items-start mb-3">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
               <div>
-                <span className="bg-orange-500/20 text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-[0.08em]">
+                <span style={{ background: '#333333', color: '#ffffff', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Awaiting Approval · High-Risk
                 </span>
-                <p className="text-white text-base font-semibold mt-2 mb-1">
+                <p style={{ color: '#ffffff', fontSize: '16px', fontWeight: 600, margin: '8px 0 4px 0' }}>
                   Config v{pendingConfig.version}
                 </p>
-                <p className="text-slate-400 text-sm">
+                <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>
                   {pendingConfig.change_summary}
                 </p>
               </div>
             </div>
-            <div className="flex gap-2.5">
+            <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => void loadConfigDetail(pendingConfig.id)}
-                className="bg-white/[0.08] text-white border-0 rounded-md px-3.5 py-[7px] text-[13px] cursor-pointer transition-colors hover:bg-white/10"
+                style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #333333', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
               >
                 Review Details
               </button>
               <button
                 onClick={() => void handleActivate(pendingConfig.id)}
-                className="bg-orange-500 text-white border-0 rounded-md px-3.5 py-[7px] text-[13px] font-semibold cursor-pointer transition-colors hover:bg-orange-600"
+                style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
               >
                 Activate
               </button>
               <button
                 onClick={() => void handleDismiss(pendingConfig.id)}
-                className="bg-transparent text-slate-500 border border-white/15 rounded-md px-3.5 py-[7px] text-[13px] cursor-pointer transition-colors hover:text-slate-300"
+                style={{ background: 'transparent', color: '#666666', border: '1px solid #333333', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
               >
                 Dismiss
               </button>
@@ -278,39 +283,39 @@ export function Intelligence({ token, on401 }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-5"
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '20px' }}
             onClick={() => setSelectedConfig(null)}
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-slate-900 border border-slate-700 rounded-[14px] p-7 max-w-[700px] w-full max-h-[80vh] overflow-y-auto"
+              style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '28px', maxWidth: '700px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}
             >
-              <h3 className="text-white text-lg mb-1">Config v{selectedConfig.version}</h3>
-              <p className="text-slate-500 text-[13px] mb-5">{selectedConfig.change_summary}</p>
+              <h3 style={{ color: '#ffffff', fontSize: '18px', fontWeight: 600, margin: '0 0 4px 0' }}>Config v{selectedConfig.version}</h3>
+              <p style={{ color: '#666666', fontSize: '13px', margin: '0 0 20px 0' }}>{selectedConfig.change_summary}</p>
 
-              <p className="text-slate-500 text-[11px] uppercase tracking-[0.06em] mb-2">Scoring Weights</p>
-              <div className="flex gap-2.5 mb-5 flex-wrap">
+              <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>Scoring Weights</p>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
                 {Object.entries(selectedConfig.scoring_weights).map(([k, v]) => (
-                  <span key={k} className="bg-white/[0.07] rounded-md px-2.5 py-1 text-[13px] text-white">
+                  <span key={k} style={{ background: '#1a1a1a', borderRadius: '6px', padding: '4px 10px', fontSize: '13px', color: '#ffffff' }}>
                     {k}: <strong>{v}</strong>
                   </span>
                 ))}
               </div>
 
-              <p className="text-slate-500 text-[11px] uppercase tracking-[0.06em] mb-2">Reasoning</p>
-              <p className="text-slate-300 text-[13px] leading-relaxed mb-5">{selectedConfig.reasoning}</p>
+              <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>Reasoning</p>
+              <p style={{ color: '#aaaaaa', fontSize: '13px', lineHeight: 1.6, margin: '0 0 20px 0' }}>{selectedConfig.reasoning}</p>
 
-              <p className="text-slate-500 text-[11px] uppercase tracking-[0.06em] mb-2">System Prompt</p>
-              <pre className="bg-slate-900 border border-slate-700 rounded-lg p-3.5 text-[11px] text-slate-300 overflow-x-auto whitespace-pre-wrap mb-5">
+              <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>System Prompt</p>
+              <pre style={{ background: '#000000', border: '1px solid #333333', borderRadius: '6px', padding: '14px', fontSize: '11px', color: '#aaaaaa', overflowX: 'auto', whiteSpace: 'pre-wrap', margin: '0 0 20px 0' }}>
                 {selectedConfig.system_prompt}
               </pre>
 
-              <div className="flex gap-2.5 justify-end">
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setSelectedConfig(null)}
-                  className="bg-white/[0.08] text-white border-0 rounded-md px-4 py-2 cursor-pointer hover:bg-white/10 transition-colors"
+                  style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #333333', borderRadius: '6px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                 >
                   Close
                 </button>
@@ -318,13 +323,13 @@ export function Intelligence({ token, on401 }: Props) {
                   <>
                     <button
                       onClick={() => void handleActivate(selectedConfig.id)}
-                      className="bg-orange-500 text-white border-0 rounded-md px-4 py-2 font-semibold cursor-pointer hover:bg-orange-600 transition-colors"
+                      style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       Activate
                     </button>
                     <button
                       onClick={() => void handleDismiss(selectedConfig.id)}
-                      className="bg-transparent text-slate-500 border border-white/15 rounded-md px-4 py-2 cursor-pointer hover:text-slate-300 transition-colors"
+                      style={{ background: 'transparent', color: '#666666', border: '1px solid #333333', borderRadius: '6px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       Dismiss
                     </button>
@@ -337,40 +342,47 @@ export function Intelligence({ token, on401 }: Props) {
       </AnimatePresence>
 
       {/* Version history */}
-      <div className="bg-slate-900 border border-slate-700 rounded-[10px] overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-700">
-          <p className="text-slate-500 text-xs uppercase tracking-[0.06em]">Version History</p>
+      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', overflow: 'hidden' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid #333333' }}>
+          <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Version History</p>
         </div>
         {configs.length === 0 && (
-          <p className="text-slate-500/60 text-[13px] px-4 py-4">No config versions yet.</p>
+          <p style={{ color: '#666666', fontSize: '13px', padding: '16px', margin: 0 }}>No config versions yet.</p>
         )}
         {configs.map((c) => {
           const statusColor: Record<string, string> = {
-            active: '#4ADE80',
-            proposed: '#FF6B35',
-            archived: 'rgba(255,255,255,0.3)',
-            dismissed: '#F87171',
+            active: '#4ade80',
+            proposed: '#ffffff',
+            archived: '#666666',
+            dismissed: '#f87171',
           }
           return (
             <div
               key={c.id}
               onClick={() => void loadConfigDetail(c.id)}
-              className="px-4 py-3 border-b border-slate-700/50 cursor-pointer flex items-center justify-between transition-colors hover:bg-white/[0.03]"
+              style={{ padding: '12px 16px', borderBottom: '1px solid #222222', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#1a1a1a' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-slate-500/60 text-xs min-w-[40px]">v{c.version}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ color: '#666666', fontSize: '12px', minWidth: '40px' }}>v{c.version}</span>
                 <span
-                  className="text-[10px] font-bold px-[7px] py-0.5 rounded uppercase tracking-[0.06em]"
                   style={{
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    padding: '2px 7px',
+                    borderRadius: '4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
                     background: `${statusColor[c.status]}20`,
                     color: statusColor[c.status],
                   }}
                 >
                   {c.status}
                 </span>
-                <span className="text-slate-400 text-[13px]">{c.change_summary}</span>
+                <span style={{ color: '#aaaaaa', fontSize: '13px' }}>{c.change_summary}</span>
               </div>
-              <span className="text-slate-500/40 text-[11px]">
+              <span style={{ color: '#666666', fontSize: '11px' }}>
                 {new Date(c.created_at).toLocaleDateString()}
               </span>
             </div>
