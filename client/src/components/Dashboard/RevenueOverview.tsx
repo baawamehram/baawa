@@ -63,24 +63,24 @@ export function RevenueOverview({ token, on401 }: Props) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-surface border border-border-subtle rounded-xl p-6">
           <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Total Phase 1 Revenue</p>
           <p className="text-3xl font-heading text-white">{fmt(totalPhase1)}</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-surface border border-border-subtle rounded-xl p-6">
           <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Active MRR</p>
           <p className="text-3xl font-heading text-brand-indigo">{fmt(activeMRR)}</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-surface border border-border-subtle rounded-xl p-6">
           <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Pipeline Value</p>
           <p className="text-3xl font-heading text-brand-violet">{fmt(pipelineValue)}</p>
         </div>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 text-left">
+            <tr className="border-b border-border-subtle text-left">
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Client</th>
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Stage</th>
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Phase 1 Fee</th>
@@ -89,7 +89,7 @@ export function RevenueOverview({ token, on401 }: Props) {
           </thead>
           <tbody>
             {clients.map((c) => (
-              <tr key={c.id} className="border-b border-gray-800/50">
+              <tr key={c.id} className="border-b border-border-subtle/50">
                 <td className="px-6 py-4">
                   <p className="text-white font-body text-sm">{c.founder_name}</p>
                   <p className="text-gray-400 font-body text-xs">{c.company_name}</p>

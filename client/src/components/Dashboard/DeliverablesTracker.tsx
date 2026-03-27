@@ -79,7 +79,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+    <div className="bg-surface border border-border-subtle rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Deliverables</h3>
 
       {error && (
@@ -90,7 +90,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
 
       <div className="space-y-3 mb-4">
         {deliverables.map((d) => (
-          <div key={d.id} className="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
+          <div key={d.id} className="flex items-center justify-between bg-surface-2 rounded-lg px-4 py-3">
             <div>
               <p className="text-white font-body text-sm">{d.title}</p>
               {d.due_date && (
@@ -102,7 +102,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
             <select
               value={d.status}
               onChange={(e) => updateStatus(d.id, e.target.value as Deliverable['status'])}
-              className={`bg-gray-700 border-0 rounded px-2 py-1 font-body text-xs focus:outline-none ${STATUS_COLORS[d.status] || 'text-gray-300'}`}
+              className={`bg-surface-2 border-0 rounded px-2 py-1 font-body text-xs focus:outline-none ${STATUS_COLORS[d.status] || 'text-gray-300'}`}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -121,13 +121,13 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="New deliverable..."
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+          className="flex-1 bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
         />
         <input
           type="date"
           value={newDueDate}
           onChange={(e) => setNewDueDate(e.target.value)}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+          className="bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
         />
         <button
           onClick={addDeliverable}

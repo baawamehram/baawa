@@ -39,7 +39,6 @@ interface Props {
   on401: () => void
 }
 
-const CORAL = '#FF6B35'
 const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}` })
 
 function fmt(n: number | null, suffix = '') {
@@ -48,17 +47,17 @@ function fmt(n: number | null, suffix = '') {
 
 function ScoreBar({ label, pct }: { label: string; pct: number }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{label}</span>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{pct}</span>
+    <div className="mb-1.5">
+      <div className="flex justify-between mb-0.5">
+        <span className="text-[11px] text-gray-500">{label}</span>
+        <span className="text-[11px] text-gray-500">{pct}</span>
       </div>
-      <div style={{ height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
+      <div className="h-1 bg-border-subtle rounded-sm">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(pct * 2, 100)}%` }}
           transition={{ duration: 0.6 }}
-          style={{ height: '100%', background: CORAL, borderRadius: 2 }}
+          className="h-full bg-brand-indigo rounded-sm"
         />
       </div>
     </div>
@@ -144,20 +143,20 @@ export function Intelligence({ token, on401 }: Props) {
 
   if (loading) {
     return (
-      <div style={{ padding: 32, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+      <div className="py-8 text-center text-gray-500">
         Loading intelligence data…
       </div>
     )
   }
 
   return (
-    <div style={{ padding: '24px 0', maxWidth: 900 }}>
+    <div className="py-6 max-w-[900px]">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 style={{ color: 'white', fontSize: 20, fontWeight: 600, margin: 0 }}>Journey Intelligence</h2>
+          <h2 className="text-white text-xl font-semibold">Journey Intelligence</h2>
           {activeConfig && (
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: '4px 0 0' }}>
+            <p className="text-gray-500 text-xs mt-1">
               Config v{activeConfig.version} active
               {metrics?.active_config_activated_at
                 ? ` · activated ${new Date(metrics.active_config_activated_at).toLocaleDateString()}`
@@ -168,17 +167,7 @@ export function Intelligence({ token, on401 }: Props) {
         <button
           onClick={() => void handleOptimize()}
           disabled={optimizing}
-          style={{
-            background: optimizing ? 'rgba(255,107,53,0.3)' : CORAL,
-            color: 'white',
-            border: 'none',
-            borderRadius: 8,
-            padding: '8px 16px',
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: optimizing ? 'default' : 'pointer',
-            transition: 'background 0.2s',
-          }}
+          className={`${optimizing ? 'bg-brand-indigo/30' : 'bg-brand-indigo'} text-white border-0 rounded-lg px-4 py-2 text-[13px] font-semibold cursor-pointer transition-colors disabled:cursor-default`}
         >
           {optimizing ? 'Running…' : 'Run Optimizer'}
         </button>
@@ -188,55 +177,38 @@ export function Intelligence({ token, on401 }: Props) {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{
-            background: 'rgba(255,107,53,0.12)',
-            border: '1px solid rgba(255,107,53,0.3)',
-            borderRadius: 8,
-            padding: '10px 14px',
-            marginBottom: 20,
-            color: 'rgba(255,176,154,0.9)',
-            fontSize: 13,
-          }}
+          className="bg-brand-indigo/10 border border-brand-indigo/30 rounded-lg px-3.5 py-2.5 mb-5 text-[#FFB09A] text-[13px]"
         >
           {optimizeResult}
         </motion.div>
       )}
 
       {/* Metrics strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+      <div className="grid grid-cols-4 gap-3 mb-5">
         {[
           { label: 'Completion Rate', value: fmt(w?.completion_rate ?? null, '%') },
           { label: 'Avg Answer Depth', value: fmt(w?.avg_answer_words ?? null, ' words') },
           { label: 'Score Mean', value: fmt(w?.score_mean ?? null, '/100') },
           { label: 'Score Std Dev', value: fmt(w?.score_std ?? null, '') },
         ].map(({ label, value }) => (
-          <div key={label} style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 10,
-            padding: '14px 16px',
-          }}>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
-            <p style={{ color: 'white', fontSize: 22, fontWeight: 700, margin: 0 }}>{value}</p>
+          <div key={label} className="bg-surface border border-border-subtle rounded-[10px] px-4 py-3.5">
+            <p className="text-gray-500 text-[11px] mb-1.5 uppercase tracking-[0.06em]">{label}</p>
+            <p className="text-white text-[22px] font-bold">{value}</p>
           </div>
         ))}
       </div>
 
       {/* Window selector */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+      <div className="flex gap-2 mb-5">
         {(['30d', '60d', '90d'] as const).map((d) => (
           <button
             key={d}
             onClick={() => setWindow(d)}
-            style={{
-              background: window === d ? 'rgba(255,107,53,0.2)' : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${window === d ? 'rgba(255,107,53,0.5)' : 'rgba(255,255,255,0.1)'}`,
-              borderRadius: 6,
-              padding: '4px 12px',
-              color: window === d ? CORAL : 'rgba(255,255,255,0.5)',
-              fontSize: 12,
-              cursor: 'pointer',
-            }}
+            className={`${
+              window === d
+                ? 'bg-brand-indigo/20 border-brand-indigo/50 text-brand-indigo'
+                : 'bg-white/5 border-white/10 text-gray-500'
+            } border rounded-md px-3 py-1 text-xs cursor-pointer transition-colors`}
           >
             {d}
           </button>
@@ -245,14 +217,8 @@ export function Intelligence({ token, on401 }: Props) {
 
       {/* Score distribution */}
       {w?.score_distribution && (
-        <div style={{
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 10,
-          padding: 16,
-          marginBottom: 20,
-        }}>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px' }}>Score Distribution</p>
+        <div className="bg-surface border border-border-subtle rounded-[10px] p-4 mb-5">
+          <p className="text-gray-500 text-xs uppercase tracking-[0.06em] mb-3">Score Distribution</p>
           {Object.entries(w.score_distribution).map(([bucket, count]) => (
             <ScoreBar key={bucket} label={bucket} pct={count} />
           ))}
@@ -266,43 +232,37 @@ export function Intelligence({ token, on401 }: Props) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            style={{
-              background: 'rgba(255,107,53,0.06)',
-              border: '1px solid rgba(255,107,53,0.25)',
-              borderRadius: 12,
-              padding: 20,
-              marginBottom: 20,
-            }}
+            className="bg-brand-indigo/[0.06] border border-brand-indigo/25 rounded-xl p-5 mb-5"
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div className="flex justify-between items-start mb-3">
               <div>
-                <span style={{ background: 'rgba(255,107,53,0.2)', color: CORAL, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                <span className="bg-brand-indigo/20 text-brand-indigo text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-[0.08em]">
                   Awaiting Approval · High-Risk
                 </span>
-                <p style={{ color: 'white', fontSize: 16, fontWeight: 600, margin: '8px 0 4px' }}>
+                <p className="text-white text-base font-semibold mt-2 mb-1">
                   Config v{pendingConfig.version}
                 </p>
-                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, margin: 0 }}>
+                <p className="text-gray-400 text-sm">
                   {pendingConfig.change_summary}
                 </p>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => void loadConfigDetail(pendingConfig.id)}
-                style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 13, cursor: 'pointer' }}
+                className="bg-white/[0.08] text-white border-0 rounded-md px-3.5 py-[7px] text-[13px] cursor-pointer transition-colors hover:bg-white/10"
               >
                 Review Details
               </button>
               <button
                 onClick={() => void handleActivate(pendingConfig.id)}
-                style={{ background: CORAL, color: 'white', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                className="bg-brand-indigo text-white border-0 rounded-md px-3.5 py-[7px] text-[13px] font-semibold cursor-pointer transition-colors hover:bg-brand-violet"
               >
                 Activate
               </button>
               <button
                 onClick={() => void handleDismiss(pendingConfig.id)}
-                style={{ background: 'transparent', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, padding: '7px 14px', fontSize: 13, cursor: 'pointer' }}
+                className="bg-transparent text-gray-500 border border-white/15 rounded-md px-3.5 py-[7px] text-[13px] cursor-pointer transition-colors hover:text-gray-300"
               >
                 Dismiss
               </button>
@@ -318,51 +278,56 @@ export function Intelligence({ token, on401 }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              zIndex: 100, padding: 20,
-            }}
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-5"
             onClick={() => setSelectedConfig(null)}
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                background: '#111', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 14, padding: 28, maxWidth: 700, width: '100%',
-                maxHeight: '80vh', overflowY: 'auto',
-              }}
+              className="bg-surface border border-border-subtle rounded-[14px] p-7 max-w-[700px] w-full max-h-[80vh] overflow-y-auto"
             >
-              <h3 style={{ color: 'white', fontSize: 18, margin: '0 0 4px' }}>Config v{selectedConfig.version}</h3>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, margin: '0 0 20px' }}>{selectedConfig.change_summary}</p>
+              <h3 className="text-white text-lg mb-1">Config v{selectedConfig.version}</h3>
+              <p className="text-gray-500 text-[13px] mb-5">{selectedConfig.change_summary}</p>
 
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Scoring Weights</p>
-              <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+              <p className="text-gray-500 text-[11px] uppercase tracking-[0.06em] mb-2">Scoring Weights</p>
+              <div className="flex gap-2.5 mb-5 flex-wrap">
                 {Object.entries(selectedConfig.scoring_weights).map(([k, v]) => (
-                  <span key={k} style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 6, padding: '4px 10px', fontSize: 13, color: 'white' }}>
+                  <span key={k} className="bg-white/[0.07] rounded-md px-2.5 py-1 text-[13px] text-white">
                     {k}: <strong>{v}</strong>
                   </span>
                 ))}
               </div>
 
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Reasoning</p>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>{selectedConfig.reasoning}</p>
+              <p className="text-gray-500 text-[11px] uppercase tracking-[0.06em] mb-2">Reasoning</p>
+              <p className="text-gray-300 text-[13px] leading-relaxed mb-5">{selectedConfig.reasoning}</p>
 
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>System Prompt</p>
-              <pre style={{
-                background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 14,
-                fontSize: 11, color: 'rgba(255,255,255,0.7)', overflowX: 'auto',
-                whiteSpace: 'pre-wrap', marginBottom: 20,
-              }}>{selectedConfig.system_prompt}</pre>
+              <p className="text-gray-500 text-[11px] uppercase tracking-[0.06em] mb-2">System Prompt</p>
+              <pre className="bg-surface border border-border-subtle rounded-lg p-3.5 text-[11px] text-gray-300 overflow-x-auto whitespace-pre-wrap mb-5">
+                {selectedConfig.system_prompt}
+              </pre>
 
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button onClick={() => setSelectedConfig(null)} style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}>Close</button>
+              <div className="flex gap-2.5 justify-end">
+                <button
+                  onClick={() => setSelectedConfig(null)}
+                  className="bg-white/[0.08] text-white border-0 rounded-md px-4 py-2 cursor-pointer hover:bg-white/10 transition-colors"
+                >
+                  Close
+                </button>
                 {selectedConfig.status === 'proposed' && (
                   <>
-                    <button onClick={() => void handleActivate(selectedConfig.id)} style={{ background: CORAL, color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 600, cursor: 'pointer' }}>Activate</button>
-                    <button onClick={() => void handleDismiss(selectedConfig.id)} style={{ background: 'transparent', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}>Dismiss</button>
+                    <button
+                      onClick={() => void handleActivate(selectedConfig.id)}
+                      className="bg-brand-indigo text-white border-0 rounded-md px-4 py-2 font-semibold cursor-pointer hover:bg-brand-violet transition-colors"
+                    >
+                      Activate
+                    </button>
+                    <button
+                      onClick={() => void handleDismiss(selectedConfig.id)}
+                      className="bg-transparent text-gray-500 border border-white/15 rounded-md px-4 py-2 cursor-pointer hover:text-gray-300 transition-colors"
+                    >
+                      Dismiss
+                    </button>
                   </>
                 )}
               </div>
@@ -372,51 +337,40 @@ export function Intelligence({ token, on401 }: Props) {
       </AnimatePresence>
 
       {/* Version history */}
-      <div style={{
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 10,
-        overflow: 'hidden',
-      }}>
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Version History</p>
+      <div className="bg-surface border border-border-subtle rounded-[10px] overflow-hidden">
+        <div className="px-4 py-3 border-b border-border-subtle">
+          <p className="text-gray-500 text-xs uppercase tracking-[0.06em]">Version History</p>
         </div>
         {configs.length === 0 && (
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, padding: '16px', margin: 0 }}>No config versions yet.</p>
+          <p className="text-gray-500/60 text-[13px] px-4 py-4">No config versions yet.</p>
         )}
         {configs.map((c) => {
           const statusColor: Record<string, string> = {
-            active: '#4ADE80', proposed: CORAL, archived: 'rgba(255,255,255,0.3)', dismissed: '#F87171',
+            active: '#4ADE80',
+            proposed: '#FF6B35',
+            archived: 'rgba(255,255,255,0.3)',
+            dismissed: '#F87171',
           }
           return (
             <div
               key={c.id}
               onClick={() => void loadConfigDetail(c.id)}
-              style={{
-                padding: '12px 16px',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              className="px-4 py-3 border-b border-border-subtle/50 cursor-pointer flex items-center justify-between transition-colors hover:bg-white/[0.03]"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, minWidth: 40 }}>v{c.version}</span>
-                <span style={{
-                  fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
-                  background: `${statusColor[c.status]}20`,
-                  color: statusColor[c.status],
-                }}>
+              <div className="flex items-center gap-3">
+                <span className="text-gray-500/60 text-xs min-w-[40px]">v{c.version}</span>
+                <span
+                  className="text-[10px] font-bold px-[7px] py-0.5 rounded uppercase tracking-[0.06em]"
+                  style={{
+                    background: `${statusColor[c.status]}20`,
+                    color: statusColor[c.status],
+                  }}
+                >
                   {c.status}
                 </span>
-                <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{c.change_summary}</span>
+                <span className="text-gray-400 text-[13px]">{c.change_summary}</span>
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11 }}>
+              <span className="text-gray-500/40 text-[11px]">
                 {new Date(c.created_at).toLocaleDateString()}
               </span>
             </div>

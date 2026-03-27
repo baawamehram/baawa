@@ -116,7 +116,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
       )}
 
       {/* Upload */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
+      <div className="bg-surface border border-border-subtle rounded-xl p-6 mb-6">
         <h3 className="text-sm font-heading text-white mb-4">Upload Source</h3>
         <div className="flex gap-3 items-end">
           <div className="flex-1">
@@ -126,7 +126,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               placeholder="e.g. pricing-guide"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+              className="w-full bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
             />
           </div>
           <div>
@@ -135,7 +135,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
               type="file"
               accept=".md"
               onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-              className="text-gray-400 font-body text-sm file:mr-3 file:bg-gray-700 file:border-0 file:rounded file:px-3 file:py-2 file:text-white file:font-body file:text-sm file:cursor-pointer"
+              className="text-gray-400 font-body text-sm file:mr-3 file:bg-surface-2 file:border-0 file:rounded file:px-3 file:py-2 file:text-white file:font-body file:text-sm file:cursor-pointer"
             />
           </div>
           <button
@@ -149,10 +149,10 @@ export function KnowledgeBase({ token, on401 }: Props) {
       </div>
 
       {/* Sources List */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 text-left">
+            <tr className="border-b border-border-subtle text-left">
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Source</th>
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Chunks</th>
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Status</th>
@@ -161,7 +161,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
           </thead>
           <tbody>
             {sources.map((s) => (
-              <tr key={s.source_name} className="border-b border-gray-800/50">
+              <tr key={s.source_name} className="border-b border-border-subtle/50">
                 <td className="px-6 py-4 text-white font-body text-sm">{s.source_name}</td>
                 <td className="px-6 py-4 text-gray-400 font-body text-sm">{s.chunk_count}</td>
                 <td className="px-6 py-4">
@@ -173,7 +173,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
                   <div className="flex gap-2">
                     <button
                       onClick={() => toggleActive(s.source_name, s.is_active)}
-                      className="text-xs font-body px-2.5 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
+                      className="text-xs font-body px-2.5 py-1 rounded bg-surface-2 hover:bg-white/10 text-gray-300 transition-colors"
                     >
                       {s.is_active ? 'Deactivate' : 'Activate'}
                     </button>

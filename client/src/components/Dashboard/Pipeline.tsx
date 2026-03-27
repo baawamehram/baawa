@@ -89,7 +89,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
         {STAGES.map((stage) => {
           const stageClients = clients.filter((c) => c.stage === stage.key)
           return (
-            <div key={stage.key} className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+            <div key={stage.key} className="bg-surface/50 border border-border-subtle rounded-xl p-4">
               <h3 className="text-sm font-heading text-brand-indigo mb-4 uppercase tracking-wider">
                 {stage.label} <span className="text-gray-400">({stageClients.length})</span>
               </h3>
@@ -97,7 +97,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                 {stageClients.map((client) => (
                   <div
                     key={client.id}
-                    className="bg-gray-800 border border-gray-700/50 rounded-lg p-4 hover:border-brand-indigo/30 transition-colors"
+                    className="bg-surface-2 border border-border-subtle/50 rounded-lg p-4 hover:border-brand-indigo/30 transition-colors"
                   >
                     <div
                       className="cursor-pointer"
@@ -116,7 +116,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                         <button
                           key={s.key}
                           onClick={() => moveClient(client.id, s.key)}
-                          className="text-xs font-body px-2.5 py-1 rounded bg-gray-700 hover:bg-brand-indigo/30 text-gray-300 hover:text-white transition-colors"
+                          className="text-xs font-body px-2.5 py-1 rounded bg-surface-2 hover:bg-brand-indigo/30 text-gray-300 hover:text-white transition-colors"
                         >
                           → {s.label}
                         </button>
@@ -125,7 +125,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                   </div>
                 ))}
                 {stageClients.length === 0 && (
-                  <p className="text-gray-600 font-body text-xs text-center py-4">No clients</p>
+                  <p className="text-gray-500 font-body text-xs text-center py-4">No clients</p>
                 )}
               </div>
             </div>

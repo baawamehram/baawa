@@ -44,7 +44,7 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+    <div className="bg-surface border border-border-subtle rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Notes</h3>
 
       {error && (
@@ -55,15 +55,15 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
 
       <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
         {notes.map((note) => (
-          <div key={note.id} className="bg-gray-800 rounded-lg px-4 py-3">
+          <div key={note.id} className="bg-surface-2 rounded-lg px-4 py-3">
             <p className="text-gray-300 font-body text-sm whitespace-pre-wrap">{note.content}</p>
-            <p className="text-gray-600 font-body text-xs mt-2">
+            <p className="text-gray-500 font-body text-xs mt-2">
               {new Date(note.created_at).toLocaleString()}
             </p>
           </div>
         ))}
         {notes.length === 0 && (
-          <p className="text-gray-600 font-body text-sm">No notes yet.</p>
+          <p className="text-gray-500 font-body text-sm">No notes yet.</p>
         )}
       </div>
 
@@ -72,7 +72,7 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Add a note..."
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo resize-none"
+          className="flex-1 bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo resize-none"
           rows={2}
         />
         <button

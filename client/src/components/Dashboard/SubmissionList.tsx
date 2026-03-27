@@ -72,12 +72,12 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by email..."
-          className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo flex-1 max-w-xs"
+          className="bg-surface-2 border border-border-subtle rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo flex-1 max-w-xs"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+          className="bg-surface-2 border border-border-subtle rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
         >
           <option value="all">All statuses</option>
           <option value="pending">Pending</option>
@@ -87,10 +87,10 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
         </select>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 text-left">
+            <tr className="border-b border-border-subtle text-left">
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Score</th>
               <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Status</th>
@@ -102,7 +102,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
               <tr
                 key={a.id}
                 onClick={() => onSelect(a.id)}
-                className="border-b border-gray-800/50 hover:bg-gray-800/30 cursor-pointer transition-colors"
+                className="border-b border-border-subtle/50 hover:bg-surface-2/30 cursor-pointer transition-colors"
               >
                 <td className="px-6 py-4 text-white font-body text-sm">{a.email}</td>
                 <td className="px-6 py-4 text-white font-heading text-sm">{a.score}</td>
