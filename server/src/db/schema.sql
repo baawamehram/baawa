@@ -155,3 +155,7 @@ CREATE INDEX IF NOT EXISTS idx_session_analytics_created
   ON session_analytics (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_session_analytics_config_version
   ON session_analytics (journey_config_version);
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS region VARCHAR(255);
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS language VARCHAR(50);
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS email VARCHAR(255);

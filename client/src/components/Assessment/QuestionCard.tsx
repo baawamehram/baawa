@@ -4,7 +4,7 @@ import { VoiceInput } from './VoiceInput'
 
 interface QuestionCardProps {
   question: string
-  questionKey: number // changes per question so AnimatePresence remounts
+  questionKey: number
   loading: boolean
   onSubmit: (answer: string) => void
   onRecordingChange?: (isRecording: boolean) => void
@@ -14,7 +14,6 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
   const [answer, setAnswer] = useState('')
   const [showTextarea, setShowTextarea] = useState(false)
 
-  // Reset answer and textarea visibility when question changes
   useEffect(() => {
     setAnswer('')
     setShowTextarea(false)
@@ -37,30 +36,25 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
     <AnimatePresence mode="wait">
       <motion.div
         key={questionKey}
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -16 }}
-        transition={{ duration: 0.45, ease: 'easeOut' }}
-        style={{
-          width: '100%',
-          maxWidth: 640,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 20,
-        }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        style={{ width: '100%', maxWidth: 640, display: 'flex', flexDirection: 'column', gap: 32 }}
       >
-        {/* Question text */}
+        {/* Question text - Stark & Authoritative */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.15, duration: 0.4 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(18px, 3vw, 24px)',
-            color: '#FDFCFA',
-            lineHeight: 1.55,
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: 'clamp(20px, 3.5vw, 28px)',
+            fontWeight: 500,
+            color: '#FFFFFF',
+            lineHeight: 1.4,
             margin: 0,
-            textAlign: 'center',
+            textAlign: 'left',
           }}
         >
           {question}
@@ -71,7 +65,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+          style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
         >
           {showTextarea && (
             <textarea
@@ -80,31 +74,34 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
               onKeyDown={handleKeyDown}
               disabled={loading}
               autoFocus
-              placeholder="Type instead…"
-              rows={2}
+              placeholder="Input response data..."
+              rows={3}
               style={{
                 width: '100%',
                 boxSizing: 'border-box',
-                background: 'rgba(255,107,53,0.06)',
-                border: '1px solid rgba(255,107,53,0.3)',
-                borderRadius: 12,
-                color: '#FDFCFA',
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#FFFFFF',
                 fontFamily: 'Outfit, sans-serif',
-                fontSize: 14,
+                fontSize: 15,
                 lineHeight: 1.6,
-                padding: '10px 14px',
+                padding: '16px',
                 resize: 'none',
                 outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#FF6B35' }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,107,53,0.3)' }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#FFFFFF'
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+              }}
             />
           )}
 
           {/* Voice + Submit row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: showTextarea ? 'none' : '1px solid rgba(255,255,255,0.1)', paddingTop: showTextarea ? 0 : 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <VoiceInput
                 onTranscript={(text) => {
                   const trimmed = text.trim()
@@ -117,48 +114,43 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
               {!showTextarea && (
                 <motion.button
                   onClick={() => setShowTextarea(true)}
-                  initial={{ opacity: 0.4 }}
-                  whileHover={{ opacity: 1 }}
+                  whileHover={{ color: '#FFFFFF' }}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'rgba(255,176,154,0.5)',
-                    fontFamily: 'Outfit, sans-serif',
-                    fontSize: 12,
-                    cursor: 'pointer',
-                    padding: 0,
+                    background: 'none', border: 'none', color: '#666',
+                    fontFamily: 'Outfit, sans-serif', fontSize: 12, letterSpacing: '0.05em',
+                    cursor: 'pointer', padding: 0, textTransform: 'uppercase'
                   }}
                 >
-                  type instead
+                  [ Manual Input ]
                 </motion.button>
               )}
             </div>
 
             {showTextarea && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 12, color: 'rgba(255,176,154,0.5)', fontFamily: 'Outfit, sans-serif' }}>
-                  ⌘↵ to send
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <span style={{ fontSize: 11, color: '#666', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.05em' }}>
+                  CMD + ENTER
                 </span>
                 <motion.button
                   onClick={handleSubmit}
                   disabled={!answer.trim() || loading}
-                  whileHover={{ scale: !answer.trim() || loading ? 1 : 1.04 }}
-                  whileTap={{ scale: !answer.trim() || loading ? 1 : 0.96 }}
+                  whileHover={{ backgroundColor: !answer.trim() || loading ? 'transparent' : '#FFFFFF', color: !answer.trim() || loading ? '#666' : '#000' }}
                   style={{
-                    background: !answer.trim() || loading ? 'rgba(255,107,53,0.2)' : 'linear-gradient(135deg, #FF6B35, #E85520)',
-                    border: 'none',
-                    borderRadius: 10,
-                    color: !answer.trim() || loading ? 'rgba(255,176,154,0.4)' : '#0A0A0A',
+                    background: 'transparent',
+                    border: '1px solid',
+                    borderColor: !answer.trim() || loading ? 'rgba(255,255,255,0.1)' : '#FFFFFF',
+                    color: !answer.trim() || loading ? '#666' : '#FFFFFF',
                     fontFamily: 'Outfit, sans-serif',
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: 600,
-                    padding: '10px 24px',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    padding: '12px 24px',
                     cursor: !answer.trim() || loading ? 'not-allowed' : 'pointer',
-                    transition: 'background 0.2s, color 0.2s',
-                    letterSpacing: '0.02em',
+                    transition: 'all 0.2s',
                   }}
                 >
-                  {loading ? 'Thinking…' : 'Continue →'}
+                  {loading ? 'EXECUTING' : 'SUBMIT'}
                 </motion.button>
               </div>
             )}

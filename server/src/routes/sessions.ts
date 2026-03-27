@@ -19,11 +19,30 @@ router.post('/start', async (req: Request, res: Response) => {
 
     const geo = await geolocateIP(ip)
 
+    // Parse optional intake fields from request body
+    const intake = z.object({
+      name: z.string().optional(),
+      region: z.string().optional(),
+      language: z.string().optional(),
+      email: z.string().email().optional(),
+    }).safeParse(req.body);
+    const intakeData = intake.success ? intake.data : {};
+
     const sessionResult = await db.query<{ id: string }>(
-      `INSERT INTO sessions (ip_address, city, country, lat, lon)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO sessions (ip_address, city, country, lat, lon, name, region, language, email)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING id`,
-      [ip, geo?.city ?? null, geo?.country ?? null, geo?.lat ?? null, geo?.lon ?? null]
+      [
+        ip,
+        geo?.city ?? null,
+        geo?.country ?? null,
+        geo?.lat ?? null,
+        geo?.lon ?? null,
+        intakeData.name ?? null,
+        intakeData.region ?? null,
+        intakeData.language ?? null,
+        intakeData.email ?? null,
+      ]
     )
     const sessionId = sessionResult.rows[0].id
 

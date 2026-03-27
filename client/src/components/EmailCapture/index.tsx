@@ -149,7 +149,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 'clamp(16px, 3vw, 22px)',
-                color: '#c7d2fe',
+                color: 'rgba(253,252,250,0.85)',
                 margin: 0,
                 lineHeight: 1.5,
                 letterSpacing: '0.01em',
@@ -287,6 +287,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 />
                 {emailError && (
                   <motion.p
+                    id="email-error"
+                    role="alert"
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{

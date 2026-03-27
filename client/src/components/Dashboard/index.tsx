@@ -52,12 +52,23 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
         <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 8px 0' }}>Dashboard Access</h2>
         <p style={{ color: '#aaaaaa', fontSize: '14px', margin: '0 0 24px 0' }}>Enter your founder API key to continue.</p>
         <form onSubmit={handleSubmit}>
+          <label htmlFor="api-key-input" style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '8px', fontWeight: 500 }}>API Key</label>
           <input
+            id="api-key-input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="API Key"
-            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '12px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', marginBottom: '16px', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
+            placeholder="Enter your API key"
+            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '12px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', transition: 'outline 0.2s, border-color 0.2s', marginBottom: '16px', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
+            onFocus={(e) => {
+              e.currentTarget.style.outline = '2px solid #ffffff'
+              e.currentTarget.style.outlineOffset = '2px'
+              e.currentTarget.style.borderColor = '#666666'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = 'none'
+              e.currentTarget.style.borderColor = '#333333'
+            }}
             autoFocus
           />
           {error && <p style={{ color: '#f87171', fontSize: '14px', marginBottom: '16px' }}>{error}</p>}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { CosmicJourney } from './components/CosmicJourney'
+import { OnboardingIntro, IntakeData } from './components/OnboardingIntro'
 import { AssessmentShell } from './components/Assessment/AssessmentShell'
 import { EmailCapture } from './components/EmailCapture'
 import { ThankYou } from './components/ThankYou'
@@ -11,7 +11,7 @@ import { PortalLogin } from './components/Portal/Login'
 import { PortalVerify } from './components/Portal/Verify'
 import { PortalResults } from './components/Portal/Results'
 
-type FunnelPhase = 'journey' | 'assessment' | 'email' | 'thankyou'
+type FunnelPhase = 'intake' | 'assessment' | 'email' | 'thankyou'
 
 interface GeoData {
   city: string | null
@@ -21,8 +21,9 @@ interface GeoData {
 }
 
 function FunnelPage({ onExit }: { onExit: () => void }) {
-  const [phase, setPhase] = useState<FunnelPhase>('journey')
+  const [phase, setPhase] = useState<FunnelPhase>('intake')
   const [sessionId, setSessionId] = useState<string>('')
+  const [intakeData, setIntakeData] = useState<IntakeData | null>(null)
   const [geo, setGeo] = useState<GeoData>({ city: null, country: null, lat: null, lon: null })
 
   useEffect(() => {
@@ -34,7 +35,10 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
       })
   }, [])
 
-  const handleJourneyComplete = useCallback(() => setPhase('assessment'), [])
+  const handleJourneyComplete = useCallback((data: IntakeData) => {
+    setIntakeData(data)
+    setPhase('assessment')
+  }, [])
 
   const exitButton = phase !== 'thankyou' && (
     <button
@@ -52,15 +56,12 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
     </button>
   )
 
-  if (phase === 'journey') {
+  if (phase === 'intake') {
     return (
       <>
         {exitButton}
-        <CosmicJourney
-          city={geo.city}
+        <OnboardingIntro
           country={geo.country}
-          lat={geo.lat}
-          lon={geo.lon}
           onComplete={handleJourneyComplete}
         />
       </>
@@ -72,6 +73,7 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
       <>
         {exitButton}
         <AssessmentShell
+          intakeData={intakeData}
           onComplete={(id: string) => {
             setSessionId(id)
             setPhase('email')

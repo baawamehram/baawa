@@ -8,12 +8,21 @@ export interface SessionState {
   loading: boolean
   done: boolean
   error: string | null
+  // New intake fields
+  name?: string
+  region?: string
+  country?: string
+  language?: string
+  email?: string
 }
 
 export interface UseSessionReturn {
   state: SessionState
   startSession: () => Promise<void>
   submitAnswer: (answer: string) => Promise<void>
+  // New setters
+  setIntakeData: (data: { name?: string; region?: string; country?: string; language?: string }) => void
+  setEmail: (email: string) => void
 }
 
 export function useSession(): UseSessionReturn {
@@ -24,6 +33,7 @@ export function useSession(): UseSessionReturn {
     loading: false,
     done: false,
     error: null,
+    // intake defaults are undefined
   })
 
   const startSession = useCallback(async () => {
@@ -33,6 +43,13 @@ export function useSession(): UseSessionReturn {
       const res = await fetch(`${API_URL}/api/sessions/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: state.name,
+          region: state.region,
+          country: state.country,
+          language: state.language,
+          email: state.email,
+        }),
       })
       if (!res.ok) throw new Error(`Failed to start session: ${res.status}`)
       const data = (await res.json()) as { sessionId: string; question: string }
@@ -50,7 +67,7 @@ export function useSession(): UseSessionReturn {
         error: err instanceof Error ? err.message : 'Unknown error',
       }))
     }
-  }, [state.loading, state.sessionId])
+  }, [state.loading, state.sessionId, state.name, state.region, state.country, state.language, state.email])
 
   const submitAnswer = useCallback(
     async (answer: string) => {
@@ -83,8 +100,17 @@ export function useSession(): UseSessionReturn {
         }))
       }
     },
-    [state.sessionId],
+    [state.sessionId]
   )
 
-  return { state, startSession, submitAnswer }
+  // New setters for intake data
+  const setIntakeData = useCallback((data: { name?: string; region?: string; country?: string; language?: string }) => {
+    setState((s) => ({ ...s, ...data }))
+  }, [])
+
+  const setEmail = useCallback((email: string) => {
+    setState((s) => ({ ...s, email }))
+  }, [])
+
+  return { state, startSession, submitAnswer, setIntakeData, setEmail }
 }

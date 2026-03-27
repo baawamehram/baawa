@@ -1,59 +1,51 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from '../../hooks/useSession'
-import { GoldenOrb } from './GoldenOrb'
 import { QuestionCard } from './QuestionCard'
+import { IntakeData } from '../OnboardingIntro'
 
 interface AssessmentShellProps {
+  intakeData: IntakeData | null
   onComplete: (sessionId: string) => void
 }
 
 const MAX_QUESTIONS = 25
 
-export function AssessmentShell({ onComplete }: AssessmentShellProps) {
-  const { state, startSession, submitAnswer } = useSession()
-  const [isRecording, setIsRecording] = useState(false)
-  const [impressed, setImpressed] = useState(false)
+export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps) {
+  const { state, startSession, submitAnswer, setIntakeData } = useSession()
 
-  // Start session immediately on mount — orbital intro already handled the intro UX
   useEffect(() => {
-    if (!state.sessionId && !state.loading) {
+    if (intakeData) {
+      setIntakeData(intakeData)
+    }
+  }, [intakeData, setIntakeData])
+
+  useEffect(() => {
+    if (!state.sessionId && !state.loading && intakeData) {
       void startSession()
     }
-  }, [state.sessionId, state.loading, startSession])
+  }, [state.sessionId, state.loading, startSession, intakeData])
 
-  // Watch for done flag
   useEffect(() => {
     if (state.done && state.sessionId) {
       onComplete(state.sessionId)
     }
   }, [state.done, state.sessionId, onComplete])
 
-  const handleRecordingChange = useCallback((recording: boolean) => {
-    setIsRecording(recording)
+  const handleRecordingChange = useCallback(() => {
+    // Left open for any future recording side effects
   }, [])
 
   const handleSubmit = async (answer: string) => {
-    if (answer.length > 100) {
-      setImpressed(true)
-      setTimeout(() => setImpressed(false), 1500)
-    }
     await submitAnswer(answer)
   }
 
-  const orbState = isRecording
-    ? 'listening'
-    : state.loading
-      ? 'processing'
-      : impressed
-        ? 'settled'
-        : 'idle'
   const progress = Math.min(state.questionCount / MAX_QUESTIONS, 1)
 
   return (
     <div
       style={{
-        background: 'linear-gradient(180deg, #0A0A0A 0%, #110805 50%, #1A0808 100%)',
+        background: '#040404',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -64,175 +56,100 @@ export function AssessmentShell({ onComplete }: AssessmentShellProps) {
         overflow: 'hidden',
       }}
     >
-      {/* Radial golden glow behind where orb sits */}
+      {/* Precision grid overlay */}
       <div style={{
-        position: 'absolute',
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -60%)',
-        width: '500px', height: '500px',
-        background: 'radial-gradient(ellipse at center, rgba(255,107,53,0.07) 0%, transparent 65%)',
-        pointerEvents: 'none',
+        position: 'absolute', inset: 0, opacity: 0.1, pointerEvents: 'none',
+        background: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+        backgroundSize: '40px 40px'
       }} />
-      {/* Corner glows */}
-      <div style={{
-        position: 'absolute', top: '-20%', left: '-10%',
-        width: '50vw', height: '50vw', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: '-15%', right: '-10%',
-        width: '40vw', height: '40vw', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(232,85,32,0.05) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      {/* Floating particles */}
-      {Array.from({ length: 24 }).map((_, i) => (
-        <div key={i} style={{
-          position: 'absolute',
-          width: i % 3 === 0 ? 2 : 1,
-          height: i % 3 === 0 ? 2 : 1,
-          borderRadius: '50%',
-          background: i % 4 === 0 ? 'rgba(255,107,53,0.4)' : 'rgba(253,252,250,0.2)',
-          left: `${(i * 37 + 11) % 95}%`,
-          top: `${(i * 53 + 7) % 90}%`,
-          animation: `float${i % 3} ${8 + (i % 5) * 2}s ease-in-out infinite`,
-          animationDelay: `${i * 0.4}s`,
-          pointerEvents: 'none',
-        }} />
-      ))}
-      <style>{`
-        @keyframes float0 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-12px)} }
-        @keyframes float1 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-18px)} }
-        @keyframes float2 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-8px)} }
-      `}</style>
 
-      {/* Progress bar */}
+      {/* Progress bar line */}
       <AnimatePresence>
         {state.questionCount > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 3,
-              background: 'rgba(255,107,53,0.15)',
-            }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 2, background: 'rgba(255,255,255,0.05)', zIndex: 100 }}
           >
             <motion.div
-              animate={{ width: `${progress * 100}%` }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              style={{
-                height: '100%',
-                background: 'linear-gradient(90deg, #FF6B35, #E85520)',
-                borderRadius: '0 2px 2px 0',
-              }}
+              animate={{ width: `${progress * 100}%` }} transition={{ duration: 0.6, ease: 'easeOut' }}
+              style={{ height: '100%', background: '#FFFFFF' }}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Assessment */}
       <AnimatePresence>
         <motion.div
           key="assessment"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, filter: 'blur(8px)' }}
+          transition={{ duration: 0.6 }}
           style={{
             width: '100%',
             maxWidth: 680,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 32,
+            gap: 40,
+            zIndex: 10
           }}
         >
-          {/* Golden Orb */}
-          <GoldenOrb state={orbState} />
+          {/* Status Header */}
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+            borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 24, width: '100%'
+          }}>
+            <span style={{
+              fontFamily: 'Outfit, sans-serif', fontSize: 10, color: '#666',
+              letterSpacing: '0.2em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6
+            }}>
+              <span style={{ display: 'inline-block', width: 4, height: 4, background: state.loading ? '#FFFFFF' : '#4ade80', borderRadius: '50%' }} />
+              {state.loading ? 'ANALYZING RESPONSE...' : 'DIAGNOSTIC ENGAGED'}
+            </span>
+            <span style={{
+              fontFamily: 'Outfit, sans-serif', fontSize: 13, color: '#FFF',
+              letterSpacing: '0.05em', fontWeight: 600
+            }}>
+              {state.questionCount > 0 ? `QUERY 0${state.questionCount}` : "INITIALIZING"}
+            </span>
+          </div>
 
-          {/* Question counter */}
-          {state.questionCount > 0 && (
-            <motion.span
-              key={state.questionCount}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: 12,
-                color: 'rgba(255,176,154,0.45)',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Question {state.questionCount}
-            </motion.span>
+          {/* Loading / Error / Question */}
+          {state.error && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center' }}>
+              <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: '#ef4444' }}>{state.error}</p>
+              <button 
+                onClick={() => void startSession()}
+                style={{
+                  marginTop: 16, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444',
+                  padding: '6px 16px', fontSize: 12, fontFamily: 'Outfit, sans-serif', cursor: 'pointer', letterSpacing: '0.1em'
+                }}
+              >REBOOT</button>
+            </motion.div>
           )}
 
-            {/* Loading / Error / Question */}
-            {state.error && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: 14,
-                  color: '#f87171',
-                  textAlign: 'center',
-                  margin: 0,
-                }}
-              >
-                {state.error}
-                <br />
-                <button
-                  onClick={() => void startSession()}
-                  style={{
-                    marginTop: 8,
-                    background: 'none',
-                    border: '1px solid #f87171',
-                    color: '#f87171',
-                    borderRadius: 6,
-                    padding: '4px 12px',
-                    cursor: 'pointer',
-                    fontFamily: 'Outfit, sans-serif',
-                    fontSize: 13,
-                  }}
-                >
-                  Retry
-                </button>
-              </motion.p>
-            )}
+          {!state.error && !state.question && state.loading && (
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}
+            >
+              <div style={{ width: 1, height: 40, borderLeft: '1px dashed rgba(255,255,255,0.4)' }} />
+              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: '#888', letterSpacing: '0.1em' }}>PROCESSING INPUT</span>
+            </motion.div>
+          )}
 
-            {!state.error && !state.question && state.loading && (
-              <motion.p
-                animate={{ opacity: [0.4, 0.9, 0.4] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: 18,
-                  color: 'rgba(255,176,154,0.6)',
-                  margin: 0,
-                }}
-              >
-                Thinking…
-              </motion.p>
-            )}
+          {!state.error && state.question && (
+            <QuestionCard
+              question={state.question}
+              questionKey={state.questionCount}
+              loading={state.loading}
+              onSubmit={(answer) => void handleSubmit(answer)}
+              onRecordingChange={handleRecordingChange}
+            />
+          )}
 
-            {!state.error && state.question && (
-              <QuestionCard
-                question={state.question}
-                questionKey={state.questionCount}
-                loading={state.loading}
-                onSubmit={(answer) => void handleSubmit(answer)}
-                onRecordingChange={handleRecordingChange}
-              />
-            )}
-          </motion.div>
+        </motion.div>
       </AnimatePresence>
     </div>
   )
