@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LogoLight, LogoDark } from '../Logo'
 
 interface Props {
@@ -5,8 +7,83 @@ interface Props {
 }
 
 export function LandingPage({ onStart }: Props) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const navigate = useNavigate()
+
   return (
     <div style={{ fontFamily: 'Outfit, sans-serif', background: '#FDFCFA', color: '#0A0A0A' }}>
+
+      {/* About Us overlay */}
+      {menuOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: '#0A0A0A', overflowY: 'auto',
+          display: 'flex', flexDirection: 'column',
+        }}>
+          {/* Overlay nav */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 48px', height: '64px', flexShrink: 0,
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+          }}>
+            <LogoDark height={32} />
+            <button onClick={() => setMenuOpen(false)} aria-label="Close menu" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: '#FDFCFA', fontSize: '28px', lineHeight: 1, padding: '4px 8px',
+            }}>✕</button>
+          </div>
+
+          {/* About Us content */}
+          <div style={{ maxWidth: '720px', margin: '0 auto', padding: '72px 32px 96px', width: '100%' }}>
+            <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: '24px' }}>About Baawa</div>
+
+            {/* Mission */}
+            <div style={{ marginBottom: '56px' }}>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, color: '#FDFCFA', margin: '0 0 16px' }}>Mission</h2>
+              <p style={{ fontSize: '17px', color: 'rgba(253,252,250,0.7)', lineHeight: 1.75, margin: 0 }}>
+                To be the first call founders make when they need things to move — delivering truth, clarity, and momentum through psychology-driven strategy.
+              </p>
+            </div>
+
+            {/* Vision */}
+            <div style={{ marginBottom: '56px' }}>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, color: '#FDFCFA', margin: '0 0 16px' }}>Vision</h2>
+              <p style={{ fontSize: '17px', color: 'rgba(253,252,250,0.7)', lineHeight: 1.75, margin: 0 }}>
+                A world where every founder has access to an advisor who tells them what they need to hear, not what they want to hear — and gets them unstuck.
+              </p>
+            </div>
+
+            {/* Core Belief */}
+            <div style={{ marginBottom: '56px', background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.15)', borderRadius: '12px', padding: '32px' }}>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 700, color: '#FF6B35', margin: '0 0 16px' }}>Core Belief</h2>
+              <p style={{ fontSize: '16px', color: 'rgba(253,252,250,0.75)', lineHeight: 1.75, margin: 0 }}>
+                Founders deserve truth, not reassurance. The agency model is broken. Psychology beats tactics. We diagnose before we prescribe.
+              </p>
+            </div>
+
+            {/* Values */}
+            <div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, color: '#FDFCFA', margin: '0 0 32px' }}>Values</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {[
+                  { title: 'Truth over comfort', body: 'We say what others won\'t.' },
+                  { title: 'Momentum over perfection', body: 'Done beats perfect.' },
+                  { title: 'Psychology over tactics', body: 'Understand why, then act.' },
+                  { title: 'Selectivity over volume', body: 'We can\'t help everyone, and we don\'t pretend to.' },
+                ].map(({ title, body }) => (
+                  <div key={title} style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+                    <span style={{ color: '#FF6B35', fontWeight: 700, flexShrink: 0, marginTop: '2px' }}>—</span>
+                    <div>
+                      <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '15px', fontWeight: 700, color: '#FDFCFA', marginBottom: '4px' }}>{title}</div>
+                      <div style={{ fontSize: '14px', color: 'rgba(253,252,250,0.5)', lineHeight: 1.6 }}>{body}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Section 1 — Navigation */}
       <nav style={{
@@ -17,11 +94,22 @@ export function LandingPage({ onStart }: Props) {
         padding: '0 48px', height: '64px'
       }}>
         <LogoLight height={32} />
-        <button onClick={onStart} style={{
-          background: '#FF6B35', color: '#FAFAFA', border: 'none', cursor: 'pointer',
-          padding: '10px 24px', borderRadius: '6px', fontSize: '14px',
-          fontFamily: 'Outfit, sans-serif', fontWeight: 600
-        }}>Apply to work with us</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => navigate('/portal/login')} style={{
+            background: 'none', color: '#6B6460', border: '1px solid rgba(0,0,0,0.12)', cursor: 'pointer',
+            padding: '8px 18px', borderRadius: '6px', fontSize: '13px',
+            fontFamily: 'Outfit, sans-serif', fontWeight: 500
+          }}>Login</button>
+          <button onClick={onStart} style={{
+            background: '#FF6B35', color: '#FAFAFA', border: 'none', cursor: 'pointer',
+            padding: '10px 24px', borderRadius: '6px', fontSize: '14px',
+            fontFamily: 'Outfit, sans-serif', fontWeight: 600
+          }}>Apply to work with us</button>
+          <button onClick={() => setMenuOpen(true)} aria-label="Open menu" style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#0A0A0A', fontSize: '22px', lineHeight: 1, padding: '4px 6px', marginLeft: '4px',
+          }}>☰</button>
+        </div>
       </nav>
 
       {/* Section 2 — Hero */}
