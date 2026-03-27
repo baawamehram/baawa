@@ -108,7 +108,7 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
             width="6"
             height="11"
             rx="3"
-            fill={isRecording ? '#FFFFFF' : 'rgba(255,255,255,0.5)'}
+            fill={isRecording ? '#FFFFFF' : 'rgba(255,255,255,0.8)'}
           />
           <path
             d="M5 11a7 7 0 0 0 14 0"
@@ -150,17 +150,41 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
       )}
 
       {isRecording ? (
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-          style={{ fontSize: 10, color: '#FFFFFF', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.05em', textTransform: 'uppercase' }}
-        >
-          RECORDING... TAP TO STOP
-        </motion.span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          {/* Simulated Waveform */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 20 }}>
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <motion.div
+                key={i}
+                animate={{
+                  height: [8, 20, 12, 18, 10],
+                }}
+                transition={{
+                  duration: 0.5,
+                  repeat: Infinity,
+                  delay: i * 0.1,
+                  ease: 'easeInOut'
+                }}
+                style={{
+                  width: 2,
+                  background: '#FFFFFF',
+                  borderRadius: 1
+                }}
+              />
+            ))}
+          </div>
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+            style={{ fontSize: 10, color: '#FFFFFF', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}
+          >
+            NODE LISTENING... TAP TO INGEST
+          </motion.span>
+        </div>
       ) : (
-        <span style={{ fontSize: 9, color: '#666', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-          ANY LANGUAGE
+        <span style={{ fontSize: 9, color: '#444', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          STRATEGY INGESTION READY
         </span>
       )}
     </div>

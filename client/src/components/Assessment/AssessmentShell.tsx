@@ -21,10 +21,10 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
   }, [intakeData, setIntakeData])
 
   useEffect(() => {
-    if (!state.sessionId && !state.loading && intakeData) {
+    if (!state.sessionId && !state.loading && !state.error && intakeData) {
       void startSession()
     }
-  }, [state.sessionId, state.loading, startSession, intakeData])
+  }, [state.sessionId, state.loading, state.error, startSession, intakeData])
 
   useEffect(() => {
     if (state.done && state.sessionId) {
@@ -111,7 +111,7 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
               fontFamily: 'Outfit, sans-serif', fontSize: 13, color: '#FFF',
               letterSpacing: '0.05em', fontWeight: 600
             }}>
-              {state.questionCount > 0 ? `QUERY 0${state.questionCount}` : "INITIALIZING"}
+              {state.questionCount > 0 ? `DIAGNOSTIC ENGINE // QUERY 0${state.questionCount}` : "STRATEGIC INITIALIZATION"}
             </span>
           </div>
 
@@ -131,11 +131,31 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
 
           {!state.error && !state.question && state.loading && (
             <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12, width: '100%', maxWidth: 400, fontFamily: 'monospace', fontSize: 11, color: '#666' }}
             >
-              <div style={{ width: 1, height: 40, borderLeft: '1px dashed rgba(255,255,255,0.4)' }} />
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: '#888', letterSpacing: '0.1em' }}>PROCESSING INPUT</span>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <span style={{ color: '#ff6b35' }}>[ 0.001s ]</span>
+                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>KICKING OFF INTELLIGENCE SERVERS...</motion.span>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <span style={{ color: '#ff6b35' }}>[ 0.452s ]</span>
+                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>CALIBRATING BEHAVIORAL MODELS...</motion.span>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <span style={{ color: '#ff6b35' }}>[ 1.120s ]</span>
+                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>INITIALIZING ADAPTIVE QUESTIONING NODE...</motion.span>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <span style={{ color: '#ff6b35' }}>[ 1.890s ]</span>
+                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }}>SYSTEMS READY. INGESTING CLIENT PROFILE.</motion.span>
+              </div>
+              <motion.div 
+                animate={{ opacity: [0, 1, 0] }} 
+                transition={{ duration: 0.8, repeat: Infinity }}
+                style={{ width: 8, height: 14, background: '#ff6b35', marginTop: 4 }}
+              />
             </motion.div>
           )}
 

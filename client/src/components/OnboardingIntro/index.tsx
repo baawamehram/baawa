@@ -1,22 +1,5 @@
-import React, { useState, useEffect } from 'react';
-
-interface TechNews {
-  title: string;
-}
-
-interface IndexData {
-  name: string;
-  value: string;
-}
-
-interface GeopoliticsData {
-  headline: string;
-}
-
-interface OnboardingIntroProps {
-  country: string | null;
-  onComplete: (intakeData: IntakeData) => void;
-}
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 export interface IntakeData {
   name: string;
@@ -25,11 +8,10 @@ export interface IntakeData {
   language: string;
 }
 
-// Placeholder data fetch functions (replace with real API calls later)
-const fetchTechNews = async (): Promise<TechNews[]> => [{ title: 'Diagnostic: Analyzing global trade signals...' }];
-const fetchMiningIndex = async (): Promise<IndexData[]> => [{ name: 'LME Copper', value: '$8,450.50' }];
-const fetchShippingIndex = async (): Promise<IndexData[]> => [{ name: 'Baltic Dry', value: '1,245.00' }];
-const fetchGeopolitics = async (): Promise<GeopoliticsData[]> => [{ headline: 'Stability Alert: Monitoring maritime chokepoints.' }];
+interface OnboardingIntroProps {
+  country: string | null;
+  onComplete: (intakeData: IntakeData) => void;
+}
 
 export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
   const [step, setStep] = useState<'dashboard' | 'intake' | 'voice'>('dashboard');
@@ -39,60 +21,43 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
     country: country || '',
     language: ''
   });
-  const [data, setData] = useState({
-    tech: [] as TechNews[],
-    mining: [] as IndexData[],
-    shipping: [] as IndexData[],
-    geopolitics: [] as GeopoliticsData[]
-  });
-
-  // Load data once when component mounts
-  useEffect(() => {
-    (async () => {
-      try {
-        const [tech, mining, shipping, geopolitics] = await Promise.all([
-          fetchTechNews(),
-          fetchMiningIndex(),
-          fetchShippingIndex(),
-          fetchGeopolitics(),
-        ]);
-        setData({ tech, mining, shipping, geopolitics });
-      } catch (err) {
-        console.error('Failed to fetch diagnostic data', err);
-      }
-    })();
-  }, []);
 
   const handleIntakeChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setIntake((prev) => ({ ...prev, [name]: value }));
+    setIntake((prev: IntakeData) => ({ ...prev, [name]: value }));
   };
 
   const renderDashboard = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '16px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '16px', maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
+      <motion.div
+        animate={{ top: ['0%', '100%'] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+        style={{ position: 'absolute', left: 0, right: 0, height: '2px', background: 'rgba(255,107,53,0.2)', zIndex: 5, pointerEvents: 'none' }}
+      />
+      
       <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>BTC/USD</strong>
-        <p style={{ color: '#fff', fontSize: '18px', fontWeight: 'bold' }}>$67,432.12 <span style={{ color: '#0f0', fontSize: '12px' }}>+1.2%</span></p>
+        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Intelligence Node 04</strong>
+        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Kicking off intelligence servers...</p>
       </div>
       <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Forex Index (DXY)</strong>
-        <p style={{ color: '#fff', fontSize: '18px', fontWeight: 'bold' }}>104.23 <span style={{ color: '#f00', fontSize: '12px' }}>-0.05%</span></p>
+        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Strategy Engine</strong>
+        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Calibrating strategy models...</p>
       </div>
       <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Intelligence Stream</strong>
-        <p style={{ color: '#fff', fontSize: '13px' }}>{data.tech[0]?.title ?? 'Loading system signals...'}</p>
+        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Ingestion Pipeline</strong>
+        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Diagnostic Nodes: <span style={{ color: '#ff6b35' }}>READY</span></p>
       </div>
       <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Mining Index</strong>
-        <p style={{ color: '#fff', fontSize: '13px' }}>{data.mining[0]?.name}: {data.mining[0]?.value}</p>
+        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Global Market Sync</strong>
+        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Stability Alert: <span style={{ color: '#0f0' }}>SYNCED</span></p>
       </div>
       <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Logistics (Shipping)</strong>
-        <p style={{ color: '#fff', fontSize: '13px' }}>{data.shipping[0]?.name}: {data.shipping[0]?.value}</p>
+        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Risk Correlation</strong>
+        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>Scanning correlation metrics...</p>
       </div>
       <div style={{ background: '#111', padding: '12px', borderRadius: '6px', border: '1px solid #333' }}>
-        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>Geopolitical Risk</strong>
-        <p style={{ color: '#fff', fontSize: '13px' }}>{data.geopolitics[0]?.headline}</p>
+        <strong style={{ display: 'block', fontSize: '10px', color: '#666', textTransform: 'uppercase' }}>System Status</strong>
+        <p style={{ color: '#fff', fontSize: '14px', fontWeight: '500', fontFamily: 'Outfit, sans-serif', margin: '4px 0' }}>All nodes active. Ingestion ready.</p>
       </div>
     </div>
   );
@@ -173,20 +138,20 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
         <svg fill="#ff6b35" width="24" height="24" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
       </div>
       <h3 style={{ fontSize: '20px', marginBottom: '16px', fontFamily: 'Cormorant Garamond, serif' }}>Optimization: Enable Voice Interface</h3>
-      <p style={{ color: '#999', lineHeight: '1.6', marginBottom: '32px' }}>
-        Our proprietary diagnostic engine delivers consultant-grade depth (valued at $5,000/hr)
+      <p style={{ color: '#999', lineHeight: '1.6', marginBottom: '32px', fontFamily: 'Outfit, sans-serif' }}>
+        Our proprietary diagnostic engine delivers consultant-grade depth
         by analyzing non-verbal cues and nuanced intent. Voice input is highly recommended for maximum precision.
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <button
           onClick={() => onComplete(intake)}
-          style={{ padding: '14px', background: '#fff', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
+          style={{ padding: '14px', background: '#fff', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}
         >
           USE VOICE (RECOMMENDED)
         </button>
         <button
           onClick={() => onComplete(intake)}
-          style={{ padding: '14px', background: 'transparent', color: '#666', border: '1px solid #333', borderRadius: '6px', cursor: 'pointer' }}
+          style={{ padding: '14px', background: 'transparent', color: '#666', border: '1px solid #333', borderRadius: '6px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}
         >
           CONTINUE WITH TEXT
         </button>

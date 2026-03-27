@@ -90,8 +90,8 @@ async function callGroq(req: LLMRequest, model: string): Promise<string> {
 export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
   const claudeModel =
     req.chain === 'optimizer'
-      ? 'claude-sonnet-4-6'
-      : (process.env.CLAUDE_MODEL ?? 'claude-haiku-4-5-20251001')
+      ? 'claude-3-5-sonnet-20241022'
+      : (process.env.CLAUDE_MODEL ?? 'claude-3-5-haiku-20241022')
 
   const geminiModel =
     req.chain === 'optimizer'
