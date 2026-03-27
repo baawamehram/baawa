@@ -222,7 +222,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto p-8 pt-20 md:pt-8">
+      <main className="flex-1 overflow-y-auto p-8 pt-20 md:pt-8 bg-space-bg">
         <AnimatePresence mode="wait">
           <motion.div
             key={`${section}-${selectedAssessmentId}-${selectedClientId}`}
