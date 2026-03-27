@@ -77,6 +77,10 @@ async function startServer() {
   try {
     await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS journey_config_version INT`)
     await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`)
+    await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS name VARCHAR(255)`)
+    await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS region VARCHAR(255)`)
+    await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS language VARCHAR(255)`)
+    await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS email VARCHAR(255)`)
     await db.query(`
       CREATE TABLE IF NOT EXISTS journey_config (
         id          SERIAL PRIMARY KEY,
