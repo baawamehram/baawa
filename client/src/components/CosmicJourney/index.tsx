@@ -54,11 +54,10 @@ const BOOT_STEPS = [
 
 const MSGS = [
   'Hello.',
-  'Hello.\n\nEverything you share here stays between us.',
-  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.',
-  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.',
-  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.\n\nWe may not be the right fit. Either way, you leave with more clarity about your business than when you arrived.',
-  'Hello.\n\nEverything you share here stays between us.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nI will ask hard questions. Don\'t be unsettled by that — the hard ones are exactly where great businesses are found.\n\nWe may not be the right fit. Either way, you leave with more clarity about your business than when you arrived.\n\nSpeak from the place that actually keeps you up at night.\n\nThat is where we begin.',
+  'Hello.\n\nVoice works best — speak freely, the way you would to someone you trust.',
+  'Hello.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nYour answers will help our consultants evaluate your business.',
+  'Hello.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nYour answers will help our consultants evaluate your business.\n\nSo go all in. Be wild. Be free.',
+  'Hello.\n\nVoice works best — speak freely, the way you would to someone you trust.\n\nYour answers will help our consultants evaluate your business.\n\nSo go all in. Be wild. Be free.\n\nWelcome to Magicland.\n\nLet\'s begin.',
 ]
 
 function fmtPct(p: number) { return (p >= 0 ? '+' : '') + p.toFixed(2) + '%' }
