@@ -40,8 +40,8 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
         if (!res.ok) throw new Error(`Transcription failed: ${res.status}`)
         const data = (await res.json()) as { transcript: string }
         onTranscriptRef.current(data.transcript)
-      } catch {
-        setTranscriptionError(null)
+      } catch (err) {
+        setTranscriptionError(err instanceof Error ? err.message : 'Transcription failed. Is backend running?')
         onVoiceUnavailable?.()
       }
     }
