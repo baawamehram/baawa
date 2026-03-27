@@ -103,7 +103,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
     }
   }
 
-  if (loading) return <p className="text-gray-400 font-body">Loading...</p>
+  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
 
   return (
     <div>
@@ -116,32 +116,32 @@ export function KnowledgeBase({ token, on401 }: Props) {
       )}
 
       {/* Upload */}
-      <div className="bg-surface border border-border-subtle rounded-xl p-6 mb-6">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6">
         <h3 className="text-sm font-heading text-white mb-4">Upload Source</h3>
         <div className="flex gap-3 items-end">
           <div className="flex-1">
-            <label className="text-gray-400 font-body text-xs mb-1 block">Source Name</label>
+            <label className="text-slate-400 font-body text-xs mb-1 block">Source Name</label>
             <input
               type="text"
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               placeholder="e.g. pricing-guide"
-              className="w-full bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
             />
           </div>
           <div>
-            <label className="text-gray-400 font-body text-xs mb-1 block">File (.md)</label>
+            <label className="text-slate-400 font-body text-xs mb-1 block">File (.md)</label>
             <input
               type="file"
               accept=".md"
               onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-              className="text-gray-400 font-body text-sm file:mr-3 file:bg-surface-2 file:border-0 file:rounded file:px-3 file:py-2 file:text-white file:font-body file:text-sm file:cursor-pointer"
+              className="text-slate-400 font-body text-sm file:mr-3 file:bg-slate-800 file:border-0 file:rounded file:px-3 file:py-2 file:text-white file:font-body file:text-sm file:cursor-pointer"
             />
           </div>
           <button
             onClick={handleUpload}
             disabled={uploading || !uploadFile || !uploadName.trim()}
-            className="bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
           >
             {uploading ? 'Uploading...' : 'Upload'}
           </button>
@@ -149,23 +149,23 @@ export function KnowledgeBase({ token, on401 }: Props) {
       </div>
 
       {/* Sources List */}
-      <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border-subtle text-left">
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Source</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Chunks</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Actions</th>
+            <tr className="border-b border-slate-700 text-left">
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Source</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Chunks</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sources.map((s) => (
-              <tr key={s.source_name} className="border-b border-border-subtle/50">
+              <tr key={s.source_name} className="border-b border-slate-700/50">
                 <td className="px-6 py-4 text-white font-body text-sm">{s.source_name}</td>
-                <td className="px-6 py-4 text-gray-400 font-body text-sm">{s.chunk_count}</td>
+                <td className="px-6 py-4 text-slate-400 font-body text-sm">{s.chunk_count}</td>
                 <td className="px-6 py-4">
-                  <span className={`text-xs font-body ${s.is_active ? 'text-green-400' : 'text-gray-400'}`}>
+                  <span className={`text-xs font-body ${s.is_active ? 'text-green-400' : 'text-slate-400'}`}>
                     {s.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -173,7 +173,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
                   <div className="flex gap-2">
                     <button
                       onClick={() => toggleActive(s.source_name, s.is_active)}
-                      className="text-xs font-body px-2.5 py-1 rounded bg-surface-2 hover:bg-white/10 text-gray-300 transition-colors"
+                      className="text-xs font-body px-2.5 py-1 rounded bg-slate-800 hover:bg-white/10 text-slate-300 transition-colors"
                     >
                       {s.is_active ? 'Deactivate' : 'Activate'}
                     </button>
@@ -189,7 +189,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
             ))}
             {sources.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-400 font-body text-sm">
+                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 font-body text-sm">
                   No knowledge sources yet.
                 </td>
               </tr>

@@ -43,27 +43,27 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-space-bg flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-slate-950 flex items-center justify-center z-50">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-surface border border-brand-indigo/30 rounded-2xl p-8 w-full max-w-md"
+        className="bg-slate-900 border border-orange-500/20 rounded-2xl p-8 w-full max-w-md"
       >
         <h2 className="text-2xl font-heading text-white mb-2">Dashboard Access</h2>
-        <p className="text-gray-400 mb-6 font-body text-sm">Enter your founder API key to continue.</p>
+        <p className="text-slate-400 mb-6 font-body text-sm">Enter your founder API key to continue.</p>
         <form onSubmit={handleSubmit}>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="API Key"
-            className="w-full bg-surface-2 border border-border-subtle rounded-lg px-4 py-3 text-white font-body focus:outline-none focus:border-brand-indigo mb-4"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white font-body focus:outline-none focus:border-orange-500 mb-4"
             autoFocus
           />
           {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-brand-indigo hover:bg-brand-violet transition-colors text-white font-heading py-3 rounded-lg"
+            className="w-full bg-orange-500 hover:bg-orange-600 transition-colors text-white font-heading py-3 rounded-lg"
           >
             Enter Dashboard
           </button>
@@ -166,13 +166,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-space-bg">
+    <div className="flex h-screen bg-slate-950">
       {/* Mobile header bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-space-bg border-b border-border-subtle">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-slate-950 border-b border-slate-700">
         <LogoIcon height={28} />
         <button
           onClick={() => setMobileNavOpen((o) => !o)}
-          className="text-gray-400 hover:text-white text-2xl leading-none"
+          className="text-slate-400 hover:text-white text-2xl leading-none"
           aria-label="Toggle navigation"
           aria-expanded={mobileNavOpen}
         >
@@ -182,15 +182,15 @@ export default function Dashboard() {
 
       {/* Mobile dropdown nav */}
       {mobileNavOpen && (
-        <div className="md:hidden fixed top-12 left-0 right-0 z-30 bg-surface border-b border-border-subtle px-4 py-3 flex flex-col gap-1">
+        <div className="md:hidden fixed top-12 left-0 right-0 z-30 bg-slate-900 border-b border-slate-700 px-4 py-3 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
               onClick={() => handleNavSelect(item.key)}
               className={`text-left px-4 py-2.5 rounded-lg font-body text-sm transition-colors ${
                 section === item.key
-                  ? 'bg-brand-indigo/20 text-brand-indigo'
-                  : 'text-gray-400 hover:text-white hover:bg-surface-2/50'
+                  ? 'bg-orange-500/10 text-orange-400'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
               {item.label}
@@ -200,7 +200,7 @@ export default function Dashboard() {
       )}
 
       {/* Sidebar — desktop only */}
-      <aside className="hidden md:flex w-64 border-r border-border-subtle flex-col py-6 px-4 shrink-0 bg-surface">
+      <aside className="hidden md:flex w-64 border-r border-slate-700 flex-col py-6 px-4 shrink-0 bg-slate-900">
         <div className="mb-8 px-2">
           <LogoDark height={32} />
         </div>
@@ -211,8 +211,8 @@ export default function Dashboard() {
               onClick={() => handleNavSelect(item.key)}
               className={`text-left px-4 py-2.5 rounded-lg font-body text-sm transition-colors ${
                 section === item.key
-                  ? 'bg-brand-indigo/20 text-brand-indigo'
-                  : 'text-gray-400 hover:text-white hover:bg-surface-2/50'
+                  ? 'bg-orange-500/10 text-orange-400'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
               {item.label}
@@ -222,7 +222,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto p-8 pt-20 md:pt-8 bg-space-bg">
+      <main className="flex-1 overflow-y-auto p-8 pt-20 md:pt-8 bg-slate-950">
         <AnimatePresence mode="wait">
           <motion.div
             key={`${section}-${selectedAssessmentId}-${selectedClientId}`}

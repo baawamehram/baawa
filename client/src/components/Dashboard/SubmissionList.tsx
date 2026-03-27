@@ -19,7 +19,7 @@ const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-500/20 text-yellow-400',
   reviewing: 'bg-blue-500/20 text-blue-400',
   onboarded: 'bg-green-500/20 text-green-400',
-  deferred: 'bg-gray-500/20 text-gray-400',
+  deferred: 'bg-slate-700 text-slate-400',
 }
 
 export function SubmissionList({ token, on401, onSelect }: Props) {
@@ -54,7 +54,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
     .filter((a) => a.email.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => b.score - a.score)
 
-  if (loading) return <p className="text-gray-400 font-body">Loading...</p>
+  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
 
   return (
     <div>
@@ -72,12 +72,12 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by email..."
-          className="bg-surface-2 border border-border-subtle rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo flex-1 max-w-xs"
+          className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 flex-1 max-w-xs"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-surface-2 border border-border-subtle rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+          className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
         >
           <option value="all">All statuses</option>
           <option value="pending">Pending</option>
@@ -87,14 +87,14 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
         </select>
       </div>
 
-      <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border-subtle text-left">
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Score</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Date</th>
+            <tr className="border-b border-slate-700 text-left">
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Score</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Date</th>
             </tr>
           </thead>
           <tbody>
@@ -102,7 +102,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
               <tr
                 key={a.id}
                 onClick={() => onSelect(a.id)}
-                className="border-b border-border-subtle/50 hover:bg-surface-2/30 cursor-pointer transition-colors"
+                className="border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition-colors"
               >
                 <td className="px-6 py-4 text-white font-body text-sm">{a.email}</td>
                 <td className="px-6 py-4 text-white font-heading text-sm">{a.score}</td>
@@ -111,14 +111,14 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
                     {a.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-gray-400 font-body text-sm">
+                <td className="px-6 py-4 text-slate-400 font-body text-sm">
                   {new Date(a.created_at).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-400 font-body text-sm">
+                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 font-body text-sm">
                   No assessments found.
                 </td>
               </tr>

@@ -64,12 +64,12 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
   }
 
   return (
-    <div className="bg-surface border border-border-subtle rounded-xl p-6">
+    <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Client Profile</h3>
       <div className="grid grid-cols-2 gap-4">
         {FIELDS.map((f) => (
           <div key={f.key}>
-            <label className="text-gray-400 font-body text-xs mb-1 block">{f.label}</label>
+            <label className="text-slate-400 font-body text-xs mb-1 block">{f.label}</label>
             <input
               type={f.type}
               value={form[f.key] ?? ''}
@@ -79,7 +79,7 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
                   [f.key]: f.type === 'number' ? Number(e.target.value) : e.target.value,
                 }))
               }
-              className="w-full bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
             />
           </div>
         ))}
@@ -92,7 +92,7 @@ export function ClientProfile({ client, token, on401, onUpdate }: Props) {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="mt-4 bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+        className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
       >
         {saving ? 'Saving...' : 'Save Profile'}
       </button>

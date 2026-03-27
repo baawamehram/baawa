@@ -73,7 +73,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
     return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
   }
 
-  if (loading) return <p className="text-gray-400 font-body">Loading...</p>
+  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
 
   return (
     <div>
@@ -89,23 +89,23 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
         {STAGES.map((stage) => {
           const stageClients = clients.filter((c) => c.stage === stage.key)
           return (
-            <div key={stage.key} className="bg-surface/50 border border-border-subtle rounded-xl p-4">
-              <h3 className="text-sm font-heading text-brand-indigo mb-4 uppercase tracking-wider">
-                {stage.label} <span className="text-gray-400">({stageClients.length})</span>
+            <div key={stage.key} className="bg-slate-900/50 border border-slate-700 rounded-xl p-4">
+              <h3 className="text-sm font-heading text-orange-400 mb-4 uppercase tracking-wider">
+                {stage.label} <span className="text-slate-400">({stageClients.length})</span>
               </h3>
               <div className="space-y-3">
                 {stageClients.map((client) => (
                   <div
                     key={client.id}
-                    className="bg-surface-2 border border-border-subtle/50 rounded-lg p-4 hover:border-brand-indigo/30 transition-colors"
+                    className="bg-slate-800 border border-slate-700/50 rounded-lg p-4 hover:border-orange-500/30 transition-colors"
                   >
                     <div
                       className="cursor-pointer"
                       onClick={() => onSelectClient(client.id)}
                     >
                       <p className="text-white font-heading text-sm">{client.founder_name}</p>
-                      <p className="text-gray-400 font-body text-xs mt-0.5">{client.company_name}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs font-body text-gray-400">
+                      <p className="text-slate-400 font-body text-xs mt-0.5">{client.company_name}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs font-body text-slate-400">
                         <span>Score: {client.score ?? 'N/A'}</span>
                         <span>{daysSince(client.start_date)}d</span>
                         {client.phase2_monthly_fee > 0 && <span>${client.phase2_monthly_fee}/mo</span>}
@@ -116,7 +116,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                         <button
                           key={s.key}
                           onClick={() => moveClient(client.id, s.key)}
-                          className="text-xs font-body px-2.5 py-1 rounded bg-surface-2 hover:bg-brand-indigo/30 text-gray-300 hover:text-white transition-colors"
+                          className="text-xs font-body px-2.5 py-1 rounded bg-slate-800 hover:bg-orange-500/30 text-slate-300 hover:text-white transition-colors"
                         >
                           → {s.label}
                         </button>
@@ -125,7 +125,7 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
                   </div>
                 ))}
                 {stageClients.length === 0 && (
-                  <p className="text-gray-500 font-body text-xs text-center py-4">No clients</p>
+                  <p className="text-slate-500 font-body text-xs text-center py-4">No clients</p>
                 )}
               </div>
             </div>

@@ -119,23 +119,23 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
     }
   }
 
-  if (loading) return <p className="text-gray-400 font-body">Loading...</p>
-  if (!assessment) return <p className="text-gray-400 font-body">Assessment not found.</p>
+  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
+  if (!assessment) return <p className="text-slate-400 font-body">Assessment not found.</p>
 
   const breakdown = assessment.score_breakdown || {}
 
   return (
     <div>
-      <button onClick={onBack} className="text-brand-indigo hover:text-brand-violet font-body text-sm mb-6 inline-block">
+      <button onClick={onBack} className="text-orange-400 hover:text-orange-400 font-body text-sm mb-6 inline-block">
         &larr; Back to list
       </button>
 
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-heading text-white">{assessment.email}</h2>
-          <p className="text-gray-400 font-body text-sm mt-1">
+          <p className="text-slate-400 font-body text-sm mt-1">
             Score: <span className="text-white font-heading">{assessment.score}</span> &middot; Status:{' '}
-            <span className="text-brand-indigo">{assessment.status}</span>
+            <span className="text-orange-400">{assessment.status}</span>
           </p>
         </div>
         <div className="flex gap-3">
@@ -153,7 +153,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                 finally { setUnlocking(false) }
               }}
               disabled={unlocking}
-              className="bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
             >
               {unlocking ? 'Unlocking…' : 'Unlock Results'}
             </button>
@@ -166,7 +166,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
           </button>
           <button
             onClick={() => handleAction('defer')}
-            className="bg-surface-2 hover:bg-white/10 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors"
+            className="bg-slate-800 hover:bg-white/10 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors"
           >
             Defer
           </button>
@@ -186,15 +186,15 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
       )}
 
       {/* Score Breakdown */}
-      <div className="bg-surface border border-border-subtle rounded-xl p-6 mb-6">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6">
         <h3 className="text-lg font-heading text-white mb-4">Score Breakdown</h3>
         <div className="space-y-3">
           {Object.entries(breakdown).map(([key, value]) => (
             <div key={key} className="flex items-center gap-4">
-              <span className="text-gray-400 font-body text-sm w-36">{DIMENSION_LABELS[key] || key}</span>
-              <div className="flex-1 bg-surface-2 rounded-full h-3 overflow-hidden">
+              <span className="text-slate-400 font-body text-sm w-36">{DIMENSION_LABELS[key] || key}</span>
+              <div className="flex-1 bg-slate-800 rounded-full h-3 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-brand-indigo to-brand-violet rounded-full transition-all"
+                  className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full transition-all"
                   style={{ width: `${value}%` }}
                 />
               </div>
@@ -206,36 +206,36 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
 
       {/* Opportunity & Risk */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-surface border border-border-subtle rounded-xl p-6">
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
           <h3 className="text-sm font-heading text-green-400 mb-2">Biggest Opportunity</h3>
-          <p className="text-gray-300 font-body text-sm">{assessment.biggest_opportunity || 'N/A'}</p>
+          <p className="text-slate-300 font-body text-sm">{assessment.biggest_opportunity || 'N/A'}</p>
         </div>
-        <div className="bg-surface border border-border-subtle rounded-xl p-6">
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
           <h3 className="text-sm font-heading text-red-400 mb-2">Biggest Risk</h3>
-          <p className="text-gray-300 font-body text-sm">{assessment.biggest_risk || 'N/A'}</p>
+          <p className="text-slate-300 font-body text-sm">{assessment.biggest_risk || 'N/A'}</p>
         </div>
       </div>
 
       {/* Notes */}
-      <div className="bg-surface border border-border-subtle rounded-xl p-6 mb-6">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6">
         <h3 className="text-lg font-heading text-white mb-4">Founder Notes</h3>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full bg-surface-2 border border-border-subtle rounded-lg px-4 py-3 text-white font-body text-sm focus:outline-none focus:border-brand-indigo min-h-[100px] resize-y"
+          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white font-body text-sm focus:outline-none focus:border-orange-500 min-h-[100px] resize-y"
           placeholder="Add notes about this assessment..."
         />
         <button
           onClick={saveNotes}
           disabled={saving}
-          className="mt-3 bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          className="mt-3 bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Notes'}
         </button>
       </div>
 
       {/* Conversation Transcript */}
-      <div className="bg-surface border border-border-subtle rounded-xl p-6">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
         <h3 className="text-lg font-heading text-white mb-4">Conversation</h3>
         <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
           {(assessment.conversation || []).map((msg, i) => (
@@ -243,8 +243,8 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
               <div
                 className={`max-w-[75%] px-4 py-3 rounded-2xl font-body text-sm ${
                   msg.role === 'user'
-                    ? 'bg-brand-indigo/20 text-white rounded-br-md'
-                    : 'bg-surface-2 text-gray-300 rounded-bl-md'
+                    ? 'bg-orange-500/20 text-white rounded-br-md'
+                    : 'bg-slate-800 text-slate-300 rounded-bl-md'
                 }`}
               >
                 {msg.content}
@@ -252,23 +252,23 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
             </div>
           ))}
           {(!assessment.conversation || assessment.conversation.length === 0) && (
-            <p className="text-gray-400 font-body text-sm">No conversation data.</p>
+            <p className="text-slate-400 font-body text-sm">No conversation data.</p>
           )}
         </div>
       </div>
 
       {/* Portal Messages */}
-      <div className="bg-surface border border-border-subtle rounded-xl p-6 mt-6">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mt-6">
         <h3 className="text-lg font-heading text-white mb-4">Portal Messages</h3>
 
         {/* Thread */}
         <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto pr-1">
           {messages.length === 0 && (
-            <p className="text-gray-400 font-body text-sm">No messages yet.</p>
+            <p className="text-slate-400 font-body text-sm">No messages yet.</p>
           )}
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'prospect' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] px-3 py-2 rounded-xl font-body text-sm ${msg.sender === 'team' ? 'bg-brand-indigo/10 text-brand-indigo' : 'bg-surface-2 text-gray-300'}`}>
+              <div className={`max-w-[75%] px-3 py-2 rounded-xl font-body text-sm ${msg.sender === 'team' ? 'bg-orange-500/10 text-orange-400' : 'bg-slate-800 text-slate-300'}`}>
                 <div className="text-xs opacity-60 mb-1">{msg.sender === 'team' ? 'You' : 'Prospect'}</div>
                 {msg.body}
               </div>
@@ -283,7 +283,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
             onChange={(e) => setMessageBody(e.target.value)}
             placeholder="Write a message to this prospect…"
             rows={2}
-            className="flex-1 bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo resize-none"
+            className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 resize-none"
           />
           <button
             onClick={async () => {
@@ -305,7 +305,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
               finally { setSendingMsg(false) }
             }}
             disabled={sendingMsg || !messageBody.trim()}
-            className="bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
           >
             {sendingMsg ? '…' : 'Send'}
           </button>

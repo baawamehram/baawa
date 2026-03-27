@@ -79,7 +79,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
   }
 
   return (
-    <div className="bg-surface border border-border-subtle rounded-xl p-6">
+    <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Deliverables</h3>
 
       {error && (
@@ -90,11 +90,11 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
 
       <div className="space-y-3 mb-4">
         {deliverables.map((d) => (
-          <div key={d.id} className="flex items-center justify-between bg-surface-2 rounded-lg px-4 py-3">
+          <div key={d.id} className="flex items-center justify-between bg-slate-800 rounded-lg px-4 py-3">
             <div>
               <p className="text-white font-body text-sm">{d.title}</p>
               {d.due_date && (
-                <p className="text-gray-400 font-body text-xs mt-0.5">
+                <p className="text-slate-400 font-body text-xs mt-0.5">
                   Due: {new Date(d.due_date).toLocaleDateString()}
                 </p>
               )}
@@ -102,7 +102,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
             <select
               value={d.status}
               onChange={(e) => updateStatus(d.id, e.target.value as Deliverable['status'])}
-              className={`bg-surface-2 border-0 rounded px-2 py-1 font-body text-xs focus:outline-none ${STATUS_COLORS[d.status] || 'text-gray-300'}`}
+              className={`bg-slate-800 border-0 rounded px-2 py-1 font-body text-xs focus:outline-none ${STATUS_COLORS[d.status] || 'text-slate-300'}`}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -111,7 +111,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
           </div>
         ))}
         {deliverables.length === 0 && (
-          <p className="text-gray-400 font-body text-sm">No deliverables yet.</p>
+          <p className="text-slate-400 font-body text-sm">No deliverables yet.</p>
         )}
       </div>
 
@@ -121,18 +121,18 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="New deliverable..."
-          className="flex-1 bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+          className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
         />
         <input
           type="date"
           value={newDueDate}
           onChange={(e) => setNewDueDate(e.target.value)}
-          className="bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo"
+          className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500"
         />
         <button
           onClick={addDeliverable}
           disabled={adding}
-          className="bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
         >
           Add
         </button>

@@ -40,7 +40,7 @@ export function RevenueOverview({ token, on401 }: Props) {
     load()
   }, [token, on401])
 
-  if (loading) return <p className="text-gray-400 font-body">Loading...</p>
+  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
 
   const totalPhase1 = clients.reduce((sum, c) => sum + (c.phase1_fee || 0), 0)
   const activeMRR = clients
@@ -63,45 +63,45 @@ export function RevenueOverview({ token, on401 }: Props) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-surface border border-border-subtle rounded-xl p-6">
-          <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Total Phase 1 Revenue</p>
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
+          <p className="text-slate-400 font-body text-xs uppercase tracking-wider mb-1">Total Phase 1 Revenue</p>
           <p className="text-3xl font-heading text-white">{fmt(totalPhase1)}</p>
         </div>
-        <div className="bg-surface border border-border-subtle rounded-xl p-6">
-          <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Active MRR</p>
-          <p className="text-3xl font-heading text-brand-indigo">{fmt(activeMRR)}</p>
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
+          <p className="text-slate-400 font-body text-xs uppercase tracking-wider mb-1">Active MRR</p>
+          <p className="text-3xl font-heading text-orange-400">{fmt(activeMRR)}</p>
         </div>
-        <div className="bg-surface border border-border-subtle rounded-xl p-6">
-          <p className="text-gray-400 font-body text-xs uppercase tracking-wider mb-1">Pipeline Value</p>
-          <p className="text-3xl font-heading text-brand-violet">{fmt(pipelineValue)}</p>
+        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
+          <p className="text-slate-400 font-body text-xs uppercase tracking-wider mb-1">Pipeline Value</p>
+          <p className="text-3xl font-heading text-orange-400">{fmt(pipelineValue)}</p>
         </div>
       </div>
 
-      <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border-subtle text-left">
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Client</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Stage</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Phase 1 Fee</th>
-              <th className="px-6 py-3 text-gray-400 font-body text-xs uppercase tracking-wider">Monthly Fee</th>
+            <tr className="border-b border-slate-700 text-left">
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Client</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Stage</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Phase 1 Fee</th>
+              <th className="px-6 py-3 text-slate-400 font-body text-xs uppercase tracking-wider">Monthly Fee</th>
             </tr>
           </thead>
           <tbody>
             {clients.map((c) => (
-              <tr key={c.id} className="border-b border-border-subtle/50">
+              <tr key={c.id} className="border-b border-slate-700/50">
                 <td className="px-6 py-4">
                   <p className="text-white font-body text-sm">{c.founder_name}</p>
-                  <p className="text-gray-400 font-body text-xs">{c.company_name}</p>
+                  <p className="text-slate-400 font-body text-xs">{c.company_name}</p>
                 </td>
-                <td className="px-6 py-4 text-gray-400 font-body text-sm">{c.stage}</td>
+                <td className="px-6 py-4 text-slate-400 font-body text-sm">{c.stage}</td>
                 <td className="px-6 py-4 text-white font-body text-sm">{fmt(c.phase1_fee || 0)}</td>
                 <td className="px-6 py-4 text-white font-body text-sm">{fmt(c.phase2_monthly_fee || 0)}</td>
               </tr>
             ))}
             {clients.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-400 font-body text-sm">
+                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 font-body text-sm">
                   No clients yet.
                 </td>
               </tr>

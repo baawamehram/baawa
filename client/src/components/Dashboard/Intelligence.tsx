@@ -49,15 +49,15 @@ function ScoreBar({ label, pct }: { label: string; pct: number }) {
   return (
     <div className="mb-1.5">
       <div className="flex justify-between mb-0.5">
-        <span className="text-[11px] text-gray-500">{label}</span>
-        <span className="text-[11px] text-gray-500">{pct}</span>
+        <span className="text-[11px] text-slate-500">{label}</span>
+        <span className="text-[11px] text-slate-500">{pct}</span>
       </div>
-      <div className="h-1 bg-border-subtle rounded-sm">
+      <div className="h-1 bg-slate-700 rounded-sm">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(pct * 2, 100)}%` }}
           transition={{ duration: 0.6 }}
-          className="h-full bg-brand-indigo rounded-sm"
+          className="h-full bg-orange-500 rounded-sm"
         />
       </div>
     </div>
@@ -143,7 +143,7 @@ export function Intelligence({ token, on401 }: Props) {
 
   if (loading) {
     return (
-      <div className="py-8 text-center text-gray-500">
+      <div className="py-8 text-center text-slate-500">
         Loading intelligence data…
       </div>
     )
@@ -156,7 +156,7 @@ export function Intelligence({ token, on401 }: Props) {
         <div>
           <h2 className="text-white text-xl font-semibold">Journey Intelligence</h2>
           {activeConfig && (
-            <p className="text-gray-500 text-xs mt-1">
+            <p className="text-slate-500 text-xs mt-1">
               Config v{activeConfig.version} active
               {metrics?.active_config_activated_at
                 ? ` · activated ${new Date(metrics.active_config_activated_at).toLocaleDateString()}`
@@ -167,7 +167,7 @@ export function Intelligence({ token, on401 }: Props) {
         <button
           onClick={() => void handleOptimize()}
           disabled={optimizing}
-          className={`${optimizing ? 'bg-brand-indigo/30' : 'bg-brand-indigo'} text-white border-0 rounded-lg px-4 py-2 text-[13px] font-semibold cursor-pointer transition-colors disabled:cursor-default`}
+          className={`${optimizing ? 'bg-orange-500/30' : 'bg-orange-500'} text-white border-0 rounded-lg px-4 py-2 text-[13px] font-semibold cursor-pointer transition-colors disabled:cursor-default`}
         >
           {optimizing ? 'Running…' : 'Run Optimizer'}
         </button>
@@ -177,7 +177,7 @@ export function Intelligence({ token, on401 }: Props) {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-brand-indigo/10 border border-brand-indigo/30 rounded-lg px-3.5 py-2.5 mb-5 text-[#FFB09A] text-[13px]"
+          className="bg-orange-500/10 border border-orange-500/20 rounded-lg px-3.5 py-2.5 mb-5 text-orange-300 text-[13px]"
         >
           {optimizeResult}
         </motion.div>
@@ -191,8 +191,8 @@ export function Intelligence({ token, on401 }: Props) {
           { label: 'Score Mean', value: fmt(w?.score_mean ?? null, '/100') },
           { label: 'Score Std Dev', value: fmt(w?.score_std ?? null, '') },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-surface border border-border-subtle rounded-[10px] px-4 py-3.5">
-            <p className="text-gray-500 text-[11px] mb-1.5 uppercase tracking-[0.06em]">{label}</p>
+          <div key={label} className="bg-slate-900 border border-slate-700 rounded-[10px] px-4 py-3.5">
+            <p className="text-slate-500 text-[11px] mb-1.5 uppercase tracking-[0.06em]">{label}</p>
             <p className="text-white text-[22px] font-bold">{value}</p>
           </div>
         ))}
@@ -206,8 +206,8 @@ export function Intelligence({ token, on401 }: Props) {
             onClick={() => setWindow(d)}
             className={`${
               window === d
-                ? 'bg-brand-indigo/20 border-brand-indigo/50 text-brand-indigo'
-                : 'bg-white/5 border-white/10 text-gray-500'
+                ? 'bg-orange-500/20 border-orange-500/50 text-orange-400'
+                : 'bg-white/5 border-white/10 text-slate-500'
             } border rounded-md px-3 py-1 text-xs cursor-pointer transition-colors`}
           >
             {d}
@@ -217,8 +217,8 @@ export function Intelligence({ token, on401 }: Props) {
 
       {/* Score distribution */}
       {w?.score_distribution && (
-        <div className="bg-surface border border-border-subtle rounded-[10px] p-4 mb-5">
-          <p className="text-gray-500 text-xs uppercase tracking-[0.06em] mb-3">Score Distribution</p>
+        <div className="bg-slate-900 border border-slate-700 rounded-[10px] p-4 mb-5">
+          <p className="text-slate-500 text-xs uppercase tracking-[0.06em] mb-3">Score Distribution</p>
           {Object.entries(w.score_distribution).map(([bucket, count]) => (
             <ScoreBar key={bucket} label={bucket} pct={count} />
           ))}
@@ -232,17 +232,17 @@ export function Intelligence({ token, on401 }: Props) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="bg-brand-indigo/[0.06] border border-brand-indigo/25 rounded-xl p-5 mb-5"
+            className="bg-orange-500/[0.06] border border-orange-500/25 rounded-xl p-5 mb-5"
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <span className="bg-brand-indigo/20 text-brand-indigo text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-[0.08em]">
+                <span className="bg-orange-500/20 text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-[0.08em]">
                   Awaiting Approval · High-Risk
                 </span>
                 <p className="text-white text-base font-semibold mt-2 mb-1">
                   Config v{pendingConfig.version}
                 </p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-slate-400 text-sm">
                   {pendingConfig.change_summary}
                 </p>
               </div>
@@ -256,13 +256,13 @@ export function Intelligence({ token, on401 }: Props) {
               </button>
               <button
                 onClick={() => void handleActivate(pendingConfig.id)}
-                className="bg-brand-indigo text-white border-0 rounded-md px-3.5 py-[7px] text-[13px] font-semibold cursor-pointer transition-colors hover:bg-brand-violet"
+                className="bg-orange-500 text-white border-0 rounded-md px-3.5 py-[7px] text-[13px] font-semibold cursor-pointer transition-colors hover:bg-orange-600"
               >
                 Activate
               </button>
               <button
                 onClick={() => void handleDismiss(pendingConfig.id)}
-                className="bg-transparent text-gray-500 border border-white/15 rounded-md px-3.5 py-[7px] text-[13px] cursor-pointer transition-colors hover:text-gray-300"
+                className="bg-transparent text-slate-500 border border-white/15 rounded-md px-3.5 py-[7px] text-[13px] cursor-pointer transition-colors hover:text-slate-300"
               >
                 Dismiss
               </button>
@@ -285,12 +285,12 @@ export function Intelligence({ token, on401 }: Props) {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-surface border border-border-subtle rounded-[14px] p-7 max-w-[700px] w-full max-h-[80vh] overflow-y-auto"
+              className="bg-slate-900 border border-slate-700 rounded-[14px] p-7 max-w-[700px] w-full max-h-[80vh] overflow-y-auto"
             >
               <h3 className="text-white text-lg mb-1">Config v{selectedConfig.version}</h3>
-              <p className="text-gray-500 text-[13px] mb-5">{selectedConfig.change_summary}</p>
+              <p className="text-slate-500 text-[13px] mb-5">{selectedConfig.change_summary}</p>
 
-              <p className="text-gray-500 text-[11px] uppercase tracking-[0.06em] mb-2">Scoring Weights</p>
+              <p className="text-slate-500 text-[11px] uppercase tracking-[0.06em] mb-2">Scoring Weights</p>
               <div className="flex gap-2.5 mb-5 flex-wrap">
                 {Object.entries(selectedConfig.scoring_weights).map(([k, v]) => (
                   <span key={k} className="bg-white/[0.07] rounded-md px-2.5 py-1 text-[13px] text-white">
@@ -299,11 +299,11 @@ export function Intelligence({ token, on401 }: Props) {
                 ))}
               </div>
 
-              <p className="text-gray-500 text-[11px] uppercase tracking-[0.06em] mb-2">Reasoning</p>
-              <p className="text-gray-300 text-[13px] leading-relaxed mb-5">{selectedConfig.reasoning}</p>
+              <p className="text-slate-500 text-[11px] uppercase tracking-[0.06em] mb-2">Reasoning</p>
+              <p className="text-slate-300 text-[13px] leading-relaxed mb-5">{selectedConfig.reasoning}</p>
 
-              <p className="text-gray-500 text-[11px] uppercase tracking-[0.06em] mb-2">System Prompt</p>
-              <pre className="bg-surface border border-border-subtle rounded-lg p-3.5 text-[11px] text-gray-300 overflow-x-auto whitespace-pre-wrap mb-5">
+              <p className="text-slate-500 text-[11px] uppercase tracking-[0.06em] mb-2">System Prompt</p>
+              <pre className="bg-slate-900 border border-slate-700 rounded-lg p-3.5 text-[11px] text-slate-300 overflow-x-auto whitespace-pre-wrap mb-5">
                 {selectedConfig.system_prompt}
               </pre>
 
@@ -318,13 +318,13 @@ export function Intelligence({ token, on401 }: Props) {
                   <>
                     <button
                       onClick={() => void handleActivate(selectedConfig.id)}
-                      className="bg-brand-indigo text-white border-0 rounded-md px-4 py-2 font-semibold cursor-pointer hover:bg-brand-violet transition-colors"
+                      className="bg-orange-500 text-white border-0 rounded-md px-4 py-2 font-semibold cursor-pointer hover:bg-orange-600 transition-colors"
                     >
                       Activate
                     </button>
                     <button
                       onClick={() => void handleDismiss(selectedConfig.id)}
-                      className="bg-transparent text-gray-500 border border-white/15 rounded-md px-4 py-2 cursor-pointer hover:text-gray-300 transition-colors"
+                      className="bg-transparent text-slate-500 border border-white/15 rounded-md px-4 py-2 cursor-pointer hover:text-slate-300 transition-colors"
                     >
                       Dismiss
                     </button>
@@ -337,12 +337,12 @@ export function Intelligence({ token, on401 }: Props) {
       </AnimatePresence>
 
       {/* Version history */}
-      <div className="bg-surface border border-border-subtle rounded-[10px] overflow-hidden">
-        <div className="px-4 py-3 border-b border-border-subtle">
-          <p className="text-gray-500 text-xs uppercase tracking-[0.06em]">Version History</p>
+      <div className="bg-slate-900 border border-slate-700 rounded-[10px] overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-700">
+          <p className="text-slate-500 text-xs uppercase tracking-[0.06em]">Version History</p>
         </div>
         {configs.length === 0 && (
-          <p className="text-gray-500/60 text-[13px] px-4 py-4">No config versions yet.</p>
+          <p className="text-slate-500/60 text-[13px] px-4 py-4">No config versions yet.</p>
         )}
         {configs.map((c) => {
           const statusColor: Record<string, string> = {
@@ -355,10 +355,10 @@ export function Intelligence({ token, on401 }: Props) {
             <div
               key={c.id}
               onClick={() => void loadConfigDetail(c.id)}
-              className="px-4 py-3 border-b border-border-subtle/50 cursor-pointer flex items-center justify-between transition-colors hover:bg-white/[0.03]"
+              className="px-4 py-3 border-b border-slate-700/50 cursor-pointer flex items-center justify-between transition-colors hover:bg-white/[0.03]"
             >
               <div className="flex items-center gap-3">
-                <span className="text-gray-500/60 text-xs min-w-[40px]">v{c.version}</span>
+                <span className="text-slate-500/60 text-xs min-w-[40px]">v{c.version}</span>
                 <span
                   className="text-[10px] font-bold px-[7px] py-0.5 rounded uppercase tracking-[0.06em]"
                   style={{
@@ -368,9 +368,9 @@ export function Intelligence({ token, on401 }: Props) {
                 >
                   {c.status}
                 </span>
-                <span className="text-gray-400 text-[13px]">{c.change_summary}</span>
+                <span className="text-slate-400 text-[13px]">{c.change_summary}</span>
               </div>
-              <span className="text-gray-500/40 text-[11px]">
+              <span className="text-slate-500/40 text-[11px]">
                 {new Date(c.created_at).toLocaleDateString()}
               </span>
             </div>

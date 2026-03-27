@@ -56,7 +56,7 @@ export function ClientDetail({ id, token, on401, onBack }: Props) {
 
   useEffect(() => { fetchClient() }, [fetchClient])
 
-  if (loading) return <p className="text-gray-400 font-body">Loading...</p>
+  if (loading) return <p className="text-slate-400 font-body">Loading...</p>
   if (!client) return (
     <div>
       {error && (
@@ -64,18 +64,18 @@ export function ClientDetail({ id, token, on401, onBack }: Props) {
           {error}
         </div>
       )}
-      <p className="text-gray-400 font-body">Client not found.</p>
+      <p className="text-slate-400 font-body">Client not found.</p>
     </div>
   )
 
   return (
     <div>
-      <button onClick={onBack} className="text-brand-indigo hover:text-brand-violet font-body text-sm mb-6 inline-block">
+      <button onClick={onBack} className="text-orange-400 hover:text-orange-400 font-body text-sm mb-6 inline-block">
         &larr; Back to pipeline
       </button>
 
       <h2 className="text-2xl font-heading text-white mb-1">{client.founder_name}</h2>
-      <p className="text-gray-400 font-body text-sm mb-6">{client.company_name} &middot; {client.stage}</p>
+      <p className="text-slate-400 font-body text-sm mb-6">{client.company_name} &middot; {client.stage}</p>
 
       {error && (
         <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg mb-6 font-body text-sm">

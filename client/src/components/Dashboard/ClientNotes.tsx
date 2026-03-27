@@ -44,7 +44,7 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
   }
 
   return (
-    <div className="bg-surface border border-border-subtle rounded-xl p-6">
+    <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
       <h3 className="text-lg font-heading text-white mb-4">Notes</h3>
 
       {error && (
@@ -55,15 +55,15 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
 
       <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
         {notes.map((note) => (
-          <div key={note.id} className="bg-surface-2 rounded-lg px-4 py-3">
-            <p className="text-gray-300 font-body text-sm whitespace-pre-wrap">{note.content}</p>
-            <p className="text-gray-500 font-body text-xs mt-2">
+          <div key={note.id} className="bg-slate-800 rounded-lg px-4 py-3">
+            <p className="text-slate-300 font-body text-sm whitespace-pre-wrap">{note.content}</p>
+            <p className="text-slate-500 font-body text-xs mt-2">
               {new Date(note.created_at).toLocaleString()}
             </p>
           </div>
         ))}
         {notes.length === 0 && (
-          <p className="text-gray-500 font-body text-sm">No notes yet.</p>
+          <p className="text-slate-500 font-body text-sm">No notes yet.</p>
         )}
       </div>
 
@@ -72,13 +72,13 @@ export function ClientNotes({ clientId, notes, token, on401, onUpdate }: Props) 
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Add a note..."
-          className="flex-1 bg-surface-2 border border-border-subtle rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-brand-indigo resize-none"
+          className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-orange-500 resize-none"
           rows={2}
         />
         <button
           onClick={addNote}
           disabled={adding}
-          className="bg-brand-indigo hover:bg-brand-violet text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-heading text-sm px-4 py-2 rounded-lg transition-colors disabled:opacity-50 self-end"
         >
           Add
         </button>
