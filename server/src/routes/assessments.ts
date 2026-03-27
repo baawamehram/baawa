@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import { db } from '../db/client'
 import { generateDeferEmail } from '../services/deferEmail'
-import { sendOnboardEmail, sendDeferEmail } from '../services/email'
+import { sendOnboardEmail, sendDeferEmail, sendMessageNotification } from '../services/email'
 import { ConversationTurn } from '../services/questioning'
 import { requireAuth } from '../middleware/auth'
 
@@ -117,6 +117,49 @@ router.put('/:id/notes', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('PUT /assessments/:id/notes error:', err)
     res.status(500).json({ error: 'Failed to update notes' })
+  }
+})
+
+// POST /api/assessments/:id/unlock-results — make score/feedback visible to prospect
+router.post('/:id/unlock-results', async (req: Request, res: Response) => {
+  try {
+    const result = await db.query<{ id: number }>(
+      `UPDATE assessments SET results_unlocked = true, updated_at = NOW() WHERE id = $1 RETURNING id`,
+      [req.params.id]
+    )
+    if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('POST /assessments/:id/unlock-results error:', err)
+    res.status(500).json({ error: 'Failed to unlock results' })
+  }
+})
+
+// POST /api/assessments/:id/message — send a message from the team to the prospect
+router.post('/:id/message', async (req: Request, res: Response) => {
+  try {
+    const parsed = z.object({ body: z.string().trim().min(1).max(2000) }).safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ error: 'Invalid message' })
+
+    const assessmentResult = await db.query<{ email: string }>(
+      `SELECT email FROM assessments WHERE id = $1`,
+      [req.params.id]
+    )
+    if (!assessmentResult.rows[0]) return res.status(404).json({ error: 'Not found' })
+
+    await db.query(
+      `INSERT INTO portal_messages (assessment_id, sender, body) VALUES ($1, 'team', $2)`,
+      [req.params.id, parsed.data.body]
+    )
+
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+    void sendMessageNotification(assessmentResult.rows[0].email, `${frontendUrl}/portal/login`)
+      .catch((e) => console.error('sendMessageNotification failed:', e))
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('POST /assessments/:id/message error:', err)
+    res.status(500).json({ error: 'Failed to send message' })
   }
 })
 
