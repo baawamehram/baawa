@@ -46,12 +46,12 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
     <div
       style={{
         background: '#040404',
-        minHeight: '100vh',
+        minHeight: '100svh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '32px 20px',
+        padding: 'max(32px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom))',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -133,28 +133,24 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12, width: '100%', maxWidth: 400, fontFamily: 'monospace', fontSize: 11, color: '#666' }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, width: '100%', maxWidth: 420, fontFamily: 'monospace', fontSize: 12, color: '#555' }}
             >
-              <div style={{ display: 'flex', gap: 12 }}>
-                <span style={{ color: '#ff6b35' }}>[ 0.001s ]</span>
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>KICKING OFF INTELLIGENCE SERVERS...</motion.span>
-              </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <span style={{ color: '#ff6b35' }}>[ 0.452s ]</span>
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>CALIBRATING BEHAVIORAL MODELS...</motion.span>
-              </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <span style={{ color: '#ff6b35' }}>[ 1.120s ]</span>
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>INITIALIZING ADAPTIVE QUESTIONING NODE...</motion.span>
-              </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <span style={{ color: '#ff6b35' }}>[ 1.890s ]</span>
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }}>SYSTEMS READY. INGESTING CLIENT PROFILE.</motion.span>
-              </div>
-              <motion.div 
-                animate={{ opacity: [0, 1, 0] }} 
-                transition={{ duration: 0.8, repeat: Infinity }}
-                style={{ width: 8, height: 14, background: '#ff6b35', marginTop: 4 }}
+              {[
+                { t: '[ 0.001s ]', msg: 'KICKING OFF INTELLIGENCE SERVERS...', d: 0.1 },
+                { t: '[ 0.452s ]', msg: 'CALIBRATING BEHAVIORAL MODELS...', d: 0.6 },
+                { t: '[ 1.120s ]', msg: 'INITIALIZING ADAPTIVE QUESTIONING NODE...', d: 1.2 },
+                { t: '[ 1.890s ]', msg: 'LOADING RORY SUTHERLAND FRAMEWORK...', d: 1.8 },
+                { t: '[ 2.310s ]', msg: 'SYSTEMS READY. PREPARING FIRST QUERY.', d: 2.4 },
+              ].map(({ t, msg, d }, i) => (
+                <motion.div key={i} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: d, duration: 0.2 }} style={{ display: 'flex', gap: 12 }}>
+                  <span style={{ color: '#ff6b35', flexShrink: 0 }}>{t}</span>
+                  <span style={{ color: '#888' }}>{msg}</span>
+                </motion.div>
+              ))}
+              <motion.div
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ duration: 0.7, repeat: Infinity }}
+                style={{ width: 9, height: 16, background: '#ff6b35', marginTop: 4, borderRadius: 1 }}
               />
             </motion.div>
           )}
