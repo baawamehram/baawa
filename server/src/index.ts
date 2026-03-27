@@ -94,7 +94,7 @@ async function startServer() {
     await db.query(`
       CREATE TABLE IF NOT EXISTS session_analytics (
         id                     SERIAL PRIMARY KEY,
-        session_id             INT NOT NULL REFERENCES sessions(id),
+        session_id             UUID NOT NULL REFERENCES sessions(id),
         journey_config_version INT,
         total_score            INT,
         answer_count           INT,
