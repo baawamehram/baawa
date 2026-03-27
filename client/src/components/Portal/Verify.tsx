@@ -41,6 +41,8 @@ export function PortalVerify() {
     void verify()
   }, []) // intentionally empty — run once on mount only // eslint-disable-line react-hooks/exhaustive-deps
 
+  const prefersNoMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   return (
     <div style={{ background: '#0A0A0A', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 20px' }}>
       {error ? (
@@ -53,8 +55,8 @@ export function PortalVerify() {
         </motion.div>
       ) : (
         <motion.div
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.6, repeat: Infinity }}
+          animate={prefersNoMotion ? {} : { opacity: [0.5, 1, 0.5] }}
+          transition={prefersNoMotion ? {} : { duration: 1.6, repeat: Infinity }}
           style={{ fontFamily: 'Outfit, sans-serif', fontSize: 18, color: '#FFB09A' }}
         >
           Logging you in…
