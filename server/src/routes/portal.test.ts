@@ -5,8 +5,9 @@ import cookieParser from 'cookie-parser'
 
 vi.mock('../db/client', () => ({ db: { query: vi.fn() } }))
 vi.mock('../services/email', () => ({
-  sendMagicLink: vi.fn().mockResolvedValue(undefined),
+  sendPortalOTP: vi.fn().mockResolvedValue(undefined),
   sendProspectReplyNotification: vi.fn().mockResolvedValue(undefined),
+  sendCallConfirmation: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock('../middleware/portalAuth', () => ({
   requirePortalAuth: vi.fn((req: any, _res: any, next: any) => {
@@ -43,21 +44,21 @@ describe('POST /api/portal/login', () => {
     expect(res.status).toBe(400)
   })
 
-  it('sends magic link when email exists', async () => {
+  it('sends OTP when email exists', async () => {
     mockDb.query
       .mockResolvedValueOnce({ rows: [{ id: 42 }] } as any)
       .mockResolvedValueOnce({ rows: [] } as any)
       .mockResolvedValueOnce({ rows: [] } as any)
-    const { sendMagicLink } = await import('../services/email')
+    const { sendPortalOTP } = await import('../services/email')
     const res = await request(app).post('/api/portal/login').send({ email: 'user@test.com' })
     expect(res.status).toBe(200)
-    expect(vi.mocked(sendMagicLink)).toHaveBeenCalled()
+    expect(vi.mocked(sendPortalOTP)).toHaveBeenCalled()
   })
 })
 
 describe('POST /api/portal/verify', () => {
-  it('returns 400 if token is not 64 hex chars', async () => {
-    const res = await request(app).post('/api/portal/verify').send({ token: 'tooshort' })
+  it('returns 400 if OTP is not 6 digits', async () => {
+    const res = await request(app).post('/api/portal/verify').send({ email: 'a@b.com', token: '123' })
     expect(res.status).toBe(400)
   })
 

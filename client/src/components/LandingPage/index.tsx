@@ -327,7 +327,7 @@ function LoginMenu() {
 
   return (
     <div ref={menuRef} style={{ position: 'relative' }}>
-      <button 
+      <button
         onClick={() => setOpen(!open)}
         className="px-2.5 py-1.5 md:px-4 md:py-2 rounded-md border border-black/10 text-[#6B6460] text-[10px] md:text-[13px] font-medium font-['Outfit'] hover:bg-black/5 transition-colors flex items-center gap-1.5"
       >

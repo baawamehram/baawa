@@ -10,7 +10,8 @@ export function PortalLogin() {
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+  const [code, setCode] = useState('')
+  const [step, setStep] = useState<'email' | 'otp'>('email')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -21,7 +22,7 @@ export function PortalLogin() {
       .catch(() => { /* not logged in, stay on login */ })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -34,12 +35,36 @@ export function PortalLogin() {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError((data as { error?: string }).error ?? 'Something went wrong.')
+        setError((data as { error?: string }).error ?? 'Failed to send code.')
         return
       }
-      setSubmitted(true)
+      setStep('otp')
     } catch {
-      setError('Network error. Please check your connection.')
+      setError('Network error. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/api/portal/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, token: code }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setError((data as { error?: string }).error ?? 'Incorrect or expired code.')
+        return
+      }
+      navigate('/portal/results', { replace: true })
+    } catch {
+      setError('Verification failed. Try again.')
     } finally {
       setLoading(false)
     }
@@ -62,19 +87,20 @@ export function PortalLogin() {
         transition={{ duration: 0.5 }}
         style={{ width: '100%', maxWidth: 400 }}
       >
-        {!submitted ? (
+        <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: 11, color: tk.accent, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+          Baawa Portal
+        </div>
+        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(22px, 4vw, 28px)', color: tk.text, margin: '0 0 6px', lineHeight: 1.3 }}>
+          Client Login
+        </h1>
+
+        {step === 'email' ? (
           <>
-            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: 11, color: tk.accent, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
-              Baawa Assessment
-            </div>
-            <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(22px, 4vw, 28px)', color: tk.text, margin: '0 0 6px', lineHeight: 1.3 }}>
-              Access your results
-            </h1>
             <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: tk.textMuted, margin: '0 0 24px', lineHeight: 1.6 }}>
-              Enter the email you used to submit your assessment.
+              Enter your email to receive a 6-digit access code.
             </p>
 
-            <form onSubmit={(e) => void handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <form onSubmit={(e) => void handleSendCode(e)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label htmlFor="portal-email" style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Email address
@@ -103,28 +129,59 @@ export function PortalLogin() {
                 whileTap={loading ? undefined : { scale: 0.98 }}
                 style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #FF6B35, #E85520)`, color: loading ? tk.accent : '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
               >
-                {loading ? 'Sending…' : 'Send magic link →'}
+                {loading ? 'Sending…' : 'Get access code →'}
               </motion.button>
             </form>
-
-            <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted, marginTop: 12, textAlign: 'center' }}>
-              We'll email you a one-time login link.
-            </p>
           </>
         ) : (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>📬</div>
-            <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 22, color: tk.text, margin: '0 0 10px' }}>Check your inbox</h2>
-            <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: tk.textMuted, lineHeight: 1.6 }}>
-              We've sent a login link to <strong style={{ color: tk.text }}>{email}</strong>. It expires in 15 minutes.
+          <>
+            <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: tk.textMuted, margin: '0 0 24px', lineHeight: 1.6 }}>
+              Enter the 6-digit code sent to <strong style={{ color: tk.text }}>{email}</strong>.
             </p>
-            <button
-              onClick={() => { setSubmitted(false); setEmail('') }}
-              style={{ marginTop: 20, background: 'none', border: 'none', color: tk.accent, fontFamily: 'Outfit, sans-serif', fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}
-            >
-              Use a different email
-            </button>
-          </motion.div>
+
+            <form onSubmit={(e) => void handleVerifyCode(e)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label htmlFor="portal-code" style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Verification Code
+                </label>
+                <input
+                  id="portal-code"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="000 000"
+                  required
+                  disabled={loading}
+                  style={{ background: tk.inputBg, border: `1.5px solid ${tk.accentBorder}`, borderRadius: 10, padding: '12px 16px', fontFamily: 'Outfit, sans-serif', fontSize: 24, fontWeight: 'bold', letterSpacing: '8px', textAlign: 'center', color: tk.text, outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              {error && (
+                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>
+              )}
+
+              <motion.button
+                type="submit"
+                disabled={loading}
+                whileHover={loading ? undefined : { scale: 1.02 }}
+                whileTap={loading ? undefined : { scale: 0.98 }}
+                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #FF6B35, #E85520)`, color: loading ? tk.accent : '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+              >
+                {loading ? 'Verifying…' : 'Verify & Enter Portal →'}
+              </motion.button>
+
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setError(''); setCode('') }}
+                style={{ background: 'none', border: 'none', color: tk.accent, fontFamily: 'Outfit, sans-serif', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', marginTop: 8 }}
+              >
+                Back to email
+              </button>
+            </form>
+          </>
         )}
       </motion.div>
     </div>

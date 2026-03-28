@@ -8,11 +8,11 @@
 
 **Baawa Mehram** is a full-stack web application for a digital marketing consultancy. It has two main parts:
 
-1. **Assessment Funnel** — An immersive "cosmic journey" onboarding experience where founders answer adaptive AI-generated questions about their business. Claude (with Gemini/Groq fallback) generates each question based on prior answers using Rory Sutherland's behavioral economics principles + RAG from a knowledge base.
+1. **Assessment Funnel** — An immersive "cosmic journey" onboarding experience where clients answer adaptive AI-generated questions about their business. Claude (with Gemini/Groq fallback) generates each question based on prior answers using Rory Sutherland's behavioral economics principles + RAG from a knowledge base.
 
-2. **Agency CRM + Admin Dashboard** — A password-protected founder dashboard with: submission review, client pipeline (Kanban), deliverables tracker, revenue overview, knowledge base management, and an AI journey optimizer.
+2. **Agency CRM + Admin Dashboard** — A password-protected consultant dashboard with: submission review, client pipeline (Kanban), deliverables tracker, revenue overview, knowledge base management, and an AI journey optimizer.
 
-3. **Submission Portal** — A prospect-facing portal at `/portal/*` where assessment takers log in via magic link, view their score/feedback (staged unlock), and exchange messages with the Baawa team.
+3. **Submission Portal** — A client-facing portal at `/portal/*` where assessment takers log in via 6-digit Email OTP, view their analysis/deliverables (staged unlock), and exchange messages with the Baawa team.
 
 **Deployed:** Frontend on Vercel (baawa.co), Backend on Railway.
 
@@ -23,7 +23,7 @@
 - **Frontend:** React 18 + Vite + TypeScript, Framer Motion, react-router-dom v6, Three.js, Leaflet.js, Tailwind CSS
 - **Backend:** Node.js + Express + TypeScript, PostgreSQL + pgvector, Resend (email)
 - **LLM:** Claude (claude-haiku-4-5) → Gemini → Groq fallback chain
-- **Auth:** Dashboard — `Authorization: Bearer <FOUNDER_API_KEY>` header. Portal — JWT in httpOnly cookie (`portal_token`), magic link via Resend
+- **Auth:** Dashboard — `Authorization: Bearer <FOUNDER_API_KEY>` header. Portal — JWT in httpOnly cookie (`portal_token`), 6-digit OTP via Resend
 - **Fonts:** Outfit (body/heading), Cormorant Garamond (display), Manrope (logo only)
 - **Monorepo:** `client/` (Vercel) + `server/` (Railway)
 
@@ -33,7 +33,7 @@
 
 - **Adaptive questioning:** Claude Haiku generates each question dynamically based on full conversation history + top-3 RAG chunks from pgvector knowledge base
 - **LLM fallback chain:** Claude → Gemini → Groq (implemented in `server/src/services/llm.ts` or similar)
-- **Portal auth:** Magic link → one-time token in `portal_tokens` DB table (15 min expiry) → 7-day JWT in httpOnly cookie. `SameSite=lax` in dev, `SameSite=none; Secure` in production (cross-origin: Vercel + Railway)
+- **Portal auth:** Step 1: Request 6-digit OTP via email. Step 2: Enter code in `/portal/login` -> 7-day JWT in httpOnly cookie. `SameSite=lax` in dev, `SameSite=none; Secure` in production (cross-origin: Vercel + Railway)
 - **Results staging:** Conversation always visible in portal. Score/feedback locked until admin clicks "Unlock Results" (`results_unlocked` column on assessments)
 - **Two-way messaging:** `portal_messages` table, `sender: 'team' | 'prospect'`
 - **DB migrations:** Run automatically at server startup in `startServer()` in `server/src/index.ts` — all `CREATE TABLE IF NOT EXISTS` / `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`
@@ -54,7 +54,7 @@ baawa-mehram/
 │   │   │   ├── Dashboard/          # Full CRM: index, SubmissionList, SubmissionDetail, Pipeline,
 │   │   │   │                       #   ClientDetail, ClientProfile, DeliverablesTracker, ClientNotes,
 │   │   │   │                       #   ActivityFeed, RevenueOverview, KnowledgeBase, Intelligence
-│   │   │   ├── Portal/             # Login, Verify, Results, MessagesPanel, usePortalTheme
+│   │   │   ├── Portal/             # Login (OTP), Results, MessagesPanel, usePortalTheme
 │   │   │   ├── EmailCapture/
 │   │   │   ├── ThankYou/
 │   │   │   ├── LandingPage/        # Homepage with burger menu (About Us) + Login button
@@ -65,7 +65,7 @@ baawa-mehram/
 │   │   ├── hooks/
 │   │   │   ├── useSession.ts       # Assessment session state
 │   │   │   └── useVoiceRecorder.ts # MediaRecorder wrapper
-│   │   └── App.tsx                 # Routes: /, /dashboard, /portal/login, /portal/verify, /portal/results
+│   │   └── App.tsx                 # Routes: /, /dashboard, /portal/login, /portal/results
 │   ├── tailwind.config.js          # Minimal — custom tokens: brand-orange (#FF6B35), brand-orange-dark
 │   ├── vercel.json                 # SPA rewrite rule
 │   └── index.html                  # Loads Outfit, Cormorant Garamond, Manrope from Google Fonts
@@ -116,7 +116,7 @@ baawa-mehram/
 ```sql
 sessions          -- Assessment conversations (id: UUID)
 assessments       -- Completed submissions (email, score, score_breakdown, results_unlocked)
-portal_tokens     -- Magic link tokens (15 min expiry, one-time use)
+portal_tokens     -- 6-digit OTP tokens (15 min expiry, one-time use)
 portal_messages   -- Two-way messages (sender: 'team'|'prospect')
 clients           -- CRM clients (stage: phase1|phase2|churned)
 deliverables      -- Per-client deliverables
@@ -158,12 +158,12 @@ VITE_API_URL=https://your-railway-url.railway.app
 - LLM fallback chain (Claude → Gemini → Groq)
 - Voice input (Whisper transcription)
 - Submission portal (Tasks 1-14 complete):
-  - Magic link auth (`/portal/login` → `/portal/verify` → `/portal/results`)
-  - Staged results unlock
-  - Two-way messaging (prospect ↔ team)
+  - 6-digit Email OTP auth (`/portal/login` -> enter code -> `/portal/results`)
+  - Staged analysis unlock
+  - Two-way messaging (client ↔ consultant)
   - Admin CRM: unlock button + message thread in SubmissionDetail
 - Landing page with burger menu (About Us: Mission/Vision/Core Belief/Values) + Login button in nav
-- Intro messages updated to "Welcome to Magicland" copy
+- Intro messages updated to "Baawa consultancy hub" copy
 
 ### Known issues / in progress:
 - Dashboard styling was broken due to undefined Tailwind custom tokens — fixed by switching to pure inline styles (black/white theme). May need polish.

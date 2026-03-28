@@ -1,17 +1,15 @@
 import { Router, Request, Response } from 'express'
 import { z } from 'zod'
-import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import { db } from '../db/client'
-import { sendMagicLink, sendProspectReplyNotification, sendCallConfirmation } from '../services/email'
+import { sendPortalOTP, sendProspectReplyNotification, sendCallConfirmation } from '../services/email'
 import { requirePortalAuth } from '../middleware/portalAuth'
 import { logActivityByAssessment } from '../services/activity'
 
 const router = Router()
 
 const JWT_SECRET = process.env.PORTAL_JWT_SECRET ?? 'dev-secret'
-const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173'
-const TOKEN_REGEX = /^[0-9a-f]{64}$/
+const OTP_REGEX = /^[0-9]{6}$/
 
 // POST /api/portal/login
 router.post('/login', async (req: Request, res: Response) => {
@@ -34,14 +32,13 @@ router.post('/login', async (req: Request, res: Response) => {
         [assessmentId]
       )
 
-      const token = crypto.randomBytes(32).toString('hex')
+      const token = Math.floor(100000 + Math.random() * 900000).toString()
       await db.query(
         `INSERT INTO portal_tokens (assessment_id, token, expires_at) VALUES ($1, $2, NOW() + interval '15 minutes')`,
         [assessmentId, token]
       )
 
-      const magicLink = `${FRONTEND_URL}/portal/verify?token=${token}`
-      void sendMagicLink(email, magicLink).catch((e) => console.error('sendMagicLink failed:', e))
+      void sendPortalOTP(email, token).catch((err: unknown) => console.error('sendPortalOTP failed:', err))
     }
 
     res.json({ ok: true })
@@ -54,20 +51,27 @@ router.post('/login', async (req: Request, res: Response) => {
 // POST /api/portal/verify
 router.post('/verify', async (req: Request, res: Response) => {
   try {
-    const parsed = z.object({ token: z.string() }).safeParse(req.body)
-    if (!parsed.success || !TOKEN_REGEX.test(parsed.data.token)) {
-      return res.status(400).json({ error: 'Invalid token format' })
+    const parsed = z.object({ 
+      email: z.string().email(),
+      token: z.string() 
+    }).safeParse(req.body)
+
+    if (!parsed.success || !OTP_REGEX.test(parsed.data.token)) {
+      return res.status(400).json({ error: 'Invalid or incorrect code format' })
     }
 
-    const { token } = parsed.data
+    const { email, token } = parsed.data
 
     const result = await db.query<{ id: number; assessment_id: number }>(
-      `SELECT id, assessment_id FROM portal_tokens WHERE token = $1 AND expires_at > NOW()`,
-      [token]
+      `SELECT bt.id, bt.assessment_id 
+       FROM portal_tokens bt
+       JOIN assessments a ON bt.assessment_id = a.id
+       WHERE a.email = $1 AND bt.token = $2 AND bt.expires_at > NOW()`,
+      [email, token]
     )
 
     if (!result.rows[0]) {
-      return res.status(400).json({ error: 'Link has expired or is invalid. Request a new one.' })
+      return res.status(400).json({ error: 'Incorrect or expired code. Please try again.' })
     }
 
     const { id: tokenId, assessment_id: assessmentId } = result.rows[0]

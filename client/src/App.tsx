@@ -8,7 +8,6 @@ import Dashboard from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
 import { API_URL } from './lib/api'
 import { PortalLogin } from './components/Portal/Login'
-import { PortalVerify } from './components/Portal/Verify'
 import { PortalResults } from './components/Portal/Results'
 
 type FunnelPhase = 'intake' | 'assessment' | 'email' | 'thankyou'
@@ -116,7 +115,6 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/portal" element={<Navigate to="/portal/login" replace />} />
         <Route path="/portal/login" element={<PortalLogin />} />
-        <Route path="/portal/verify" element={<PortalVerify />} />
         <Route path="/portal/results" element={<PortalResults />} />
       </Routes>
     </BrowserRouter>
