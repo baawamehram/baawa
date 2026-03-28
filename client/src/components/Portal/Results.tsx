@@ -61,11 +61,14 @@ export function PortalResults() {
   const sessionExpiredMsg = (location.state as { message?: string } | null)?.message ?? ''
 
   const [assessment, setAssessment] = useState<Assessment | null>(null)
+  const [allAssessments, setAllAssessments] = useState<Array<{ id: number; created_at: string; score: number | null }>>([])
+  const [showHistory, setShowHistory] = useState(false)
   const [messages, setMessages] = useState<PortalMessage[]>([])
   const [loadError, setLoadError] = useState('')
   const [sendError, setSendError] = useState('')
   const [transcriptOpen, setTranscriptOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('results')
+  const [switching, setSwitching] = useState(false)
 
   const prefersNoMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -73,20 +76,37 @@ export function PortalResults() {
     navigate('/portal/login', { replace: true, state: { message: 'Your session expired — log in again.' } })
   }, [navigate])
 
-  useEffect(() => {
-    const load = async () => {
-      const [meRes, msgsRes] = await Promise.all([
-        portalFetch('/api/portal/me', on401),
-        portalFetch('/api/portal/messages', on401),
-      ])
-      if (!meRes || !msgsRes) return
-      if (!meRes.ok) { setLoadError('Failed to load your assessment.'); return }
-      const [me, msgs] = await Promise.all([meRes.json(), msgsRes.json()])
-      setAssessment(me as Assessment)
-      setMessages(msgs as PortalMessage[])
-    }
-    void load()
+  const load = useCallback(async () => {
+    const [meRes, msgsRes, listRes] = await Promise.all([
+      portalFetch('/api/portal/me', on401),
+      portalFetch('/api/portal/messages', on401),
+      portalFetch('/api/portal/assessments', on401),
+    ])
+    if (!meRes || !msgsRes || !listRes) return
+    if (!meRes.ok) { setLoadError('Failed to load your assessment.'); return }
+    const [me, msgs, list] = await Promise.all([meRes.json(), msgsRes.json(), listRes.json()])
+    setAssessment(me as Assessment)
+    setMessages(msgs as PortalMessage[])
+    setAllAssessments(list)
   }, [on401])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  const handleSwitch = async (id: number) => {
+    if (id === assessment?.id) return
+    setSwitching(true)
+    setShowHistory(false)
+    const res = await portalFetch('/api/portal/switch', on401, {
+      method: 'POST',
+      body: JSON.stringify({ assessmentId: id }),
+    })
+    if (res?.ok) {
+      await load()
+    }
+    setSwitching(false)
+  }
 
   const handleSendMessage = async (body: string) => {
     setSendError('')
@@ -145,12 +165,45 @@ export function PortalResults() {
             </div>
           )}
           <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: 11, color: tk.accent, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>Baawa Portal</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
-            <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(20px, 3vw, 26px)', color: tk.text, margin: 0 }}>Your Dashboard</h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(20px, 3vw, 26px)', color: tk.text, margin: 0 }}>Your Dashboard</h1>
+              {allAssessments.length > 1 && (
+                <div style={{ position: 'relative' }}>
+                  <button 
+                    onClick={() => setShowHistory(!showHistory)}
+                    style={{ background: tk.bg2, border: `1px solid ${tk.border}`, borderRadius: 6, padding: '4px 8px', fontFamily: 'Outfit, sans-serif', fontSize: 11, color: tk.accent, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                  >
+                    {new Date(assessment.created_at).toLocaleDateString()} {showHistory ? '▲' : '▼'}
+                  </button>
+                  <AnimatePresence>
+                    {showHistory && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                        style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: tk.bg2, border: `1px solid ${tk.border}`, borderRadius: 8, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.3)', zIndex: 50, minWidth: 160, padding: 4 }}
+                      >
+                        <div style={{ padding: '6px 10px', fontSize: 10, color: tk.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Submission History</div>
+                        {allAssessments.map(a => (
+                          <button 
+                            key={a.id}
+                            onClick={() => handleSwitch(a.id)}
+                            style={{ width: '100%', textAlign: 'left', background: a.id === assessment.id ? tk.accentLight : 'none', border: 'none', borderRadius: 6, padding: '8px 10px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontSize: 12, color: a.id === assessment.id ? tk.accent : tk.text, transition: 'background 0.2s', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                          >
+                            <span>{new Date(a.created_at).toLocaleDateString()}</span>
+                            {a.score !== null && <span style={{ fontSize: 10, opacity: 0.7 }}>Score: {a.score}</span>}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
             <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted }}>
               {assessment.email}
             </span>
           </div>
+          {switching && <div style={{ fontSize: 10, color: tk.accent, marginTop: 4 }}>Switching submission…</div>}
 
           {/* Domain pills */}
           {domains.length > 0 && (

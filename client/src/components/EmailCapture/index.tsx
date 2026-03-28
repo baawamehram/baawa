@@ -50,11 +50,6 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
         body: JSON.stringify({ email, phone: phone.trim() || undefined }),
       })
 
-      if (res.status === 409) {
-        setApiError('This email has already been submitted.')
-        setSubmitting(false)
-        return
-      }
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

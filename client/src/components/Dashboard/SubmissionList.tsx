@@ -113,7 +113,12 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
                 onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent' }}
               >
                 <td style={{ padding: '16px 24px' }}>
-                  <div style={{ color: theme.text, fontSize: '14px', fontWeight: 600 }}>{a.founder_name || a.email}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ color: theme.text, fontSize: '14px', fontWeight: 600 }}>{a.founder_name || a.email}</div>
+                    {assessments.filter(x => x.email === a.email).length > 1 && (
+                      <span style={{ fontSize: '9px', padding: '2px 5px', borderRadius: 4, background: isDark ? 'rgba(96,165,250,0.15)' : 'rgba(96,165,250,0.1)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Returning</span>
+                    )}
+                  </div>
                   <div style={{ color: theme.textMuted, fontSize: '12px' }}>{a.company_name || a.email}</div>
                 </td>
                 <td style={{ padding: '16px 24px' }}>
