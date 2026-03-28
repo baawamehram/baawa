@@ -108,8 +108,6 @@ async function urlAlreadyIngested(url: string): Promise<boolean> {
   return parseInt(res.rows[0].count, 10) > 0
 }
 
-const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
-
 async function ingestArticle(article: ScrapedArticle): Promise<number> {
   if (await urlAlreadyIngested(article.url)) {
     console.log(`[ingestion] Skipping (already ingested): ${article.url}`)
