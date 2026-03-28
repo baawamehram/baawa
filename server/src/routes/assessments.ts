@@ -320,28 +320,6 @@ router.post('/:id/sentinel', async (req, res) => {
   }
 })
 
-router.get('/sentinel/proposals', async (req, res) => {
-  try {
-    const proposals = await getAllOpenFindings()
-    res.json(proposals)
-  } catch (err) {
-    console.error('[SENTINEL_PROPOSALS] Error:', err)
-    res.status(500).json({ error: 'Failed to fetch proposals' })
-  }
-})
-
-// ── Sentinel (Discovery) API ──
-
-router.post('/:id/sentinel', async (req, res) => {
-  try {
-    const findings = await conductDiscovery(req.params.id)
-    res.json({ success: true, count: findings.length, findings })
-  } catch (err) {
-    console.error('[SENTINEL_DISCOVERY] Error:', err)
-    res.status(500).json({ error: 'Discovery failed' })
-  }
-})
-
 router.get('/:id/sentinel/proposals', async (req, res) => {
   try {
     const findings = await getSessionFindings(req.params.id)
@@ -352,7 +330,7 @@ router.get('/:id/sentinel/proposals', async (req, res) => {
   }
 })
 
-router.get('/sentinel/proposals', async (_req, res) => {
+router.get('/sentinel/proposals/all', async (_req, res) => {
   try {
     const proposals = await getAllOpenFindings()
     res.json(proposals)

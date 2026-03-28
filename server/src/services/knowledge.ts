@@ -1,6 +1,6 @@
 import { db } from '../db/client'
 import cheerio from 'cheerio'
-import pdf from 'pdf-parse'
+const pdf = require('pdf-parse')
 import { callLLM } from './llm-provider'
 
 export async function generateKnowledgeMetadata(text: string): Promise<{ category: string, tags: string[] }> {
