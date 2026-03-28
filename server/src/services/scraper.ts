@@ -140,7 +140,14 @@ function extractTextFromHtml(html: string): string {
   return paragraphs.join('\n\n')
 }
 
-async function fetchWithTimeout(url: string, timeoutMs = 12000): Promise<string> {
+function isPrimarilyEnglish(text: string): boolean {
+  // Simple check: is more than 85% of characters in the basic latin range?
+  // Also filters out the ancient Chinese text (太平御覽) that polluted previous ingestions.
+  const latinChars = text.match(/[a-zA-Z0-9\s.,!?;:'"()[\]{}-]/g)?.length ?? 0
+  return (latinChars / text.length) > 0.85
+}
+
+async function fetchWithTimeout(url: string, timeoutMs = 25000): Promise<string> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -183,6 +190,12 @@ async function scrapeSource(source: SourceConfig): Promise<ScrapedArticle[]> {
       const bodyText = extracted.length > 300 ? extracted : item.description
 
       if (bodyText.length > 80) {
+        // Safety check: Filter out non-English content (ancient Chinese text leak fix)
+        if (!isPrimarilyEnglish(bodyText)) {
+          console.warn(`[scraper] Skipping article due to non-English content: ${item.url}`)
+          continue
+        }
+
         articles.push({
           title: item.title,
           url: item.url,

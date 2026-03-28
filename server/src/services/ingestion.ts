@@ -13,6 +13,14 @@ export const ingestionState = {
   lastError: null as string | null,
 }
 
+const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
+
+function isPrimarilyEnglish(text: string): boolean {
+  if (!text) return false
+  const latinChars = text.match(/[a-zA-Z0-9\s.,!?;:'"()[\]{}-]/g)?.length ?? 0
+  return (latinChars / text.length) > 0.85
+}
+
 // Local file ingestion logic (Markdown files in the workspace)
 async function ingestLocalKnowledgeFiles(): Promise<Record<string, number>> {
   // Smarter path discovery for Railway monorepos
@@ -47,6 +55,12 @@ async function ingestLocalKnowledgeFiles(): Promise<Record<string, number>> {
 
       for (let i = 0; i < chunks.length; i++) {
         try {
+          // Safety check: Filter out non-English content
+          if (!isPrimarilyEnglish(chunks[i])) {
+            console.warn(`[ingestion] Local file ${file} chunk ${i} skipped due to non-English content`)
+            continue
+          }
+
           const embedding = await getEmbedding(chunks[i])
           await db.query(
             `INSERT INTO knowledge_chunks (content, embedding, source_name, source_url, chunk_index, is_active, ingested_at)
@@ -141,6 +155,11 @@ export async function runFullIngestion(): Promise<void> {
   console.log('[ingestion] ── Starting full knowledge base ingestion ──')
 
   try {
+    // Wipe existing data for a clean restart (prevents stale/poisoned data like the Chinese text leak)
+    console.log('[ingestion] ── Wiping knowledge_chunks table ──')
+    await db.query('DELETE FROM knowledge_chunks')
+    console.log('[ingestion] ── Wipe complete ──')
+
     const stats: Record<string, number> = {}
     let totalChunks = 0
 
