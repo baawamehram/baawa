@@ -17,6 +17,8 @@ export interface ScoringResult {
   summary: string
   biggest_opportunity: string
   biggest_risk: string
+  founder_archetype?: string
+  engagement_pulse?: string
   company_name?: string
 }
 
@@ -60,7 +62,9 @@ Output ONLY valid JSON in this exact format:
   "summary": "<2-3 sentence honest portrait of where this founder is right now>",
   "biggest_opportunity": "<one sentence — what is most likely to unlock growth>",
   "biggest_risk": "<one sentence — what could slow or stop progress>",
-  "company_name": "<The business name mentioned, or null if unknown>"
+  "company_name": "<The business name mentioned, or null if unknown>",
+  "founder_archetype": "<One of: 'The Visionary', 'The Operator', 'The Hustler', 'The Technician'>",
+  "engagement_pulse": "<One of: 'High - Ready to move', 'Medium - Cautiously interested', 'Low - Informational only'>"
 }`
 
   const { text: raw } = await callLLM({

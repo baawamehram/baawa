@@ -4,6 +4,7 @@ import { db } from '../db/client'
 import { generateDeferEmail } from '../services/deferEmail'
 import { sendOnboardEmail, sendDeferEmail, sendMessageNotification } from '../services/email'
 import { ConversationTurn } from '../services/questioning'
+import { scoreConversation } from '../services/scoring'
 import { requireAuth } from '../middleware/auth'
 
 const router = Router()
@@ -11,12 +12,24 @@ const router = Router()
 router.use(requireAuth)
 
 // GET /api/assessments — list all, sorted by score desc
-router.get('/', async (_req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
+    const { q, limit = 50, offset = 0 } = req.query
+    const values: any[] = []
+    let whereClause = '1=1'
+
+    if (q) {
+      values.push(`%${q}%`)
+      whereClause += ` AND (email ILIKE $1 OR founder_name ILIKE $1 OR company_name ILIKE $1)`
+    }
+
     const result = await db.query(
-      `SELECT id, email, score, score_breakdown, score_summary, biggest_opportunity, biggest_risk, status, city, country, created_at
+      `SELECT id, email, score, score_breakdown, score_summary, biggest_opportunity, biggest_risk, status, city, country, created_at, founder_name, company_name
        FROM assessments
-       ORDER BY score DESC NULLS LAST, created_at DESC`
+       WHERE ${whereClause}
+       ORDER BY score DESC NULLS LAST, created_at DESC
+       LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+      [...values, limit, offset]
     )
     res.json(result.rows)
   } catch (err) {
@@ -37,6 +50,67 @@ router.get('/:id', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('GET /assessments/:id error:', err)
     res.status(500).json({ error: 'Failed to get assessment' })
+  }
+})
+
+// POST /api/assessments/:id/review — mark as reviewing (Gap 7)
+// Front-end should call this when the detail page is opened
+router.post('/:id/review', async (req: Request, res: Response) => {
+  try {
+    const result = await db.query<{ status: string }>(
+      'SELECT status FROM assessments WHERE id = $1',
+      [req.params.id]
+    )
+    if (result.rows[0]?.status === 'pending') {
+      await db.query(
+        "UPDATE assessments SET status = 'reviewing', updated_at = NOW() WHERE id = $1",
+        [req.params.id]
+      )
+    }
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update status' })
+  }
+})
+
+// POST /api/assessments/:id/rescore — re-run scoring (Gap 11)
+router.post('/:id/rescore', async (req: Request, res: Response) => {
+  try {
+    const result = await db.query<{ conversation: ConversationTurn[] }>(
+      'SELECT conversation FROM assessments WHERE id = $1',
+      [req.params.id]
+    )
+    if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
+
+    const scoreResult = await scoreConversation(result.rows[0].conversation)
+
+    await db.query(
+      `UPDATE assessments SET
+        score = $1,
+        score_breakdown = $2,
+        score_summary = $3,
+        biggest_opportunity = $4,
+        biggest_risk = $5,
+        founder_archetype = $6,
+        engagement_pulse = $7,
+        updated_at = NOW()
+       WHERE id = $8`,
+      [
+        scoreResult.score,
+        JSON.stringify(scoreResult.breakdown),
+        scoreResult.summary,
+        scoreResult.biggest_opportunity,
+        scoreResult.biggest_risk,
+        scoreResult.founder_archetype || null,
+        scoreResult.engagement_pulse || null,
+        req.params.id,
+      ]
+    )
+
+    res.json({ ok: true, scoreResult })
+  } catch (err) {
+    console.error('POST /assessments/:id/rescore error:', err)
+    res.status(500).json({ error: 'Failed to re-score' })
   }
 })
 

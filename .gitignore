@@ -20,3 +20,6 @@ Thumbs.db
 
 # Superpowers brainstorm artifacts
 .superpowers/
+
+# Uploads
+server/uploads/

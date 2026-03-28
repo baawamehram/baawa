@@ -1,4 +1,6 @@
 import 'dotenv/config'
+import cron from 'node-cron'
+import { runOptimizer } from './services/journeyOptimizer'
 import { V1_INTRO_MESSAGES } from './db/seeds/journeyConfigV1'
 import express from 'express'
 import cors from 'cors'
@@ -160,6 +162,11 @@ async function startServer() {
 
     // Phase 1 — Problem classification
     await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS problem_domains JSONB`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS founder_archetype VARCHAR(100)`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS engagement_pulse VARCHAR(100)`)
+
+    // Phase 1.5 — Client archival
+    await db.query(`ALTER TABLE clients ADD COLUMN IF NOT EXISTS archived BOOLEAN NOT NULL DEFAULT false`)
 
     // Phase 2 — Call scheduling
     await db.query(`
@@ -235,6 +242,17 @@ async function startServer() {
   } catch (err) {
     console.error('Startup migration error:', err)
   }
+
+  // Gap 12: Optimizer Cron — runs every Sunday at midnight
+  cron.schedule('0 0 * * 0', async () => {
+    console.log('[CRON] Running AI Journey Optimizer...')
+    try {
+      await runOptimizer()
+      console.log('[CRON] Optimizer finished successfully.')
+    } catch (err) {
+      console.error('[CRON] Optimizer failed:', err)
+    }
+  })
 
   const PORT = process.env.PORT ?? 3001
   app.listen(PORT, () => console.log(`Server listening on :${PORT}`))

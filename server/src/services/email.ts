@@ -156,3 +156,56 @@ export async function sendMessageNotification(to: string, loginUrl: string): Pro
     console.error(`sendMessageNotification failed for ${to}:`, err)
   }
 }
+
+// 9. Notify founder that a prospect has replied in the portal
+export async function sendProspectReplyNotification(
+  prospectEmail: string,
+  snippet: string,
+  dashboardUrl: string
+): Promise<void> {
+  if (!FOUNDER_EMAIL) return
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: FOUNDER_EMAIL,
+      subject: `Portal reply from ${escapeHtml(prospectEmail)}`,
+      html: `<h2>New Portal Message</h2>
+<p><strong>From:</strong> ${escapeHtml(prospectEmail)}</p>
+<p><strong>Message:</strong> "${escapeHtml(snippet)}"</p>
+<p><a href="${escapeHtml(dashboardUrl)}/dashboard/assessments">View message thread →</a></p>`,
+    })
+  } catch (err) {
+    console.error(`sendProspectReplyNotification failed:`, err)
+  }
+}
+
+// 10. Send call confirmation to both parties
+export async function sendCallConfirmation(
+  to: string,
+  prospectEmail: string,
+  datetime: string,
+  type: 'founder' | 'prospect'
+): Promise<void> {
+  try {
+    const subject = type === 'founder'
+      ? `Call confirmed: ${escapeHtml(prospectEmail)}`
+      : 'Your call with Baawa is confirmed'
+
+    const intro = type === 'founder'
+      ? `A prospect has selected a call slot.`
+      : `Your strategy session with the Baawa team is confirmed.`
+
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject,
+      html: `<h2>Call Confirmed</h2>
+<p>${intro}</p>
+<p><strong>Time:</strong> ${escapeHtml(datetime)}</p>
+<p><strong>With:</strong> ${type === 'founder' ? escapeHtml(prospectEmail) : 'Baawa Team'}</p>
+<p>A calendar invitation will follow shortly.</p>`,
+    })
+  } catch (err) {
+    console.error(`sendCallConfirmation (${type}) failed for ${to}:`, err)
+  }
+}

@@ -1,7 +1,10 @@
 import { Router } from 'express'
 import { db } from '../db/client'
+import { requireAuth } from '../middleware/auth'
 
 const router = Router()
+
+router.use(requireAuth)
 
 // Populates session_analytics with fake data to test the Intelligence tab
 router.post('/seed-analytics', async (_req, res) => {

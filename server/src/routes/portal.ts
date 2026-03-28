@@ -3,8 +3,9 @@ import { z } from 'zod'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import { db } from '../db/client'
-import { sendMagicLink } from '../services/email'
+import { sendMagicLink, sendProspectReplyNotification, sendCallConfirmation } from '../services/email'
 import { requirePortalAuth } from '../middleware/portalAuth'
+import { logActivityByAssessment } from '../services/activity'
 
 const router = Router()
 
@@ -149,6 +150,12 @@ router.post('/messages', requirePortalAuth, async (req: Request, res: Response) 
       `INSERT INTO portal_messages (assessment_id, sender, body) VALUES ($1, 'prospect', $2)`,
       [assessmentId, parsed.data.body]
     )
+
+    // Gap 2: Notify founder
+    const dashboardUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+    void sendProspectReplyNotification(req.portalUser!.email, parsed.data.body, dashboardUrl)
+      .catch(e => console.error('sendProspectReplyNotification failed:', e))
+
     res.json({ ok: true })
   } catch (err) {
     console.error('POST /portal/messages error:', err)
@@ -177,6 +184,18 @@ router.put('/call/:id/select', requirePortalAuth, async (req: Request, res: Resp
       `UPDATE call_slots SET selected_slot = $1, status = 'confirmed' WHERE id = $2 AND assessment_id = $3`,
       [parsed.data.datetime, req.params.id, assessmentId]
     )
+
+    // Gap 3: Notify both parties
+    const founderEmail = process.env.FOUNDER_EMAIL ?? 'hello@baawa.co'
+    void sendCallConfirmation(founderEmail, req.portalUser!.email, parsed.data.datetime, 'founder')
+      .catch(e => console.error('sendCallConfirmation (founder) failed:', e))
+    
+    void sendCallConfirmation(req.portalUser!.email, req.portalUser!.email, parsed.data.datetime, 'prospect')
+      .catch(e => console.error('sendCallConfirmation (prospect) failed:', e))
+
+    // Gap 4: Log activity
+    void logActivityByAssessment(assessmentId, 'call_booked', `Prospect booked a call for ${parsed.data.datetime}`)
+
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to book slot' })
@@ -207,9 +226,32 @@ router.put('/proposal/:id/approve', requirePortalAuth, async (req: Request, res:
        WHERE id = $1 AND assessment_id = $2 AND status = 'sent'`,
       [req.params.id, assessmentId]
     )
+
+    // Gap 4: Log activity
+    void logActivityByAssessment(assessmentId, 'proposal_approved', `Prospect approved proposal #${req.params.id}`)
+
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to approve proposal' })
+  }
+})
+
+// PUT /api/portal/proposal/:id/reject — founder rejects proposal (Gap 6)
+router.put('/proposal/:id/reject', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    await db.query(
+      `UPDATE proposals SET status = 'rejected'
+       WHERE id = $1 AND assessment_id = $2 AND status = 'sent'`,
+      [req.params.id, assessmentId]
+    )
+
+    // Gap 4: Log activity
+    void logActivityByAssessment(assessmentId, 'proposal_rejected', `Prospect rejected proposal #${req.params.id}`)
+
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to reject proposal' })
   }
 })
 
@@ -250,6 +292,10 @@ router.post('/agreement/:proposalId/sign', requirePortalAuth, async (req: Reques
              signed_ip = EXCLUDED.signed_ip, signed_user_agent = EXCLUDED.signed_user_agent, status = 'signed'`,
       [req.params.proposalId, assessmentId, parsed.data.signed_name, ip, req.headers['user-agent'] ?? '']
     )
+
+    // Gap 4: Log activity
+    void logActivityByAssessment(assessmentId, 'agreement_signed', `Agreement signed by ${parsed.data.signed_name}`)
+
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to sign agreement' })
@@ -290,6 +336,10 @@ router.post('/deliverables/:id/accept', requirePortalAuth, async (req: Request, 
       `UPDATE deliverables SET accepted_at = NOW(), accepted_by = $1 WHERE id = $2 AND client_id = $3`,
       [email, req.params.id, client.rows[0].id]
     )
+
+    // Gap 4: Log activity
+    void logActivityByAssessment(assessmentId, 'deliverable_accepted', `Deliverable #${req.params.id} accepted by prospect`)
+
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to accept deliverable' })

@@ -117,6 +117,13 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         setNotes(data.founder_notes || '')
         setEditFounder(data.founder_name || '')
         setEditCompany(data.company_name || '')
+
+        // Gap 7: Mark as reviewing if currently pending
+        if (data.status === 'pending') {
+          void authFetch(`${API_URL}/api/assessments/${id}/review`, token, on401, { method: 'POST' })
+            .then(() => setAssessment(prev => prev ? { ...prev, status: 'reviewing' } : null))
+            .catch(console.error)
+        }
       }
       if (msgsRes?.ok) setMessages(await msgsRes.json())
       if (callRes?.ok) setCall(await callRes.json())

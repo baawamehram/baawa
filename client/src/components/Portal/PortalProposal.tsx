@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { jsPDF } from 'jspdf'
 import { portalFetch } from '../../lib/portalApi'
 import { t } from './usePortalTheme'
 
@@ -75,6 +76,89 @@ export function PortalProposal({ theme, on401 }: Props) {
     })
     if (res?.ok) { setSigned(true); void loadProposal() }
     setSigning(false)
+  }
+
+  const downloadPDF = () => {
+    if (!proposal) return
+    const doc = new jsPDF()
+    const margin = 20
+    let y = 30
+
+    // Header
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    doc.text('ENGAGEMENT AGREEMENT', margin, y)
+    y += 15
+
+    doc.setFontSize(14)
+    doc.text(proposal.title, margin, y)
+    y += 10
+
+    // Meta
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, margin, y)
+    y += 15
+
+    // Summary
+    if (proposal.summary) {
+      doc.setFont('helvetica', 'bold')
+      doc.text('EXECUTIVE SUMMARY', margin, y)
+      y += 6
+      doc.setFont('helvetica', 'normal')
+      const lines = doc.splitTextToSize(proposal.summary, 170)
+      doc.text(lines, margin, y)
+      y += lines.length * 5 + 10
+    }
+
+    // Packages
+    doc.setFont('helvetica', 'bold')
+    doc.text('SCOPE & INVESTMENT', margin, y)
+    y += 8
+    
+    proposal.packages.forEach((pkg) => {
+      if (y > 250) { doc.addPage(); y = 20 }
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text(`${pkg.name} — ${proposal.currency === 'GBP' ? '£' : '$'}${pkg.price.toLocaleString()}`, margin, y)
+      y += 6
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(10)
+      const pLines = doc.splitTextToSize(pkg.description, 170)
+      doc.text(pLines, margin, y)
+      y += pLines.length * 5 + 4
+      
+      pkg.deliverables.forEach(d => {
+        doc.text(`• ${d}`, margin + 5, y)
+        y += 5
+      })
+      y += 5
+    })
+
+    y += 10
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(14)
+    doc.text(`TOTAL INVESTMENT: ${proposal.currency === 'GBP' ? '£' : '$'}${proposal.total_price.toLocaleString()}`, margin, y)
+    y += 20
+
+    // Signature
+    if (agreement?.status === 'signed') {
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(12)
+      doc.text('DIGITAL SIGNATURE', margin, y)
+      y += 8
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(10)
+      doc.text(`Signed by: ${agreement.signed_name}`, margin, y)
+      y += 5
+      doc.text(`Date: ${new Date(agreement.signed_at!).toLocaleString()}`, margin, y)
+      y += 15
+      doc.setFont('times', 'italic')
+      doc.setFontSize(24)
+      doc.text(agreement.signed_name!, margin + 10, y)
+    }
+
+    doc.save(`Baawa_Agreement_${proposal.id}.pdf`)
   }
 
   const card = (extra = {}) => ({ background: tk.bg2, border: `1px solid ${tk.border}`, borderRadius: 10, padding: 20, ...extra })
@@ -171,8 +255,7 @@ export function PortalProposal({ theme, on401 }: Props) {
         </div>
       )}
 
-      {(signed || agreement?.status === 'signed') && (
-        <div style={card({ background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.25)' })}>
+        <div style={card({ background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.25)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' })}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 22 }}>✅</span>
             <div>
@@ -182,8 +265,13 @@ export function PortalProposal({ theme, on401 }: Props) {
               </div>
             </div>
           </div>
+          <button 
+            onClick={downloadPDF}
+            style={{ background: 'transparent', color: tk.text, border: `1px solid ${tk.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}
+          >
+            Download PDF
+          </button>
         </div>
-      )}
     </div>
   )
 }

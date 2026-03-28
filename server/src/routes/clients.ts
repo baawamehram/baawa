@@ -8,13 +8,25 @@ const router = Router()
 router.use(requireAuth)
 
 // GET /api/clients
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
+    const { q, limit = 50, offset = 0, showArchived = 'false' } = req.query
+    const values: any[] = []
+    let whereClause = showArchived === 'true' ? '1=1' : 'c.archived = false'
+
+    if (q) {
+      values.push(`%${q}%`)
+      whereClause += ` AND (c.founder_name ILIKE $1 OR c.company_name ILIKE $1 OR c.email ILIKE $1)`
+    }
+
     const result = await db.query(
       `SELECT c.*, a.score, a.score_summary
        FROM clients c
        LEFT JOIN assessments a ON c.assessment_id = a.id
-       ORDER BY c.created_at DESC`
+       WHERE ${whereClause}
+       ORDER BY c.created_at DESC
+       LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+      [...values, limit, offset]
     )
     res.json(result.rows)
   } catch (err) {
@@ -144,6 +156,27 @@ router.post('/:id/deliverables', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to add deliverable' })
+  }
+})
+
+// DELETE /api/clients/:id — archive client (Gap 8)
+router.delete('/:id', async (req, res) => {
+  try {
+    await db.query(
+      "UPDATE clients SET archived = true, updated_at = NOW() WHERE id = $1",
+      [req.params.id]
+    )
+
+    // Log activity
+    await db.query(
+      "INSERT INTO activities (client_id, type, description) VALUES ($1, 'archived', 'Client was archived')",
+      [req.params.id]
+    )
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('DELETE /clients/:id error:', err)
+    res.status(500).json({ error: 'Failed to archive client' })
   }
 })
 
