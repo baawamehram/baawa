@@ -150,7 +150,6 @@ export function Intelligence({ token, on401 }: Props) {
   }
 
   // Zero State: No metrics yet
-  const totalSessions = (metrics?.windows['90d'].completion_rate !== null) ? 1 : 0
   if (!metrics || !metrics.windows['30d'].completion_rate && configs.length <= 1) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto', fontFamily: "'Outfit', sans-serif" }}>

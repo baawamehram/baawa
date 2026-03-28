@@ -43,8 +43,8 @@ router.get('/:id', async (req: Request, res: Response) => {
 // POST /api/assessments/:id/onboard — mark as onboarded, send email, create client
 router.post('/:id/onboard', async (req: Request, res: Response) => {
   try {
-    const result = await db.query<{ email: string; status: string }>(
-      'SELECT email, status FROM assessments WHERE id = $1',
+    const result = await db.query<{ email: string; status: string; founder_name: string; company_name: string }>(
+      'SELECT email, status, founder_name, company_name FROM assessments WHERE id = $1',
       [req.params.id]
     )
     if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
@@ -61,8 +61,8 @@ router.post('/:id/onboard', async (req: Request, res: Response) => {
 
     // Create client record
     const clientResult = await db.query<{ id: number }>(
-      `INSERT INTO clients (assessment_id, email) VALUES ($1, $2) RETURNING id`,
-      [req.params.id, assessment.email]
+      `INSERT INTO clients (assessment_id, email, founder_name, company_name) VALUES ($1, $2, $3, $4) RETURNING id`,
+      [req.params.id, assessment.email, assessment.founder_name, assessment.company_name]
     )
 
     await sendOnboardEmail(assessment.email)

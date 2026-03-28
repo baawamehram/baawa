@@ -17,6 +17,7 @@ export interface ScoringResult {
   summary: string
   biggest_opportunity: string
   biggest_risk: string
+  company_name?: string
 }
 
 export async function scoreConversation(
@@ -37,6 +38,8 @@ export async function scoreConversation(
   const systemPrompt = `You are analyzing a founder's responses from a business diagnostic interview.
 Think like a senior partner reviewing a new client engagement.
 
+Identify the Business Name / Company Name if mentioned (usually near the start).
+
 Score on 5 dimensions:
 1. PMF Clarity — 0 to ${pmf}
 2. Customer Validation — 0 to ${validation}
@@ -56,7 +59,8 @@ Output ONLY valid JSON in this exact format:
   "breakdown": {"pmf": <0-${pmf}>, "validation": <0-${validation}>, "growth": <0-${growth}>, "mindset": <0-${mindset}>, "revenue": <0-${revenue}>},
   "summary": "<2-3 sentence honest portrait of where this founder is right now>",
   "biggest_opportunity": "<one sentence — what is most likely to unlock growth>",
-  "biggest_risk": "<one sentence — what could slow or stop progress>"
+  "biggest_risk": "<one sentence — what could slow or stop progress>",
+  "company_name": "<The business name mentioned, or null if unknown>"
 }`
 
   const { text: raw } = await callLLM({

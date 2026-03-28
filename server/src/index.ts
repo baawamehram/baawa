@@ -217,6 +217,9 @@ async function startServer() {
     await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS engagement_pulse VARCHAR(20) DEFAULT 'neutral'`)
 
     // Phase 4 — Deliverables portal columns
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS founder_name VARCHAR(255)`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS company_name VARCHAR(255)`)
+    
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS portal_visible BOOLEAN NOT NULL DEFAULT false`)
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS content TEXT`)
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_url TEXT`)

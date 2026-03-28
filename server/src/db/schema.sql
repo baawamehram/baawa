@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS assessments (
   score_summary TEXT,
   biggest_opportunity TEXT,
   biggest_risk TEXT,
+  founder_name VARCHAR(255),
+  company_name VARCHAR(255),
   status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewing', 'onboarded', 'deferred')),
   founder_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

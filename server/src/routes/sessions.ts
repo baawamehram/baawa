@@ -182,10 +182,15 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
 
     const scoring = await scoreConversation(session.conversation)
 
+    const sessionData = await db.query<{ name: string | null }>(
+      'SELECT name FROM sessions WHERE id = $1',
+      [id]
+    )
+
     const assessmentResult = await db.query<{ id: number }>(
       `INSERT INTO assessments
-       (session_id, email, phone, city, country, conversation, score, score_breakdown, score_summary, biggest_opportunity, biggest_risk)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       (session_id, email, phone, city, country, conversation, score, score_breakdown, score_summary, biggest_opportunity, biggest_risk, founder_name, company_name)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING id`,
       [
         id,
@@ -199,6 +204,8 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
         scoring.summary,
         scoring.biggest_opportunity,
         scoring.biggest_risk,
+        sessionData.rows[0]?.name ?? null,
+        scoring.company_name ?? null // Scoring engine usually extracts company
       ]
     )
 
