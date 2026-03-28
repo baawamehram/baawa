@@ -138,6 +138,51 @@ router.get('/messages', requirePortalAuth, async (req: Request, res: Response) =
   }
 })
 
+// GET /api/portal/assessments — List all submissions for this email
+router.get('/assessments', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { email } = req.portalUser!
+    const result = await db.query(
+      `SELECT id, created_at, results_unlocked, score, company_name, founder_name
+       FROM assessments WHERE email = $1 ORDER BY created_at DESC`,
+      [email]
+    )
+    res.json(result.rows)
+  } catch (err) {
+    console.error('GET /portal/assessments error:', err)
+    res.status(500).json({ error: 'Failed to load assessment list' })
+  }
+})
+
+// POST /api/portal/switch — Switch active assessment in JWT
+router.post('/switch', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const parsed = z.object({ assessmentId: z.number() }).safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ error: 'Invalid assessmentId' })
+    const { assessmentId } = parsed.data
+    const { email } = req.portalUser!
+
+    // Verify ownership
+    const result = await db.query('SELECT id FROM assessments WHERE id = $1 AND email = $2', [assessmentId, email])
+    if (!result.rows[0]) return res.status(403).json({ error: 'Assessment not found or unauthorized' })
+
+    const jwtPayload = { assessmentId, email }
+    const signedToken = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' })
+
+    res.cookie('portal_token', signedToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('POST /portal/switch error:', err)
+    res.status(500).json({ error: 'Failed to switch assessment' })
+  }
+})
+
 // POST /api/portal/messages
 router.post('/messages', requirePortalAuth, async (req: Request, res: Response) => {
   try {

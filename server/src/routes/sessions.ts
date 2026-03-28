@@ -210,14 +210,7 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
     if (!sessionResult.rows[0]) return res.status(404).json({ error: 'Session not found' })
     const session = sessionResult.rows[0]
 
-    // Check for duplicate email
-    const existing = await db.query(
-      'SELECT id FROM assessments WHERE email = $1',
-      [email]
-    )
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ error: 'Email already submitted' })
-    }
+    // Removed duplicate email check to support multiple submissions per user
 
     const scoring = await scoreConversation(session.conversation)
 
