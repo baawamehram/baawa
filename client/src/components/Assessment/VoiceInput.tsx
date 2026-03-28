@@ -18,10 +18,44 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
   const onTranscriptRef = useRef(onTranscript)
   useEffect(() => { onTranscriptRef.current = onTranscript })
 
+  const wakeLockRef = useRef<any>(null)
+
   const isRecording = recorderState === 'recording'
 
   useEffect(() => {
     onRecordingChange?.(isRecording)
+
+    // Handle Screen Wake Lock to prevent screen from turning black
+    const requestWakeLock = async () => {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
+        } catch (err) {
+          console.error('Wake Lock request failed:', err)
+        }
+      }
+    }
+
+    const releaseWakeLock = async () => {
+      if (wakeLockRef.current) {
+        try {
+          await wakeLockRef.current.release()
+          wakeLockRef.current = null
+        } catch (err) {
+          console.error('Wake Lock release failed:', err)
+        }
+      }
+    }
+
+    if (isRecording) {
+      void requestWakeLock()
+    } else {
+      void releaseWakeLock()
+    }
+
+    return () => {
+      void releaseWakeLock()
+    }
   }, [isRecording, onRecordingChange])
 
   useEffect(() => {
