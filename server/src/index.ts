@@ -15,6 +15,7 @@ import marketRouter from './routes/market'
 import journeyRouter from './routes/journey'
 import cookieParser from 'cookie-parser'
 import portalRouter from './routes/portal'
+import ingestionRouter from './routes/ingestion'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -53,6 +54,7 @@ app.use('/api/geo', geoRouter)
 app.use('/api/market-data', marketRouter)
 app.use('/api/journey', journeyRouter)
 app.use('/api/portal', portalRouter)
+app.use('/api/admin/ingest', ingestionRouter)
 
 // Health
 app.get('/health', async (_req, res) => {
@@ -81,6 +83,14 @@ async function startServer() {
     await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS region VARCHAR(255)`)
     await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS language VARCHAR(255)`)
     await db.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS email VARCHAR(255)`)
+    // Knowledge base pipeline columns
+    await db.query(`ALTER TABLE knowledge_chunks ADD COLUMN IF NOT EXISTS source_url TEXT`)
+    await db.query(`ALTER TABLE knowledge_chunks ADD COLUMN IF NOT EXISTS ingested_at TIMESTAMPTZ DEFAULT NOW()`)
+    await db.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_knowledge_url_chunk
+      ON knowledge_chunks(source_url, chunk_index)
+      WHERE source_url IS NOT NULL
+    `)
     await db.query(`
       CREATE TABLE IF NOT EXISTS journey_config (
         id          SERIAL PRIMARY KEY,
