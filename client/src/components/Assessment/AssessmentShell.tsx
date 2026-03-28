@@ -36,8 +36,8 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
     // Left open for any future recording side effects
   }, [])
 
-  const handleSubmit = async (answer: string) => {
-    await submitAnswer(answer)
+  const handleSubmit = async (answer: string, meta: { inputType: 'voice' | 'text', latency: number }) => {
+    await submitAnswer(answer, meta)
   }
 
   const progress = Math.min(state.questionCount / MAX_QUESTIONS, 1)
@@ -160,7 +160,7 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
               question={state.question}
               questionKey={state.questionCount}
               loading={state.loading}
-              onSubmit={(answer) => void handleSubmit(answer)}
+              onSubmit={(ans, meta) => void handleSubmit(ans, meta)}
               onRecordingChange={handleRecordingChange}
             />
           )}

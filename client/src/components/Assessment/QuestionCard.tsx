@@ -6,7 +6,7 @@ interface QuestionCardProps {
   question: string
   questionKey: number
   loading: boolean
-  onSubmit: (answer: string) => void
+  onSubmit: (answer: string, meta: { inputType: 'voice' | 'text', latency: number }) => void
   onRecordingChange?: (isRecording: boolean) => void
 }
 
@@ -23,12 +23,18 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
   const [showTextarea, setShowTextarea] = useState(false)
   const [isVoiceRecording, setIsVoiceRecording] = useState(false)
   const [processingLineIndex, setProcessingLineIndex] = useState(0)
+  
+  const [startTime, setStartTime] = useState(Date.now())
+  const [lastQuestionKey, setLastQuestionKey] = useState(questionKey)
 
-  useEffect(() => {
+  // Reset state for new question
+  if (questionKey !== lastQuestionKey) {
+    setLastQuestionKey(questionKey)
+    setStartTime(Date.now())
     setAnswer('')
     setShowTextarea(false)
     setIsVoiceRecording(false)
-  }, [questionKey])
+  }
 
   // Rotate AI processing microcopy while loading
   useEffect(() => {
@@ -42,12 +48,17 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
     return () => clearInterval(interval)
   }, [loading])
 
-  const handleSubmit = () => {
-    const trimmed = answer.trim()
+  const handleSubmit = (overrideAnswer?: string, overrideType?: 'voice' | 'text') => {
+    const finalAnswer = overrideAnswer ?? answer
+    const trimmed = finalAnswer.trim()
     if (!trimmed || loading) return
+    
+    const latency = Math.round((Date.now() - startTime) / 1000)
+    const type = overrideType ?? (showTextarea ? 'text' : 'voice')
+    
     setAnswer('')
     setShowTextarea(false)
-    onSubmit(trimmed)
+    onSubmit(trimmed, { inputType: type, latency })
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -161,7 +172,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
                       ← Use Voice Instead
                     </button>
                     <motion.button
-                      onClick={handleSubmit}
+                      onClick={() => handleSubmit()}
                       disabled={!answer.trim() || loading}
                       whileTap={{ scale: !answer.trim() ? 1 : 0.97 }}
                       style={{
@@ -190,7 +201,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
                   <VoiceInput
                     onTranscript={(text) => {
                       const trimmed = text.trim()
-                      if (trimmed && !loading) onSubmit(trimmed)
+                      if (trimmed && !loading) handleSubmit(trimmed, 'voice')
                     }}
                     onVoiceUnavailable={() => setShowTextarea(true)}
                     disabled={loading}

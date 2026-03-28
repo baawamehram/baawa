@@ -168,6 +168,43 @@ router.get('/metrics', requireAuth, async (_req: Request, res: Response) => {
   }
 })
 
+// GET /api/journey/funnel — aggregated funnel stats from events JSONB
+router.get('/funnel', requireAuth, async (_req: Request, res: Response) => {
+  try {
+    const result = await db.query(`
+      WITH exploded_events AS (
+        SELECT 
+          (jsonb_array_elements(events)->>'step')::int as step,
+          (jsonb_array_elements(events)->>'latency')::float as latency,
+          (jsonb_array_elements(events)->>'inputType') as input_type,
+          (jsonb_array_elements(events)->>'words')::int as words
+        FROM session_analytics
+        WHERE created_at > NOW() - INTERVAL '30 days'
+      )
+      SELECT 
+        step,
+        COUNT(*) as count,
+        ROUND(AVG(latency)::numeric, 1) as avg_latency,
+        ROUND((COUNT(*) FILTER (WHERE input_type = 'voice')::float / NULLIF(COUNT(*), 0) * 100)::numeric, 1) as voice_ratio,
+        ROUND(AVG(words)::numeric, 1) as avg_words
+      FROM exploded_events
+      WHERE step IS NOT NULL
+      GROUP BY step
+      ORDER BY step ASC
+    `)
+
+    const totalStarted = await db.query("SELECT COUNT(*) FROM sessions WHERE created_at > NOW() - INTERVAL '30 days'")
+    
+    res.json({
+      steps: result.rows,
+      totalStarted: parseInt(totalStarted.rows[0].count)
+    })
+  } catch (err) {
+    console.error('GET /journey/funnel error:', err)
+    res.status(500).json({ error: 'Failed to load funnel stats' })
+  }
+})
+
 // GET /api/journey/suggestions — smart actionable suggestions (auth required)
 router.get('/suggestions', requireAuth, async (_req: Request, res: Response) => {
   try {

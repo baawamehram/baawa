@@ -1,4 +1,35 @@
 import { db } from '../db/client'
+import cheerio from 'cheerio'
+import pdf from 'pdf-parse'
+import { callLLM } from './llm-provider'
+
+export async function generateKnowledgeMetadata(text: string): Promise<{ category: string, tags: string[] }> {
+  try {
+    const prompt = `
+      Analyze the following text from a consultancy knowledge base.
+      Extract a single category from this list: [general, article, case-study, benchmark, mental-model, playbook].
+      Also extract up to 5 relevant strategic tags (e.g., "pricing", "retention", "marketing-psychology").
+      
+      Respond only in valid JSON format: {"category": "...", "tags": ["...", "..."]}
+      
+      TEXT:
+      ${text.slice(0, 4000)}
+    `
+    const { text: response } = await callLLM({
+      messages: [{ role: 'user', content: prompt }],
+      systemPrompt: 'You are a metadata extraction engine for a strategic consultancy.',
+      chain: 'assessment',
+      maxTokens: 500
+    })
+    
+    // Clean JSON response (Claude sometimes wraps in ```json ... ```)
+    const cleanJson = response.replace(/```json/g, '').replace(/```/g, '').trim()
+    return JSON.parse(cleanJson)
+  } catch (err) {
+    console.error('Auto-tagging failed:', err)
+    return { category: 'general', tags: [] }
+  }
+}
 
 export async function getEmbedding(text: string): Promise<number[]> {
   const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY || ''
@@ -42,19 +73,35 @@ function chunkText(text: string): string[] {
   const overlapChars = CHUNK_OVERLAP * 4
   const chunks: string[] = []
   let start = 0
-  while (start < text.length) {
-    const end = Math.min(start + chunkChars, text.length)
-    chunks.push(text.slice(start, end).trim())
-    if (end === text.length) break
+  const cleanText = text.replace(/\s+/g, ' ').trim()
+  while (start < cleanText.length) {
+    const end = Math.min(start + chunkChars, cleanText.length)
+    chunks.push(cleanText.slice(start, end).trim())
+    if (end === cleanText.length) break
     start += chunkChars - overlapChars
   }
   return chunks.filter((c) => c.length > 0)
 }
 
+/**
+ * Core ingestion logic for plain text/markdown
+ */
 export async function ingestMarkdown(
   markdownText: string,
-  sourceName: string
+  sourceName: string,
+  category?: string,
+  tags: string[] = []
 ): Promise<number> {
+  let finalCategory = category
+  let finalTags = tags
+
+  // If no category provided or it's 'general', try auto-tagging
+  if (!finalCategory || finalCategory === 'general') {
+    const metadata = await generateKnowledgeMetadata(markdownText)
+    finalCategory = finalCategory || metadata.category
+    if (finalTags.length === 0) finalTags = metadata.tags
+  }
+
   await db.query('DELETE FROM knowledge_chunks WHERE source_name = $1', [sourceName])
 
   const chunks = chunkText(markdownText)
@@ -62,21 +109,56 @@ export async function ingestMarkdown(
 
   const allEmbeddings: number[][] = []
 
+  // Batching isn't natively supported by this specific Gemini endpoint easily for large sets, 
+  // so we still loop but with a slightly more robust error handling
   for (let i = 0; i < chunks.length; i++) {
-    console.log(`Embedding chunk ${i + 1}/${chunks.length}...`)
-    allEmbeddings.push(await getEmbedding(chunks[i]))
+    try {
+      allEmbeddings.push(await getEmbedding(chunks[i]))
+    } catch (err) {
+      console.error(`Failed to embed chunk ${i} for ${sourceName}:`, err)
+      // If one fails, we stop this source to prevent partial/corrupt index
+      throw err 
+    }
   }
 
   for (let i = 0; i < chunks.length; i++) {
     await db.query(
-      `INSERT INTO knowledge_chunks (content, embedding, source_name, chunk_index)
-       VALUES ($1, $2, $3, $4)`,
-      [chunks[i], `[${allEmbeddings[i].join(',')}]`, sourceName, i]
+      `INSERT INTO knowledge_chunks (content, embedding, source_name, chunk_index, category, tags)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [chunks[i], `[${allEmbeddings[i].join(',')}]`, sourceName, i, category, JSON.stringify(tags)]
     )
   }
 
   invalidateKnowledgeCache()
   return chunks.length
+}
+
+/**
+ * URL Scraper
+ */
+export async function ingestUrl(url: string, sourceName: string, category: string = 'article'): Promise<number> {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Failed to fetch URL: ${res.status}`)
+  const html = await res.text()
+  
+  const $ = cheerio.load(html)
+  
+  // Remove scripts, styles, nav, footer
+  $('script, style, nav, footer, iframe, aside').remove()
+  
+  // Try to get primary content
+  const content = $('article, main, .content, #content, .post-content').text() || $('body').text()
+  const cleanContent = content.replace(/\n\s*\n/g, '\n').trim()
+  
+  return ingestMarkdown(cleanContent, sourceName, category, [url])
+}
+
+/**
+ * PDF Parser
+ */
+export async function ingestPdf(buffer: Buffer, sourceName: string, category: string = 'document'): Promise<number> {
+  const data = await pdf(buffer)
+  return ingestMarkdown(data.text, sourceName, category)
 }
 
 export async function listKnowledgeSources(): Promise<

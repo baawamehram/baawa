@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 vi.mock('../db/client', () => ({ db: { query: vi.fn() } }))
 vi.mock('../services/email', () => ({
   sendMagicLink: vi.fn().mockResolvedValue(undefined),
+  sendProspectReplyNotification: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock('../middleware/portalAuth', () => ({
   requirePortalAuth: vi.fn((req: any, _res: any, next: any) => {

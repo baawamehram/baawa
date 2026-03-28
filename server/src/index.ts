@@ -243,6 +243,27 @@ async function startServer() {
     await db.query(`CREATE INDEX IF NOT EXISTS idx_notes_client_id ON client_notes(client_id)`)
     await db.query(`CREATE INDEX IF NOT EXISTS idx_assessments_onboarding ON assessments(email, status)`)
 
+    // Triple Intelligence Upgrade: Phase 1 Migrations
+    await db.query(`ALTER TABLE knowledge_chunks ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'general'`)
+    await db.query(`ALTER TABLE knowledge_chunks ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS events JSONB DEFAULT '[]'::jsonb`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS health_score INT DEFAULT 100`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS last_input_method VARCHAR(20)`)
+
+    // Sentinel Proposals Table (The Brain's Memory)
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS sentinel_proposals (
+        id SERIAL PRIMARY KEY,
+        session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
+        type VARCHAR(50) NOT NULL,
+        observation TEXT NOT NULL,
+        proposal TEXT NOT NULL,
+        behavioral_frame VARCHAR(100),
+        status VARCHAR(20) DEFAULT 'open',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+
     console.log('Startup migrations + indices OK')
   } catch (err) {
     console.error('Startup migration error:', err)

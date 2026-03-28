@@ -4,6 +4,7 @@ import { db } from '../db/client'
 import { generateDeferEmail } from '../services/deferEmail'
 import { sendOnboardEmail, sendDeferEmail, sendMessageNotification } from '../services/email'
 import { ConversationTurn } from '../services/questioning'
+import { conductDiscovery, getAllOpenFindings, getSessionFindings } from '../services/sentinelAgent'
 import { scoreConversation } from '../services/scoring'
 import { requireAuth } from '../middleware/auth'
 
@@ -278,6 +279,97 @@ router.put('/:id/identity', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('PUT /assessments/:id/identity error:', err)
     res.status(500).json({ error: 'Failed to update identity' })
+  }
+})
+
+// GET /api/assessments/:id/analytics — fetch granular engagement metadata
+router.get('/:id/analytics', async (req: Request, res: Response) => {
+  try {
+    const result = await db.query(
+      `SELECT sa.*, a.email, a.founder_name, a.company_name
+       FROM session_analytics sa
+       JOIN assessments a ON a.id = sa.assessment_id
+       WHERE a.id = $1`,
+      [req.params.id]
+    )
+    if (!result.rows[0]) {
+      // Try fetching by session_id if it's a UUID
+      const sessionResult = await db.query(
+        `SELECT * FROM session_analytics WHERE session_id = $1`,
+        [req.params.id]
+      )
+      if (!sessionResult.rows[0]) return res.status(404).json({ error: 'Analytics not found' })
+      return res.json(sessionResult.rows[0])
+    }
+    res.json(result.rows[0])
+  } catch (err) {
+    console.error('GET /assessments/:id/analytics error:', err)
+    res.status(500).json({ error: 'Failed to fetch analytics' })
+  }
+})
+
+// ── Sentinel (Discovery) API ──
+
+router.post('/:id/sentinel', async (req, res) => {
+  try {
+    const findings = await conductDiscovery(req.params.id)
+    res.json({ success: true, count: findings.length, findings })
+  } catch (err) {
+    console.error('[SENTINEL_DISCOVERY] Error:', err)
+    res.status(500).json({ error: 'Discovery failed' })
+  }
+})
+
+router.get('/sentinel/proposals', async (req, res) => {
+  try {
+    const proposals = await getAllOpenFindings()
+    res.json(proposals)
+  } catch (err) {
+    console.error('[SENTINEL_PROPOSALS] Error:', err)
+    res.status(500).json({ error: 'Failed to fetch proposals' })
+  }
+})
+
+// ── Sentinel (Discovery) API ──
+
+router.post('/:id/sentinel', async (req, res) => {
+  try {
+    const findings = await conductDiscovery(req.params.id)
+    res.json({ success: true, count: findings.length, findings })
+  } catch (err) {
+    console.error('[SENTINEL_DISCOVERY] Error:', err)
+    res.status(500).json({ error: 'Discovery failed' })
+  }
+})
+
+router.get('/:id/sentinel/proposals', async (req, res) => {
+  try {
+    const findings = await getSessionFindings(req.params.id)
+    res.json(findings)
+  } catch (err) {
+    console.error('[SENTINEL_SESSION_PROPOSALS] Error:', err)
+    res.status(500).json({ error: 'Failed to fetch proposals' })
+  }
+})
+
+router.get('/sentinel/proposals', async (_req, res) => {
+  try {
+    const proposals = await getAllOpenFindings()
+    res.json(proposals)
+  } catch (err) {
+    console.error('[SENTINEL_PROPOSALS] Error:', err)
+    res.status(500).json({ error: 'Failed to fetch proposals' })
+  }
+})
+
+router.patch('/sentinel/:id/status', async (req, res) => {
+  const { status } = req.body
+  try {
+    await db.query('UPDATE sentinel_proposals SET status = $1 WHERE id = $2', [status, req.params.id])
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[SENTINEL_STATUS] Error:', err)
+    res.status(500).json({ error: 'Failed to update status' })
   }
 })
 

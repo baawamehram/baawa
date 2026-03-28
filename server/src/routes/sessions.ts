@@ -79,17 +79,22 @@ router.post('/start', async (req: Request, res: Response) => {
 router.post('/:id/answer', async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const parsed = z.object({ answer: z.string().min(1).max(5000) }).safeParse(req.body)
+    const parsed = z.object({ 
+      answer: z.string().min(1).max(5000),
+      inputType: z.enum(['voice', 'text']).optional(),
+      clientLatency: z.number().optional()
+    }).safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: 'Invalid answer' })
 
-    const { answer } = parsed.data
+    const { answer, inputType, clientLatency } = parsed.data
 
     const sessionResult = await db.query<{
       conversation: ConversationTurn[]
       question_count: number
       status: string
+      journey_config_version: number | null
     }>(
-      'SELECT conversation, question_count, status FROM sessions WHERE id = $1',
+      'SELECT conversation, question_count, status, journey_config_version FROM sessions WHERE id = $1',
       [id]
     )
 
@@ -101,10 +106,7 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
 
     // Server-side hard cap: if already at 25 questions, signal done
     if (session.question_count >= 25) {
-      await db.query(
-        `UPDATE sessions SET status = 'completed' WHERE id = $1`,
-        [id]
-      )
+      await db.query(`UPDATE sessions SET status = 'completed' WHERE id = $1`, [id])
       return res.json({ done: true })
     }
 
@@ -114,13 +116,52 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       { role: 'user', content: answer },
     ]
 
+    // --- REAL-TIME HEARTBEAT (Update Analytics) ---
+    void (async () => {
+      try {
+        const stats = computeAnswerStats(updatedConversation)
+        const newEvent = {
+          step: session.question_count,
+          inputType: inputType ?? 'unknown',
+          latency: clientLatency ?? 0,
+          words: answer.trim().split(/\s+/).length,
+          timestamp: new Date().toISOString()
+        }
+
+        await db.query(
+          `INSERT INTO session_analytics 
+           (session_id, question_count, avg_answer_words, min_answer_words, max_answer_words, drop_off_at_question, journey_config_version, events, last_input_method)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           ON CONFLICT (session_id) DO UPDATE SET
+             question_count = EXCLUDED.question_count,
+             avg_answer_words = EXCLUDED.avg_answer_words,
+             min_answer_words = EXCLUDED.min_answer_words,
+             max_answer_words = EXCLUDED.max_answer_words,
+             drop_off_at_question = EXCLUDED.question_count,
+             events = session_analytics.events || EXCLUDED.events,
+             last_input_method = EXCLUDED.last_input_method`,
+          [
+            id, 
+            stats.question_count, 
+            stats.avg_answer_words, 
+            stats.min_answer_words, 
+            stats.max_answer_words, 
+            stats.question_count,
+            session.journey_config_version,
+            JSON.stringify([newEvent]),
+            inputType ?? 'unknown'
+          ]
+        )
+      } catch (e) {
+        console.error('[heartbeat] Failed to update analytics:', e)
+      }
+    })()
+
     const result = await generateNextQuestion(updatedConversation, answer)
 
     if (result.done) {
       await db.query(
-        `UPDATE sessions
-         SET conversation = $1, status = 'completed'
-         WHERE id = $2`,
+        `UPDATE sessions SET conversation = $1, status = 'completed' WHERE id = $2`,
         [JSON.stringify(updatedConversation), id]
       )
       return res.json({ done: true })
@@ -133,9 +174,7 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
     ]
 
     await db.query(
-      `UPDATE sessions
-       SET conversation = $1, question_count = question_count + 1
-       WHERE id = $2`,
+      `UPDATE sessions SET conversation = $1, question_count = question_count + 1 WHERE id = $2`,
       [JSON.stringify(newConversation), id]
     )
 

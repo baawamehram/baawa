@@ -29,8 +29,9 @@ async function getEmbedding(text: string): Promise<number[]> {
 
 export async function retrieveRelevantChunks(
   queryText: string,
-  topK = 3
+  options: { topK?: number; category?: string } = {}
 ): Promise<string[]> {
+  const { topK = 3, category } = options
   let embedding: number[]
   try {
     embedding = await getEmbedding(queryText)
@@ -39,13 +40,20 @@ export async function retrieveRelevantChunks(
     return []
   }
 
+  const values: any[] = [`[${embedding.join(',')}]`, topK]
+  let whereClause = 'WHERE is_active = true'
+  if (category) {
+    whereClause += ' AND category = $3'
+    values.push(category)
+  }
+
   const result = await db.query<{ content: string }>(
     `SELECT content
      FROM knowledge_chunks
-     WHERE is_active = true
+     ${whereClause}
      ORDER BY embedding <=> $1
      LIMIT $2`,
-    [`[${embedding.join(',')}]`, topK]
+    values
   )
 
   return result.rows.map((r) => r.content)

@@ -19,7 +19,7 @@ export interface SessionState {
 export interface UseSessionReturn {
   state: SessionState
   startSession: () => Promise<void>
-  submitAnswer: (answer: string) => Promise<void>
+  submitAnswer: (answer: string, meta?: { inputType: 'voice' | 'text', latency: number }) => Promise<void>
   // New setters
   setIntakeData: (data: { name?: string; region?: string; country?: string; language?: string }) => void
   setEmail: (email: string) => void
@@ -70,14 +70,18 @@ export function useSession(): UseSessionReturn {
   }, [state.loading, state.sessionId, state.name, state.region, state.country, state.language, state.email])
 
   const submitAnswer = useCallback(
-    async (answer: string) => {
+    async (answer: string, meta?: { inputType: 'voice' | 'text', latency: number }) => {
       if (!state.sessionId) return
       setState((s) => ({ ...s, loading: true, error: null }))
       try {
         const res = await fetch(`${API_URL}/api/sessions/${state.sessionId}/answer`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answer }),
+          body: JSON.stringify({ 
+            answer,
+            inputType: meta?.inputType,
+            clientLatency: meta?.latency
+          }),
         })
         if (!res.ok) throw new Error(`Failed to submit answer: ${res.status}`)
         const data = (await res.json()) as {
@@ -88,7 +92,7 @@ export function useSession(): UseSessionReturn {
         setState((s) => ({
           ...s,
           question: data.done ? null : data.question,
-          questionCount: data.questionCount,
+          questionCount: data.questionCount || (s.questionCount + 1),
           done: data.done,
           loading: false,
         }))

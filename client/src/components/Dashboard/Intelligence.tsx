@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { API_URL } from '../../lib/api'
 import { useDashboardTheme } from './ThemeContext'
+import { FunnelAnalytics } from './FunnelAnalytics'
+
+interface FunnelStep {
+  step: number
+  count: number
+  avg_latency: number
+  voice_ratio: number
+  avg_words: number
+}
 
 interface MetricsWindow {
   completion_rate: number | null
@@ -35,6 +44,18 @@ interface ConfigDetail extends ConfigVersion {
   reasoning: string
 }
 
+interface SentinelProposal {
+  id: number
+  session_id: string
+  founder_email: string
+  type: 'friction' | 'optimization' | 'anomaly'
+  observation: string
+  proposal: string
+  behavioral_frame: string
+  status: 'open' | 'applied' | 'dismissed'
+  created_at: string
+}
+
 interface Props {
   token: string
   on401: () => void
@@ -42,7 +63,7 @@ interface Props {
 
 const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}` })
 
-function fmt(n: number | null, suffix = '') {
+function fmt(n: number | string | null, suffix = '') {
   return n === null ? '—' : `${n}${suffix}`
 }
 
@@ -74,16 +95,25 @@ export function Intelligence({ token, on401 }: Props) {
   const [optimizing, setOptimizing] = useState(false)
   const [optimizeResult, setOptimizeResult] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [proposals, setProposals] = useState<SentinelProposal[]>([])
+  const [funnelData, setFunnelData] = useState<FunnelStep[]>([])
+  const [totalStarted, setTotalStarted] = useState(0)
 
   const fetchData = async () => {
     try {
-      const [metricsRes, configsRes] = await Promise.all([
+      const [metricsRes, configsRes, proposalsRes, funnelRes] = await Promise.all([
         fetch(`${API_URL}/api/journey/metrics`, { headers: authHeaders(token) }),
         fetch(`${API_URL}/api/journey/config`, { headers: authHeaders(token) }),
+        fetch(`${API_URL}/api/assessments/sentinel/proposals`, { headers: authHeaders(token) }),
+        fetch(`${API_URL}/api/journey/funnel`, { headers: authHeaders(token) }),
       ])
-      if (metricsRes.status === 401 || configsRes.status === 401) { on401(); return }
+      if (metricsRes.status === 401 || configsRes.status === 401 || proposalsRes.status === 401 || funnelRes.status === 401) { on401(); return }
       setMetrics(await metricsRes.json())
       setConfigs(await configsRes.json())
+      setProposals(await proposalsRes.json())
+      const funnel = await funnelRes.json()
+      setFunnelData(funnel.steps)
+      setTotalStarted(funnel.totalStarted)
     } catch (e) {
       console.error('Intelligence fetch error:', e)
     } finally {
@@ -115,6 +145,15 @@ export function Intelligence({ token, on401 }: Props) {
       headers: authHeaders(token),
     })
     setSelectedConfig(null)
+    void fetchData()
+  }
+
+  const handleUpdateProposal = async (id: number, status: 'applied' | 'dismissed') => {
+    await fetch(`${API_URL}/api/assessments/sentinel/${id}/status`, {
+      method: 'PATCH',
+      headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    })
     void fetchData()
   }
 
@@ -152,7 +191,7 @@ export function Intelligence({ token, on401 }: Props) {
   }
 
   // Zero State: No metrics yet
-  if (!metrics || !metrics.windows['30d'].completion_rate && configs.length <= 1) {
+  if (!metrics || (!metrics.windows['30d'].completion_rate && configs.length <= 1)) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto', fontFamily: "'Outfit', sans-serif" }}>
         <div style={{ fontSize: '48px', marginBottom: '20px' }}>👁️</div>
@@ -207,10 +246,10 @@ export function Intelligence({ token, on401 }: Props) {
       {/* Metrics strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
         {[
-          { label: 'Completion Rate', value: fmt(w?.completion_rate ?? null, '%') },
-          { label: 'Avg Answer Depth', value: fmt(w?.avg_answer_words ?? null, ' words') },
-          { label: 'Score Mean', value: fmt(w?.score_mean ?? null, '/100') },
-          { label: 'Score Std Dev', value: fmt(w?.score_std ?? null, '') },
+          { label: 'Completion Rate', value: fmt(w?.completion_rate ? (w.completion_rate * 100).toFixed(1) : null, '%') },
+          { label: 'Avg Answer Depth', value: fmt(w?.avg_answer_words ? Math.round(w.avg_answer_words) : null, ' words') },
+          { label: 'Score Mean', value: fmt(w?.score_mean ? Math.round(w.score_mean) : null, '/100') },
+          { label: 'Score Std Dev', value: fmt(w?.score_std ? Math.round(w.score_std) : null, '') },
         ].map(({ label, value }) => (
           <div key={label} style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '14px 16px' }}>
             <p style={{ color: theme.textMuted, fontSize: '11px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px 0' }}>{label}</p>
@@ -240,6 +279,50 @@ export function Intelligence({ token, on401 }: Props) {
           </button>
         ))}
       </div>
+
+      {/* Funnel Analytics Section */}
+      <FunnelAnalytics data={funnelData} totalStarted={totalStarted} />
+
+      {/* Sentinel Findings Inbox */}
+      {proposals.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <span style={{ fontSize: '18px' }}>🛰️</span>
+            <h3 style={{ color: theme.text, fontSize: '16px', fontWeight: 600, margin: 0 }}>Cosmic Sentinel Insights</h3>
+          </div>
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {proposals.map((p) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '10px', padding: '16px' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: p.type === 'friction' ? '#FF6B3520' : '#4ade8020', color: p.type === 'friction' ? '#FF6B35' : '#4ade80', textTransform: 'uppercase', marginRight: '8px' }}>
+                      {p.type}
+                    </span>
+                    <span style={{ fontSize: '10px', border: `1px solid ${theme.border}`, color: theme.textMuted, padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                      {p.behavioral_frame}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '11px', color: theme.textMuted }}>{p.founder_email}</span>
+                </div>
+                <p style={{ color: theme.text, fontSize: '14px', margin: '0 0 8px 0', lineHeight: 1.5 }}>{p.observation}</p>
+                <div style={{ background: theme.input, borderRadius: '6px', padding: '10px', marginBottom: '12px' }}>
+                  <p style={{ color: '#FF6B35', fontSize: '12px', fontWeight: 700, margin: '0 0 4px 0', textTransform: 'uppercase' }}>Proposal</p>
+                  <p style={{ color: theme.text, fontSize: '13px', margin: 0 }}>{p.proposal}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => void handleUpdateProposal(p.id, 'applied')} style={{ background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Apply</button>
+                  <button onClick={() => void handleUpdateProposal(p.id, 'dismissed')} style={{ background: 'transparent', color: theme.textMuted, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '6px 14px', fontSize: '12px', cursor: 'pointer' }}>Dismiss</button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Score distribution */}
       {w?.score_distribution && (

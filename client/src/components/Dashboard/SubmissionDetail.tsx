@@ -45,6 +45,16 @@ interface Assessment {
   company_name?: string
 }
 
+interface SentinelProposal {
+  id: number
+  type: 'friction' | 'optimization' | 'anomaly'
+  observation: string
+  proposal: string
+  behavioral_frame: string
+  status: 'open' | 'applied' | 'dismissed'
+  created_at: string
+}
+
 interface Props {
   id: number
   token: string
@@ -83,6 +93,8 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const [messageBody, setMessageBody] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
+  const [sentinelProposals, setSentinelProposals] = useState<SentinelProposal[]>([])
+  const [isScanning, setIsScanning] = useState(false)
 
   // Identity state
   const [isEditingIdentity, setIsEditingIdentity] = useState(false)
@@ -128,6 +140,10 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
       if (msgsRes?.ok) setMessages(await msgsRes.json())
       if (callRes?.ok) setCall(await callRes.json())
       if (propRes?.ok) setProposals(await propRes.json())
+
+      // Fetch Sentinel Proposals for this session
+      const sentRes = await authFetch(`${API_URL}/api/assessments/${id}/sentinel/proposals`, token, on401)
+      if (sentRes?.ok) setSentinelProposals(await sentRes.json())
     } catch {
       setError('Network error loading detailed view.')
     } finally {
@@ -233,6 +249,24 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
     } catch { setError('Failed to send proposal.') }
   }
 
+  const runSentinel = async () => {
+    setIsScanning(true)
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/assessments/${id}/sentinel`, token, on401, { method: 'POST' })
+      if (res?.ok) {
+        setActionMsg('Sentinel discovery complete.')
+        void loadAll()
+      } else {
+        setError('Sentinel scan failed.')
+      }
+    } catch {
+      setError('Network error during scanning.')
+    } finally {
+      setIsScanning(false)
+    }
+  }
+
   if (loading) return <p style={{ color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
   if (!assessment) return <p style={{ color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>Assessment not found.</p>
 
@@ -331,6 +365,36 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
             ) : (
               <p style={{ color: theme.textMuted, fontSize: '14px', fontStyle: 'italic' }}>AI is still classifying this assessment based on the interview transcript...</p>
             )}
+          </div>
+
+          {/* Cosmic Sentinel Findings */}
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: theme.text, margin: 0 }}>🛸 Cosmic Sentinel Insights</h3>
+              <button 
+                onClick={runSentinel} 
+                disabled={isScanning}
+                style={{ background: isScanning ? theme.border : theme.text, color: theme.bg, border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: isScanning ? 'default' : 'pointer' }}
+              >
+                {isScanning ? 'SCANNING...' : 'TRIGGER DIAGNOSTIC'}
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {sentinelProposals.map(p => (
+                <div key={p.id} style={{ background: theme.input, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '12px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '9px', fontWeight: 800, padding: '2px 5px', borderRadius: '4px', background: p.type === 'friction' ? '#FF6B3520' : '#4ade8020', color: p.type === 'friction' ? '#FF6B35' : '#4ade80', textTransform: 'uppercase' }}>{p.type}</span>
+                    <span style={{ fontSize: '9px', border: `1px solid ${theme.border}`, color: theme.textMuted, padding: '2px 5px', borderRadius: '4px', fontWeight: 600 }}>{p.behavioral_frame}</span>
+                  </div>
+                  <p style={{ color: theme.text, fontSize: '13px', margin: '0 0 8px 0', lineHeight: 1.4 }}><b>Observation:</b> {p.observation}</p>
+                  <p style={{ color: theme.accent, fontSize: '12px', margin: 0 }}><b>Proposal:</b> {p.proposal}</p>
+                </div>
+              ))}
+              {sentinelProposals.length === 0 && !isScanning && (
+                <p style={{ color: theme.textMuted, fontSize: '13px', fontStyle: 'italic' }}>No diagnostic findings. Trigger a manual scan to analyze the "Golden Path".</p>
+              )}
+            </div>
           </div>
 
           {/* Call Scheduler Card */}
