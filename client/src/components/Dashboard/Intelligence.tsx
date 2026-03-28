@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { API_URL } from '../../lib/api'
+import { useDashboardTheme } from './ThemeContext'
 
 interface MetricsWindow {
   completion_rate: number | null
@@ -45,19 +46,19 @@ function fmt(n: number | null, suffix = '') {
   return n === null ? '—' : `${n}${suffix}`
 }
 
-function ScoreBar({ label, pct }: { label: string; pct: number }) {
+function ScoreBar({ label, pct, theme }: { label: string; pct: number, theme: any }) {
   return (
     <div style={{ marginBottom: '6px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-        <span style={{ fontSize: '11px', color: '#666666' }}>{label}</span>
-        <span style={{ fontSize: '11px', color: '#666666' }}>{pct}</span>
+        <span style={{ fontSize: '11px', color: theme.textMuted }}>{label}</span>
+        <span style={{ fontSize: '11px', color: theme.textMuted }}>{pct}</span>
       </div>
-      <div style={{ height: '4px', background: '#333333', borderRadius: '2px', overflow: 'hidden' }}>
+      <div style={{ height: '4px', background: theme.border, borderRadius: '2px', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(pct * 2, 100)}%` }}
           transition={{ duration: 0.6 }}
-          style={{ height: '100%', background: '#ffffff', borderRadius: '2px' }}
+          style={{ height: '100%', background: theme.text, borderRadius: '2px' }}
         />
       </div>
     </div>
@@ -65,6 +66,7 @@ function ScoreBar({ label, pct }: { label: string; pct: number }) {
 }
 
 export function Intelligence({ token, on401 }: Props) {
+  const { theme, isDark } = useDashboardTheme()
   const [metrics, setMetrics] = useState<MetricsResponse | null>(null)
   const [configs, setConfigs] = useState<ConfigVersion[]>([])
   const [selectedConfig, setSelectedConfig] = useState<ConfigDetail | null>(null)
@@ -143,7 +145,7 @@ export function Intelligence({ token, on401 }: Props) {
 
   if (loading) {
     return (
-      <div style={{ padding: '32px 0', textAlign: 'center', color: '#666666', fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ padding: '32px 0', textAlign: 'center', color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>
         Loading intelligence data…
       </div>
     )
@@ -154,13 +156,13 @@ export function Intelligence({ token, on401 }: Props) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto', fontFamily: "'Outfit', sans-serif" }}>
         <div style={{ fontSize: '48px', marginBottom: '20px' }}>👁️</div>
-        <h2 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 600, marginBottom: '12px' }}>Awaiting First Journey</h2>
-        <p style={{ color: '#888888', fontSize: '15px', lineHeight: 1.6, marginBottom: '32px' }}>
+        <h2 style={{ color: theme.text, fontSize: '24px', fontWeight: 600, marginBottom: '12px' }}>Awaiting First Journey</h2>
+        <p style={{ color: theme.textMuted, fontSize: '15px', lineHeight: 1.6, marginBottom: '32px' }}>
           The Intelligence engine needs data from completed assessments to generate insights and optimize your funnel. Start a "Cosmic Journey" on your landing page to see the stats appear here!
         </p>
         <button
           onClick={() => void fetchData()}
-          style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '10px 20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+          style={{ background: theme.primary, color: theme.primaryText, border: 'none', borderRadius: '6px', padding: '10px 20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
         >
           Refresh Data
         </button>
@@ -173,9 +175,9 @@ export function Intelligence({ token, on401 }: Props) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 600, margin: 0 }}>Journey Intelligence</h2>
+          <h2 style={{ color: theme.text, fontSize: '20px', fontWeight: 600, margin: 0 }}>Journey Intelligence</h2>
           {activeConfig && (
-            <p style={{ color: '#666666', fontSize: '12px', margin: '4px 0 0 0' }}>
+            <p style={{ color: theme.textMuted, fontSize: '12px', margin: '4px 0 0 0' }}>
               Config v{activeConfig.version} active
               {metrics?.active_config_activated_at
                 ? ` · activated ${new Date(metrics.active_config_activated_at).toLocaleDateString()}`
@@ -186,7 +188,7 @@ export function Intelligence({ token, on401 }: Props) {
         <button
           onClick={() => void handleOptimize()}
           disabled={optimizing}
-          style={{ background: optimizing ? 'rgba(255,255,255,0.2)' : '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: optimizing ? 'default' : 'pointer', fontFamily: "'Outfit', sans-serif" }}
+          style={{ background: optimizing ? theme.border : theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 700, cursor: optimizing ? 'default' : 'pointer', fontFamily: "'Outfit', sans-serif" }}
         >
           {optimizing ? 'Running…' : 'Run Optimizer'}
         </button>
@@ -196,7 +198,7 @@ export function Intelligence({ token, on401 }: Props) {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '10px 14px', marginBottom: '20px', color: '#aaaaaa', fontSize: '13px' }}
+          style={{ background: theme.input, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '10px 14px', marginBottom: '20px', color: theme.textMuted, fontSize: '13px' }}
         >
           {optimizeResult}
         </motion.div>
@@ -210,9 +212,9 @@ export function Intelligence({ token, on401 }: Props) {
           { label: 'Score Mean', value: fmt(w?.score_mean ?? null, '/100') },
           { label: 'Score Std Dev', value: fmt(w?.score_std ?? null, '') },
         ].map(({ label, value }) => (
-          <div key={label} style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '14px 16px' }}>
-            <p style={{ color: '#666666', fontSize: '11px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px 0' }}>{label}</p>
-            <p style={{ color: '#ffffff', fontSize: '22px', fontWeight: 700, margin: 0 }}>{value}</p>
+          <div key={label} style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '14px 16px' }}>
+            <p style={{ color: theme.textMuted, fontSize: '11px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px 0' }}>{label}</p>
+            <p style={{ color: theme.text, fontSize: '22px', fontWeight: 700, margin: 0 }}>{value}</p>
           </div>
         ))}
       </div>
@@ -224,9 +226,9 @@ export function Intelligence({ token, on401 }: Props) {
             key={d}
             onClick={() => setWindow(d)}
             style={{
-              background: window === d ? '#ffffff' : '#1a1a1a',
-              color: window === d ? '#000000' : '#666666',
-              border: `1px solid ${window === d ? '#ffffff' : '#333333'}`,
+              background: window === d ? theme.text : theme.input,
+              color: window === d ? theme.bg : theme.textMuted,
+              border: `1px solid ${window === d ? theme.text : theme.border}`,
               borderRadius: '6px',
               padding: '4px 12px',
               fontSize: '12px',
@@ -241,10 +243,10 @@ export function Intelligence({ token, on401 }: Props) {
 
       {/* Score distribution */}
       {w?.score_distribution && (
-        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
-          <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px', margin: '0 0 12px 0' }}>Score Distribution</p>
+        <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+          <p style={{ color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px', margin: '0 0 12px 0' }}>Score Distribution</p>
           {Object.entries(w.score_distribution).map(([bucket, count]) => (
-            <ScoreBar key={bucket} label={bucket} pct={count} />
+            <ScoreBar key={bucket} label={bucket} pct={count} theme={theme} />
           ))}
         </div>
       )}
@@ -256,17 +258,17 @@ export function Intelligence({ token, on401 }: Props) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '20px', marginBottom: '20px' }}
+            style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '20px', marginBottom: '20px' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
               <div>
-                <span style={{ background: '#333333', color: '#ffffff', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <span style={{ background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', color: theme.text, fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Awaiting Approval · High-Risk
                 </span>
-                <p style={{ color: '#ffffff', fontSize: '16px', fontWeight: 600, margin: '8px 0 4px 0' }}>
+                <p style={{ color: theme.text, fontSize: '16px', fontWeight: 600, margin: '8px 0 4px 0' }}>
                   Config v{pendingConfig.version}
                 </p>
-                <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>
+                <p style={{ color: theme.textMuted, fontSize: '14px', margin: 0 }}>
                   {pendingConfig.change_summary}
                 </p>
               </div>
@@ -274,19 +276,19 @@ export function Intelligence({ token, on401 }: Props) {
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => void loadConfigDetail(pendingConfig.id)}
-                style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #333333', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                style={{ background: theme.input, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '7px 14px', fontSize: '13px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
               >
                 Review Details
               </button>
               <button
                 onClick={() => void handleActivate(pendingConfig.id)}
-                style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                style={{ background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
               >
                 Activate
               </button>
               <button
                 onClick={() => void handleDismiss(pendingConfig.id)}
-                style={{ background: 'transparent', color: '#666666', border: '1px solid #333333', borderRadius: '6px', padding: '7px 14px', fontSize: '13px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                style={{ background: 'transparent', color: theme.textMuted, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '7px 14px', fontSize: '13px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
               >
                 Dismiss
               </button>
@@ -309,32 +311,32 @@ export function Intelligence({ token, on401 }: Props) {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
-              style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '28px', maxWidth: '700px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}
+              style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '28px', maxWidth: '700px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}
             >
-              <h3 style={{ color: '#ffffff', fontSize: '18px', fontWeight: 600, margin: '0 0 4px 0' }}>Config v{selectedConfig.version}</h3>
-              <p style={{ color: '#666666', fontSize: '13px', margin: '0 0 20px 0' }}>{selectedConfig.change_summary}</p>
+              <h3 style={{ color: theme.text, fontSize: '18px', fontWeight: 600, margin: '0 0 4px 0' }}>Config v{selectedConfig.version}</h3>
+              <p style={{ color: theme.textMuted, fontSize: '13px', margin: '0 0 20px 0' }}>{selectedConfig.change_summary}</p>
 
-              <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>Scoring Weights</p>
+              <p style={{ color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>Scoring Weights</p>
               <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
                 {Object.entries(selectedConfig.scoring_weights).map(([k, v]) => (
-                  <span key={k} style={{ background: '#1a1a1a', borderRadius: '6px', padding: '4px 10px', fontSize: '13px', color: '#ffffff' }}>
+                  <span key={k} style={{ background: theme.input, borderRadius: '6px', padding: '4px 10px', fontSize: '13px', color: theme.text }}>
                     {k}: <strong>{v}</strong>
                   </span>
                 ))}
               </div>
 
-              <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>Reasoning</p>
-              <p style={{ color: '#aaaaaa', fontSize: '13px', lineHeight: 1.6, margin: '0 0 20px 0' }}>{selectedConfig.reasoning}</p>
+              <p style={{ color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>Reasoning</p>
+              <p style={{ color: theme.textMuted, fontSize: '13px', lineHeight: 1.6, margin: '0 0 20px 0' }}>{selectedConfig.reasoning}</p>
 
-              <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>System Prompt</p>
-              <pre style={{ background: '#000000', border: '1px solid #333333', borderRadius: '6px', padding: '14px', fontSize: '11px', color: '#aaaaaa', overflowX: 'auto', whiteSpace: 'pre-wrap', margin: '0 0 20px 0' }}>
+              <p style={{ color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px 0' }}>System Prompt</p>
+              <pre style={{ background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '14px', fontSize: '11px', color: theme.textMuted, overflowX: 'auto', whiteSpace: 'pre-wrap', margin: '0 0 20px 0' }}>
                 {selectedConfig.system_prompt}
               </pre>
 
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setSelectedConfig(null)}
-                  style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #333333', borderRadius: '6px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                  style={{ background: theme.input, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                 >
                   Close
                 </button>
@@ -342,13 +344,13 @@ export function Intelligence({ token, on401 }: Props) {
                   <>
                     <button
                       onClick={() => void handleActivate(selectedConfig.id)}
-                      style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                      style={{ background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '8px 16px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       Activate
                     </button>
                     <button
                       onClick={() => void handleDismiss(selectedConfig.id)}
-                      style={{ background: 'transparent', color: '#666666', border: '1px solid #333333', borderRadius: '6px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                      style={{ background: 'transparent', color: theme.textMuted, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       Dismiss
                     </button>
@@ -361,30 +363,30 @@ export function Intelligence({ token, on401 }: Props) {
       </AnimatePresence>
 
       {/* Version history */}
-      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', overflow: 'hidden' }}>
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #333333' }}>
-          <p style={{ color: '#666666', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Version History</p>
+      <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', overflow: 'hidden' }}>
+        <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.border}` }}>
+          <p style={{ color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Version History</p>
         </div>
         {configs.length === 0 && (
-          <p style={{ color: '#666666', fontSize: '13px', padding: '16px', margin: 0 }}>No config versions yet.</p>
+          <p style={{ color: theme.textMuted, fontSize: '13px', padding: '16px', margin: 0 }}>No config versions yet.</p>
         )}
         {configs.map((c) => {
           const statusColor: Record<string, string> = {
             active: '#4ade80',
-            proposed: '#ffffff',
-            archived: '#666666',
+            proposed: theme.text,
+            archived: theme.textMuted,
             dismissed: '#f87171',
           }
           return (
             <div
               key={c.id}
               onClick={() => void loadConfigDetail(c.id)}
-              style={{ padding: '12px 16px', borderBottom: '1px solid #222222', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#1a1a1a' }}
+              style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? '#222222' : '#f0f0f0'}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'background 0.2s' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ color: '#666666', fontSize: '12px', minWidth: '40px' }}>v{c.version}</span>
+                <span style={{ color: theme.textMuted, fontSize: '12px', minWidth: '40px' }}>v{c.version}</span>
                 <span
                   style={{
                     fontSize: '10px',
@@ -399,9 +401,9 @@ export function Intelligence({ token, on401 }: Props) {
                 >
                   {c.status}
                 </span>
-                <span style={{ color: '#aaaaaa', fontSize: '13px' }}>{c.change_summary}</span>
+                <span style={{ color: theme.text, fontSize: '13px' }}>{c.change_summary}</span>
               </div>
-              <span style={{ color: '#666666', fontSize: '11px' }}>
+              <span style={{ color: theme.textMuted, fontSize: '11px' }}>
                 {new Date(c.created_at).toLocaleDateString()}
               </span>
             </div>

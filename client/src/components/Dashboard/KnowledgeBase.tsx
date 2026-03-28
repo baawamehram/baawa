@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { API_URL, authFetch } from '../../lib/api'
+import { useDashboardTheme } from './ThemeContext'
 
 interface KnowledgeSource {
   source_name: string
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export function KnowledgeBase({ token, on401 }: Props) {
+  const { theme, isDark } = useDashboardTheme()
   const [sources, setSources] = useState<KnowledgeSource[]>([])
   const [loading, setLoading] = useState(true)
   const [uploadName, setUploadName] = useState('')
@@ -152,11 +154,11 @@ export function KnowledgeBase({ token, on401 }: Props) {
     }
   }
 
-  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
+  if (loading) return <p style={{ color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
 
   const cardStyle = {
-    background: '#111111',
-    border: '1px solid #333333',
+    background: theme.card,
+    border: `1px solid ${theme.border}`,
     borderRadius: '8px',
     padding: '24px',
     marginBottom: '20px',
@@ -164,7 +166,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 24px 0' }}>Knowledge Base</h2>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: theme.text, margin: '0 0 24px 0' }}>Knowledge Base</h2>
 
       {error && (
         <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '20px', fontSize: '14px' }}>
@@ -173,11 +175,11 @@ export function KnowledgeBase({ token, on401 }: Props) {
       )}
 
       {/* ── Sync Knowledge Base ── */}
-      <div style={{ ...cardStyle, border: syncing ? '1px solid rgba(255,107,53,0.4)' : '1px solid #333333' }}>
+      <div style={{ ...cardStyle, border: syncing ? '1px solid rgba(255,107,53,0.4)' : `1px solid ${theme.border}` }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: theme.text, margin: 0 }}>
                 Sync Knowledge Base
               </h3>
               {syncing && (
@@ -186,17 +188,17 @@ export function KnowledgeBase({ token, on401 }: Props) {
                 </span>
               )}
             </div>
-            <p style={{ fontSize: '13px', color: '#888888', margin: '0 0 12px', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 12px', lineHeight: 1.6 }}>
               Scrapes public white papers from HBR, McKinsey, BCG, Bain, Deloitte, Strategy+Business, MIT Sloan, and Accenture. Embeds and stores chunks into the RAG knowledge base.
             </p>
             {ingestStatus && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px' }}>
-                <span style={{ fontSize: 12, color: '#555' }}>
-                  Total active chunks: <span style={{ color: '#ffffff', fontWeight: 600 }}>{ingestStatus.totalActiveChunks.toLocaleString()}</span>
+                <span style={{ fontSize: 12, color: theme.textMuted }}>
+                  Total active chunks: <span style={{ color: theme.text, fontWeight: 600 }}>{ingestStatus.totalActiveChunks.toLocaleString()}</span>
                 </span>
                 {ingestStatus.lastRun && (
-                  <span style={{ fontSize: 12, color: '#555' }}>
-                    Last sync: <span style={{ color: '#aaa' }}>{new Date(ingestStatus.lastRun).toLocaleString()}</span>
+                  <span style={{ fontSize: 12, color: theme.textMuted }}>
+                    Last sync: <span style={{ color: theme.textMuted }}>{new Date(ingestStatus.lastRun).toLocaleString()}</span>
                   </span>
                 )}
                 {ingestStatus.lastError && (
@@ -233,13 +235,13 @@ export function KnowledgeBase({ token, on401 }: Props) {
 
         {/* Per-source status table */}
         {ingestStatus && ingestStatus.sources.length > 0 && (
-          <div style={{ marginTop: 20, borderTop: '1px solid #222', paddingTop: 16 }}>
-            <div style={{ fontSize: '11px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Ingested Sources</div>
+          <div style={{ marginTop: 20, borderTop: `1px solid ${theme.border}`, paddingTop: 16 }}>
+            <div style={{ fontSize: '11px', color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Ingested Sources</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
               {ingestStatus.sources.map(s => (
-                <div key={s.source_name} style={{ background: '#0d0d0d', border: '1px solid #222', borderRadius: 6, padding: '10px 12px' }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.source_name}</div>
-                  <div style={{ fontSize: 11, color: '#555' }}>
+                <div key={s.source_name} style={{ background: isDark ? '#0d0d0d' : 'rgba(0,0,0,0.03)', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.source_name}</div>
+                  <div style={{ fontSize: 11, color: theme.textMuted }}>
                     <span style={{ color: '#FF6B35', fontWeight: 700 }}>{parseInt(s.count).toLocaleString()}</span> chunks
                     {s.last_ingested && (
                       <span style={{ marginLeft: 6 }}>· {new Date(s.last_ingested).toLocaleDateString()}</span>
@@ -254,31 +256,31 @@ export function KnowledgeBase({ token, on401 }: Props) {
 
       {/* ── Upload ── */}
       <div style={cardStyle}>
-        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Upload Custom Source</h3>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, color: theme.text, margin: '0 0 16px 0' }}>Upload Custom Source</h3>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 140 }}>
-            <label style={{ color: '#aaaaaa', fontSize: '12px', marginBottom: '4px', display: 'block' }}>Source Name</label>
+            <label style={{ color: theme.textMuted, fontSize: '12px', marginBottom: '4px', display: 'block' }}>Source Name</label>
             <input
               type="text"
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               placeholder="e.g. pricing-guide"
-              style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
+              style={{ width: '100%', background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '8px 12px', color: theme.text, fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
             />
           </div>
           <div>
-            <label style={{ color: '#aaaaaa', fontSize: '12px', marginBottom: '4px', display: 'block' }}>File (.md)</label>
+            <label style={{ color: theme.textMuted, fontSize: '12px', marginBottom: '4px', display: 'block' }}>File (.md)</label>
             <input
               type="file"
               accept=".md"
               onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-              style={{ color: '#aaaaaa', fontSize: '14px', fontFamily: "'Outfit', sans-serif" }}
+              style={{ color: theme.textMuted, fontSize: '14px', fontFamily: "'Outfit', sans-serif" }}
             />
           </div>
           <button
             onClick={() => { void handleUpload() }}
             disabled={uploading || !uploadFile || !uploadName.trim()}
-            style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: (uploading || !uploadFile || !uploadName.trim()) ? 'default' : 'pointer', opacity: (uploading || !uploadFile || !uploadName.trim()) ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
+            style={{ background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: (uploading || !uploadFile || !uploadName.trim()) ? 'default' : 'pointer', opacity: (uploading || !uploadFile || !uploadName.trim()) ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
           >
             {uploading ? 'Uploading...' : 'Upload'}
           </button>
@@ -286,23 +288,23 @@ export function KnowledgeBase({ token, on401 }: Props) {
       </div>
 
       {/* ── Sources List ── */}
-      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', overflow: 'hidden' }}>
+      <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid #333333', textAlign: 'left' }}>
-              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Source</th>
-              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Chunks</th>
-              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Status</th>
-              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Actions</th>
+            <tr style={{ borderBottom: `1px solid ${theme.border}`, textAlign: 'left', background: 'rgba(0,0,0,0.02)' }}>
+              <th style={{ padding: '12px 24px', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Source</th>
+              <th style={{ padding: '12px 24px', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Chunks</th>
+              <th style={{ padding: '12px 24px', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Status</th>
+              <th style={{ padding: '12px 24px', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {sources.map((s) => (
-              <tr key={s.source_name} style={{ borderBottom: '1px solid #222222' }}>
-                <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px' }}>{s.source_name}</td>
-                <td style={{ padding: '16px 24px', color: '#aaaaaa', fontSize: '14px' }}>{s.chunk_count}</td>
+              <tr key={s.source_name} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                <td style={{ padding: '16px 24px', color: theme.text, fontSize: '14px' }}>{s.source_name}</td>
+                <td style={{ padding: '16px 24px', color: theme.textMuted, fontSize: '14px' }}>{s.chunk_count}</td>
                 <td style={{ padding: '16px 24px' }}>
-                  <span style={{ fontSize: '12px', color: s.is_active ? '#4ade80' : '#aaaaaa' }}>
+                  <span style={{ fontSize: '12px', color: s.is_active ? '#4ade80' : theme.textMuted }}>
                     {s.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -310,7 +312,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                       onClick={() => { void toggleActive(s.source_name, s.is_active) }}
-                      style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '4px', background: '#333333', color: '#ffffff', border: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                      style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '4px', background: theme.bg, color: theme.text, border: `1px solid ${theme.border}`, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
                     >
                       {s.is_active ? 'Deactivate' : 'Activate'}
                     </button>
@@ -326,7 +328,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
             ))}
             {sources.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ padding: '32px 24px', textAlign: 'center', color: '#aaaaaa', fontSize: '14px' }}>
+                <td colSpan={4} style={{ padding: '32px 24px', textAlign: 'center', color: theme.textMuted, fontSize: '14px' }}>
                   No knowledge sources yet. Run a sync or upload a file above.
                 </td>
               </tr>

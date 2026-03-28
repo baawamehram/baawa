@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { API_URL, authFetch } from '../../lib/api'
+import { useDashboardTheme } from './ThemeContext'
 
 interface ProblemDomain {
   domain: string
@@ -40,6 +41,8 @@ interface Assessment {
   created_at: string
   results_unlocked?: boolean
   problem_domains?: ProblemDomain[] | null
+  founder_name?: string
+  company_name?: string
 }
 
 interface Props {
@@ -69,6 +72,7 @@ const DOMAIN_COLORS: Record<string, string> = {
 }
 
 export function SubmissionDetail({ id, token, on401, onBack }: Props) {
+  const { theme, isDark } = useDashboardTheme()
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [loading, setLoading] = useState(true)
   const [notes, setNotes] = useState('')
@@ -193,14 +197,14 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
     } catch { setError('Failed to send proposal.') }
   }
 
-  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
-  if (!assessment) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Assessment not found.</p>
+  if (loading) return <p style={{ color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
+  if (!assessment) return <p style={{ color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>Assessment not found.</p>
 
   const breakdown = assessment.score_breakdown || {}
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif", paddingBottom: '100px' }}>
-      <button onClick={onBack} style={{ color: '#aaaaaa', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', marginBottom: '24px', display: 'inline-block', padding: 0 }}>
+      <button onClick={onBack} style={{ color: theme.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', marginBottom: '24px', display: 'inline-block', padding: 0 }}>
         &larr; Back to list
       </button>
 
@@ -208,11 +212,13 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', margin: 0 }}>{assessment.email}</h2>
-            <span style={{ fontSize: '12px', color: '#aaaaaa' }}>ID: {assessment.id}</span>
+            <h2 style={{ fontSize: '28px', fontWeight: 700, color: theme.text, margin: 0 }}>
+              {assessment.founder_name || assessment.email}
+            </h2>
+            <span style={{ fontSize: '12px', color: theme.textMuted }}>ID: {assessment.id} {assessment.company_name && `• ${assessment.company_name}`}</span>
           </div>
           <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
-            <span style={{ color: '#ffffff', background: '#333', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>{assessment.status}</span>
+            <span style={{ color: theme.primaryText, background: theme.primary, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{assessment.status}</span>
             {(assessment.problem_domains || []).map(d => (
               <span key={d.domain} style={{ background: `${DOMAIN_COLORS[d.domain] || '#FF6B35'}20`, color: DOMAIN_COLORS[d.domain] || '#FF6B35', border: `1px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}40`, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{d.domain}</span>
             ))}
@@ -231,13 +237,13 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                   }
                 } finally { setUnlocking(false) }
               }}
-              style={{ background: '#ffffff', color: '#000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', opacity: unlocking ? 0.5 : 1 }}
+              style={{ background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', opacity: unlocking ? 0.5 : 1 }}
             >
               Unlock Results
             </button>
           )}
-          <button onClick={() => handleAction('onboard')} style={{ background: '#FF6B35', color: '#000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Onboard</button>
-          <button onClick={() => handleAction('defer')} style={{ background: 'transparent', color: '#fff', border: '1px solid #333', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Defer</button>
+          <button onClick={() => handleAction('onboard')} style={{ background: theme.accent, color: '#000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Onboard</button>
+          <button onClick={() => handleAction('defer')} style={{ background: 'transparent', color: theme.text, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Defer</button>
         </div>
       </div>
 
@@ -250,36 +256,36 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* AI Intelligence Card */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', margin: '0 0 16px 0', borderBottom: '1px solid #222', paddingBottom: '12px' }}>AI Classification</h3>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: theme.text, margin: '0 0 16px 0', borderBottom: `1px solid ${theme.border}`, paddingBottom: '12px' }}>AI Classification</h3>
             {assessment.problem_domains && assessment.problem_domains.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {assessment.problem_domains.map((d, i) => (
-                  <div key={i} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', borderLeft: `3px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}` }}>
+                  <div key={i} style={{ background: theme.input, padding: '12px', borderRadius: '8px', borderLeft: `3px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontWeight: 700, color: '#fff', fontSize: '14px' }}>{d.domain} &middot; {d.subCategory}</span>
-                      <span style={{ color: '#FF6B35', fontSize: '12px', fontWeight: 700 }}>{d.confidence}% match</span>
+                      <span style={{ fontWeight: 700, color: theme.text, fontSize: '14px' }}>{d.domain} &middot; {d.subCategory}</span>
+                      <span style={{ color: theme.accent, fontSize: '12px', fontWeight: 700 }}>{d.confidence}% match</span>
                     </div>
-                    <p style={{ color: '#aaa', fontSize: '13px', margin: '6px 0 0', lineHeight: 1.5 }}>{d.rationale}</p>
+                    <p style={{ color: theme.textMuted, fontSize: '13px', margin: '6px 0 0', lineHeight: 1.5 }}>{d.rationale}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#555', fontSize: '14px', fontStyle: 'italic' }}>AI is still classifying this assessment based on the interview transcript...</p>
+              <p style={{ color: theme.textMuted, fontSize: '14px', fontStyle: 'italic' }}>AI is still classifying this assessment based on the interview transcript...</p>
             )}
           </div>
 
           {/* Call Scheduler Card */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', margin: 0 }}>Strategic Call</h3>
-              {!call && !showCallForm && <button onClick={() => setShowCallForm(true)} style={{ background: '#fff', color: '#000', border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>+ PROPOSE SLOTS</button>}
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: theme.text, margin: 0 }}>Strategic Call</h3>
+              {!call && !showCallForm && <button onClick={() => setShowCallForm(true)} style={{ background: theme.text, color: theme.bg, border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>+ PROPOSE SLOTS</button>}
             </div>
 
             {call && (
-              <div style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', border: `1px solid ${call.status === 'confirmed' ? '#4ade80' : '#333'}` }}>
+              <div style={{ background: theme.input, padding: '12px', borderRadius: '8px', border: `1px solid ${call.status === 'confirmed' ? '#4ade80' : theme.border}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                   <span style={{ fontSize: '13px', color: '#aaa' }}>Status: <b style={{ color: '#fff' }}>{call.status.toUpperCase()}</b></span>
+                   <span style={{ fontSize: '13px', color: theme.textMuted }}>Status: <b style={{ color: theme.text }}>{call.status.toUpperCase()}</b></span>
                    {call.status === 'pending' && <span style={{ color: '#facc15', fontSize: '11px' }}>Waiting for founder...</span>}
                 </div>
                 {call.selected_slot ? (
@@ -287,7 +293,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                     {new Date(call.selected_slot).toLocaleString()}
                   </div>
                 ) : (
-                  <div style={{ marginTop: '8px', color: '#aaa', fontSize: '12px' }}>Proposed: {call.proposed_slots.length} slots</div>
+                  <div style={{ marginTop: '8px', color: theme.textMuted, fontSize: '12px' }}>Proposed: {call.proposed_slots.length} slots</div>
                 )}
                 {call.meeting_link && <div style={{ marginTop: '8px', fontSize: '12px', color: '#3B82F6' }}>Link: {call.meeting_link}</div>}
               </div>
@@ -295,68 +301,79 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
 
             {showCallForm && (
               <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <label style={{ fontSize: '12px', color: '#aaa' }}>Propose up to 3 date/time options:</label>
+                <label style={{ fontSize: '12px', color: theme.textMuted }}>Propose up to 3 date/time options:</label>
                 {newSlots.map((s, i) => (
                   <div key={i} style={{ display: 'flex', gap: '8px' }}>
                     <input type="datetime-local" value={s.datetime} onChange={e => {
                         const next = [...newSlots]; next[i].datetime = e.target.value; setNewSlots(next);
-                    }} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '6px', flex: 2, fontSize: '13px' }} />
+                    }} style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '4px', padding: '6px', flex: 2, fontSize: '13px' }} />
                     <input placeholder="Label (e.g. Afternoon)" value={s.label} onChange={e => {
                         const next = [...newSlots]; next[i].label = e.target.value; setNewSlots(next);
-                    }} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '6px', flex: 1, fontSize: '13px' }} />
+                    }} style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '4px', padding: '6px', flex: 1, fontSize: '13px' }} />
                   </div>
                 ))}
-                <button onClick={() => setNewSlots([...newSlots, { datetime: '', label: '' }])} style={{ color: '#aaa', fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>+ Add Option</button>
-                <input placeholder="Meeting Link (GMeet/Zoom)" value={meetingLink} onChange={e => setMeetingLink(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '6px', fontSize: '13px' }} />
+                <button onClick={() => setNewSlots([...newSlots, { datetime: '', label: '' }])} style={{ color: theme.textMuted, fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>+ Add Option</button>
+                <input placeholder="Meeting Link (GMeet/Zoom)" value={meetingLink} onChange={e => setMeetingLink(e.target.value)} style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '4px', padding: '6px', fontSize: '13px' }} />
                 <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                  <button onClick={proposeCall} style={{ background: '#FF6B35', border: 'none', color: '#000', fontWeight: 700, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Send to Portal</button>
-                  <button onClick={() => setShowCallForm(false)} style={{ background: 'transparent', border: '1px solid #333', color: '#fff', padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+                  <button onClick={proposeCall} style={{ background: theme.accent, border: 'none', color: '#000', fontWeight: 700, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Send to Portal</button>
+                  <button onClick={() => setShowCallForm(false)} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: theme.text, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
                 </div>
               </div>
             )}
           </div>
 
           {/* Proposal Management */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-               <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', margin: 0 }}>Proposals</h3>
-               {!showPropForm && <button onClick={() => setShowPropForm(true)} style={{ background: '#fff', color: '#000', border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>+ NEW DRAFT</button>}
+               <h3 style={{ fontSize: '16px', fontWeight: 600, color: theme.text, margin: 0 }}>Proposals</h3>
+               {!showPropForm && <button onClick={() => setShowPropForm(true)} style={{ background: theme.text, color: theme.bg, border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>+ NEW DRAFT</button>}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {proposals.map(p => (
-                <div key={p.id} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={p.id} style={{ background: theme.input, padding: '12px', borderRadius: '8px', border: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>{p.title}</div>
-                    <div style={{ color: '#aaa', fontSize: '11px' }}>Total: £{p.total_price.toLocaleString()} &middot; Status: <span style={{ color: p.status === 'approved' ? '#4ade80' : p.status === 'sent' ? '#3B82F6' : '#facc15' }}>{p.status}</span></div>
+                    <div style={{ color: theme.text, fontSize: '14px', fontWeight: 600 }}>{p.title}</div>
+                    <div style={{ color: theme.textMuted, fontSize: '11px' }}>Total: £{p.total_price.toLocaleString()} &middot; Status: <span style={{ color: p.status === 'approved' ? '#4ade80' : p.status === 'sent' ? '#3B82F6' : '#facc15' }}>{p.status}</span></div>
                   </div>
                   {p.status === 'draft' && <button onClick={() => sendProposal(p.id)} style={{ background: '#3B82F6', border: 'none', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>SEND</button>}
                   {p.status === 'approved' && <span style={{ fontSize: '16px' }}>✅</span>}
                 </div>
               ))}
-              {proposals.length === 0 && !showPropForm && <p style={{ color: '#555', fontSize: '13px' }}>No proposals created yet.</p>}
+              {proposals.length === 0 && !showPropForm && <p style={{ color: theme.textMuted, fontSize: '13px' }}>No proposals created yet.</p>}
             </div>
 
             {showPropForm && (
-              <div style={{ marginTop: '20px', borderTop: '1px solid #222', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <input placeholder="Proposal Title" value={propTitle} onChange={e => setPropTitle(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '8px', fontSize: '14px' }} />
-                <textarea placeholder="Executive Summary" value={propSummary} onChange={e => setPropSummary(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '8px', fontSize: '13px', minHeight: '60px' }} />
-                <input type="number" placeholder="Total Price" value={propPrice} onChange={e => setPropPrice(Number(e.target.value))} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '8px', fontSize: '14px' }} />
+              <div style={{ marginTop: '20px', borderTop: `1px solid ${theme.border}`, paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <input placeholder="Proposal Title" value={propTitle} onChange={e => setPropTitle(e.target.value)} style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '4px', padding: '8px', fontSize: '14px' }} />
+                <textarea placeholder="Executive Summary" value={propSummary} onChange={e => setPropSummary(e.target.value)} style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '4px', padding: '8px', fontSize: '13px', minHeight: '60px' }} />
+                <input type="number" placeholder="Total Price" value={propPrice} onChange={e => setPropPrice(Number(e.target.value))} style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '4px', padding: '8px', fontSize: '14px' }} />
                 <div style={{ display: 'flex', gap: '8px' }}>
                    <button onClick={createProposal} style={{ background: '#4ade80', border: 'none', color: '#000', fontWeight: 700, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Save Draft</button>
-                   <button onClick={() => setShowPropForm(false)} style={{ background: 'transparent', border: '1px solid #333', color: '#fff', padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+                   <button onClick={() => setShowPropForm(false)} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: theme.text, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
                 </div>
               </div>
             )}
           </div>
 
           {/* Conversation & Transcript */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Conversation</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }}>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: theme.text, margin: '0 0 16px 0' }}>Conversation</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '400px', overflowY: 'auto', paddingRight: '12px' }}>
               {(assessment.conversation || []).map((msg, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                  <div style={{ maxWidth: '85%', padding: '12px 14px', borderRadius: '12px', fontSize: '13.5px', background: msg.role === 'user' ? '#333' : '#1a1a1a', color: msg.role === 'user' ? '#fff' : '#aaa', lineHeight: 1.5, borderBottomRightRadius: msg.role === 'user' ? '2px' : '12px', borderBottomLeftRadius: msg.role === 'user' ? '12px' : '2px' }}>
+                  <div style={{ 
+                    maxWidth: '85%', 
+                    padding: '12px 14px', 
+                    borderRadius: '12px', 
+                    fontSize: '13.5px', 
+                    background: msg.role === 'user' ? theme.border : theme.input, 
+                    color: msg.role === 'user' ? theme.text : theme.textMuted, 
+                    lineHeight: 1.5, 
+                    borderBottomRightRadius: msg.role === 'user' ? '2px' : '12px', 
+                    borderBottomLeftRadius: msg.role === 'user' ? '12px' : '2px',
+                    border: `1px solid ${theme.border}`
+                  }}>
                     {msg.content}
                   </div>
                 </div>
@@ -369,17 +386,17 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Status Tracker */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', margin: '0 0 16px 0' }}>Engagement Score</h3>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: theme.text, margin: '0 0 16px 0' }}>Engagement Score</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {Object.entries(breakdown).map(([key, value]) => (
                 <div key={key}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#aaa', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: theme.textMuted, marginBottom: '4px' }}>
                     <span>{DIMENSION_LABELS[key] || key.toUpperCase()}</span>
                     <span>{value}%</span>
                   </div>
-                  <div style={{ background: '#1a1a1a', borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', background: '#FF6B35', width: `${value}%` }} />
+                  <div style={{ background: theme.input, borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', background: theme.accent, width: `${value}%` }} />
                   </div>
                 </div>
               ))}
@@ -387,43 +404,43 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
           </div>
 
           <div style={{ display: 'grid', gap: '16px' }}>
-             <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '20px' }}>
+             <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '20px' }}>
                 <h4 style={{ fontSize: '12px', color: '#4ade80', margin: '0 0 6px 0' }}>TOP OPPORTUNITY</h4>
-                <p style={{ color: '#fff', fontSize: '13px', margin: 0 }}>{assessment.biggest_opportunity}</p>
+                <p style={{ color: theme.text, fontSize: '13px', margin: 0 }}>{assessment.biggest_opportunity}</p>
              </div>
-             <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '20px' }}>
+             <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '20px' }}>
                 <h4 style={{ fontSize: '12px', color: '#f87171', margin: '0 0 6px 0' }}>TOP RISK</h4>
-                <p style={{ color: '#fff', fontSize: '13px', margin: 0 }}>{assessment.biggest_risk}</p>
+                <p style={{ color: theme.text, fontSize: '13px', margin: 0 }}>{assessment.biggest_risk}</p>
              </div>
           </div>
 
           {/* CRM Notes */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '12px' }}>CRM Working Notes</h3>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: theme.text, marginBottom: '12px' }}>CRM Working Notes</h3>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              style={{ width: '100%', background: '#000', border: '1px solid #333', borderRadius: '6px', padding: '12px', color: '#fff', fontSize: '14px', minHeight: '80px', fontFamily: "'Outfit', sans-serif" }}
+              style={{ width: '100%', background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '12px', color: theme.text, fontSize: '14px', minHeight: '80px', fontFamily: "'Outfit', sans-serif" }}
               placeholder="Private notes for the team..."
             />
-            <button onClick={saveNotes} disabled={saving} style={{ marginTop: '12px', background: '#333', color: '#fff', border: 'none', borderRadius: '4px', padding: '8px 16px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'SAVING...' : 'UPDATE NOTES'}</button>
+            <button onClick={saveNotes} disabled={saving} style={{ marginTop: '12px', background: theme.primary, color: theme.primaryText, border: 'none', borderRadius: '4px', padding: '8px 16px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'SAVING...' : 'UPDATE NOTES'}</button>
           </div>
 
           {/* Portal Messages Chat */}
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '16px' }}>Portal Chat</h3>
+          <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: theme.text, marginBottom: '16px' }}>Portal Chat</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '250px', overflowY: 'auto' }}>
               {messages.map((msg) => (
                 <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'prospect' ? 'flex-end' : 'flex-start' }}>
-                  <div style={{ maxWidth: '85%', padding: '8px 12px', borderRadius: '8px', fontSize: '13px', background: msg.sender === 'team' ? '#1a1a1a' : '#333', color: '#aaa', border: '1px solid #222' }}>
-                    <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '4px', color: msg.sender === 'team' ? '#FF6B35' : '#fff' }}>{msg.sender === 'team' ? 'BAAWA' : 'CLIENT'}</div>
+                  <div style={{ maxWidth: '85%', padding: '8px 12px', borderRadius: '8px', fontSize: '13px', background: msg.sender === 'team' ? theme.input : theme.border, color: theme.textMuted, border: `1px solid ${theme.border}` }}>
+                    <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '4px', color: msg.sender === 'team' ? theme.accent : theme.text }}>{msg.sender === 'team' ? 'BAAWA' : 'CLIENT'}</div>
                     {msg.body}
                   </div>
                 </div>
               ))}
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <textarea value={messageBody} onChange={e => setMessageBody(e.target.value)} placeholder="Message the client..." rows={2} style={{ flex: 1, background: '#000', border: '1px solid #333', borderRadius: '6px', padding: '10px', color: '#fff', fontSize: '13px', resize: 'none' }} />
+              <textarea value={messageBody} onChange={e => setMessageBody(e.target.value)} placeholder="Message the client..." rows={2} style={{ flex: 1, background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '10px', color: theme.text, fontSize: '13px', resize: 'none' }} />
               <button
                 onClick={async () => {
                    if (!messageBody.trim()) return; setSendingMsg(true);
@@ -432,7 +449,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                    setSendingMsg(false)
                 }}
                 disabled={sendingMsg}
-                style={{ background: '#fff', color: '#000', border: 'none', borderRadius: '6px', padding: '8px 12px', fontSize: '12px', fontWeight: 700, alignSelf: 'flex-end', cursor: 'pointer' }}
+                style={{ background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '8px 12px', fontSize: '12px', fontWeight: 700, alignSelf: 'flex-end', cursor: 'pointer' }}
               >{sendingMsg ? '..' : 'SEND'}</button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { LogoDark, LogoIcon } from '../Logo'
+import { LogoDark, LogoLight, LogoIcon } from '../Logo'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SubmissionList } from './SubmissionList'
 import { SubmissionDetail } from './SubmissionDetail'
@@ -24,6 +24,7 @@ const NAV_ITEMS: { key: Section; label: string }[] = [
 ]
 
 function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
+  const { theme } = useDashboardTheme()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
@@ -45,44 +46,34 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, fontFamily: "'Outfit', sans-serif" }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '420px' }}
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="api-key-input" style={{ display: 'block', fontSize: '12px', color: theme.text, marginBottom: '8px', fontWeight: 500 }}>API Key</label>
+      <input
+        id="api-key-input"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter your API key"
+        style={{ width: '100%', background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '12px 16px', color: theme.text, fontSize: '14px', outline: 'none', transition: 'outline 0.2s, border-color 0.2s', marginBottom: '16px', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
+        onFocus={(e) => {
+          e.currentTarget.style.outline = `2px solid ${theme.text}`
+          e.currentTarget.style.outlineOffset = '2px'
+          e.currentTarget.style.borderColor = theme.textMuted
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.outline = 'none'
+          e.currentTarget.style.borderColor = theme.border
+        }}
+        autoFocus
+      />
+      {error && <p style={{ color: '#f87171', fontSize: '14px', marginBottom: '16px' }}>{error}</p>}
+      <button
+        type="submit"
+        style={{ width: '100%', background: theme.text, color: theme.bg, border: 'none', borderRadius: '6px', padding: '12px', fontSize: '16px', fontWeight: 700, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
       >
-        <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 8px 0' }}>Dashboard Access</h2>
-        <p style={{ color: '#aaaaaa', fontSize: '14px', margin: '0 0 24px 0' }}>Enter your founder API key to continue.</p>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="api-key-input" style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '8px', fontWeight: 500 }}>API Key</label>
-          <input
-            id="api-key-input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your API key"
-            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '12px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', transition: 'outline 0.2s, border-color 0.2s', marginBottom: '16px', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
-            onFocus={(e) => {
-              e.currentTarget.style.outline = '2px solid #ffffff'
-              e.currentTarget.style.outlineOffset = '2px'
-              e.currentTarget.style.borderColor = '#666666'
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.outline = 'none'
-              e.currentTarget.style.borderColor = '#333333'
-            }}
-            autoFocus
-          />
-          {error && <p style={{ color: '#f87171', fontSize: '14px', marginBottom: '16px' }}>{error}</p>}
-          <button
-            type="submit"
-            style={{ width: '100%', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '12px', fontSize: '16px', fontWeight: 700, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
-          >
-            Enter Dashboard
-          </button>
-        </form>
-      </motion.div>
-    </div>
+        Enter Dashboard
+      </button>
+    </form>
   )
 }
 
@@ -99,7 +90,31 @@ function DashboardContent() {
   }, [])
 
   if (!token) {
-    return <PasswordModal onAuth={setToken} />
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: theme.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, fontFamily: "'Outfit', sans-serif" }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '32px', width: '100%', maxWidth: '420px' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            {isDark ? <LogoDark height={40} /> : <LogoLight height={40} />}
+          </div>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, color: theme.text, margin: '0 0 8px 0', textAlign: 'center' }}>Dashboard Access</h2>
+          <p style={{ color: theme.textMuted, fontSize: '14px', margin: '0 0 24px 0', textAlign: 'center' }}>Enter your founder API key to continue.</p>
+          <PasswordModal onAuth={setToken} />
+          
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
+             <button
+               onClick={toggleTheme}
+               style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.textMuted, fontSize: '12px', opacity: 0.6 }}
+             >
+               {isDark ? '☀️ Swich to Light Mode' : '🌙 Switch to Dark Mode'}
+             </button>
+          </div>
+        </motion.div>
+      </div>
+    )
   }
 
   const renderContent = () => {
@@ -169,7 +184,7 @@ function DashboardContent() {
       {/* Mobile header bar */}
       <div style={{ display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: theme.sidebar, borderBottom: `1px solid ${theme.border}` }}
         className="mobile-header">
-        <LogoIcon height={28} />
+        <LogoIcon height={28} color={theme.text} />
         <button
           onClick={() => setMobileNavOpen((o) => !o)}
           style={{ color: theme.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}
@@ -215,7 +230,7 @@ function DashboardContent() {
       {/* Sidebar — desktop only */}
       <aside style={{ width: '256px', background: theme.sidebar, borderRight: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', padding: '24px 16px', flexShrink: 0 }}>
         <div style={{ marginBottom: '32px', padding: '0 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {isDark ? <LogoDark height={32} /> : <LogoIcon height={32} />}
+          {isDark ? <LogoDark height={32} /> : <LogoLight height={32} />}
           <button
             onClick={toggleTheme}
             style={{ background: theme.input, border: `1px solid ${theme.border}`, cursor: 'pointer', padding: '6px', borderRadius: '6px', color: theme.text, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
