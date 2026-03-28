@@ -34,14 +34,11 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
     e.preventDefault()
     setError('')
     try {
-      const res = await fetch(`${API_URL}/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+      const res = await fetch(`${API_URL}/api/assessments`, {
+        headers: { Authorization: `Bearer ${password}` },
       })
       if (res.ok) {
-        const { token } = await res.json()
-        onAuth(token)
+        onAuth(password)
       } else {
         setError('Invalid password')
       }
