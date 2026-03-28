@@ -189,7 +189,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   }
 
   const handleAction = async (action: 'onboard' | 'defer') => {
-    if (action === 'defer' && !window.confirm('Send defer email to this founder?')) return
+    if (action === 'defer' && !window.confirm('Send defer email to this client?')) return
     setError('')
     try {
       const res = await authFetch(`${API_URL}/api/assessments/${id}/${action}`, token, on401, { method: 'POST' })
@@ -287,7 +287,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                 <input
                   value={editFounder}
                   onChange={e => setEditFounder(e.target.value)}
-                  placeholder="Founder Name"
+                  placeholder="Client Name"
                   style={{ background: theme.bg, color: theme.text, border: `1px solid ${theme.border}`, padding: '4px 8px', borderRadius: '4px', fontSize: '20px', fontWeight: 700 }}
                 />
                 <input
@@ -408,7 +408,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
               <div style={{ background: theme.input, padding: '12px', borderRadius: '8px', border: `1px solid ${call.status === 'confirmed' ? '#4ade80' : theme.border}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                    <span style={{ fontSize: '13px', color: theme.textMuted }}>Status: <b style={{ color: theme.text }}>{call.status.toUpperCase()}</b></span>
-                   {call.status === 'pending' && <span style={{ color: '#facc15', fontSize: '11px' }}>Waiting for founder...</span>}
+                   {call.status === 'pending' && <span style={{ color: '#facc15', fontSize: '11px' }}>Waiting for client...</span>}
                 </div>
                 {call.selected_slot ? (
                   <div style={{ marginTop: '8px', color: '#4ade80', fontWeight: 700, fontSize: '15px' }}>

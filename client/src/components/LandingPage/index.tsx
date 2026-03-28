@@ -113,7 +113,7 @@ const HERO_SLIDES = [
     kicker: "Perception over Reality",
     title1: "A flower is just a weed",
     title2: "with an advertising budget.",
-    subtitle: "If you can't outspend them, outsmart them. We help founders reposition their entire offering without changing the product.",
+    subtitle: "If you can't outspend them, outsmart them. We help clients reposition their entire offering without changing the product.",
   },
   {
     kicker: "Behavioral Design",
@@ -205,7 +205,7 @@ const GAP_TABS = [
   {
     id: 'problem',
     label: 'The Problem',
-    heading: 'Most founders guess what\'s broken.',
+    heading: 'Most clients guess what\'s broken.',
     sub: 'You waste months talking to biased agencies and expensive consultants. We cut through the noise instantly.',
     items: [
       { num: '01', title: 'Biased Discoveries', body: "Human consultants sell what they know. Our AI engine diagnoses what you actually need — without an agenda or a retainer fee." },
@@ -233,7 +233,7 @@ const GAP_TABS = [
       { num: '🧠', title: 'AI-Powered Clarity', body: "Instantly uncover the strategic gaps in your positioning and execution that traditional discovery calls miss entirely." },
       { num: '🗺️', title: 'Expert Translation', body: "Our seasoned panel turns the diagnostic data into a concrete, immediately actionable business reality." },
       { num: '⚡', title: 'Vetted Matching', body: "Need execution? We bypass the noise and match you with pre-vetted experts perfectly suited for your immediate hurdles." },
-      { num: '📈', title: 'Founder Accountability', body: "We don't hand you an automated PDF. We ensure the execution actually happens and converts to revenue." },
+      { num: '📈', title: 'Client Accountability', body: "We don't hand you an automated PDF. We ensure the execution actually happens and converts to revenue." },
     ]
   }
 ]
@@ -310,9 +310,79 @@ interface Props {
   onStart: () => void
 }
 
+function LoginMenu() {
+  const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  return (
+    <div ref={menuRef} style={{ position: 'relative' }}>
+      <button 
+        onClick={() => setOpen(!open)}
+        className="px-2.5 py-1.5 md:px-4 md:py-2 rounded-md border border-black/10 text-[#6B6460] text-[10px] md:text-[13px] font-medium font-['Outfit'] hover:bg-black/5 transition-colors flex items-center gap-1.5"
+      >
+        Login {open ? '▲' : '▼'}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            style={{
+              position: 'absolute', top: '100%', right: 0, marginTop: 8,
+              background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12,
+              boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, minWidth: 180,
+              padding: 8, overflow: 'hidden',
+            }}
+          >
+            <button
+              onClick={() => { navigate('/portal/login'); setOpen(false) }}
+              style={{
+                width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
+                display: 'flex', flexDirection: 'column', gap: 2,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,107,53,0.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+            >
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Client Access</span>
+              <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>View your diagnostics portal</span>
+            </button>
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.04)', margin: '4px 8px' }} />
+            <button
+              onClick={() => { navigate('/dashboard'); setOpen(false) }}
+              style={{
+                width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
+                display: 'flex', flexDirection: 'column', gap: 2,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+            >
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Staff Access</span>
+              <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>CRM & Consultant Dashboard</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 export function LandingPage({ onStart }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const navigate = useNavigate()
 
   return (
     <div style={{ fontFamily: 'Outfit, sans-serif', background: '#FDFCFA', color: '#0A0A0A' }}>
@@ -336,8 +406,8 @@ export function LandingPage({ onStart }: Props) {
             <div style={{ maxWidth: '680px', margin: '0 auto', padding: '56px 24px 80px', width: '100%' }}>
               <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: '20px' }}>About Baawa</div>
               {[
-                { title: 'Mission', body: 'To be the first call founders make when they need things to move — delivering truth, clarity, and momentum through psychology-driven strategy.' },
-                { title: 'Vision', body: 'A world where every founder has access to an advisor who tells them what they need to hear, not what they want to hear — and gets them unstuck.' },
+                { title: 'Mission', body: 'To be the first call clients make when they need things to move — delivering truth, clarity, and momentum through psychology-driven strategy.' },
+                { title: 'Vision', body: 'A world where every client has access to an advisor who tells them what they need to hear, not what they want to hear — and gets them unstuck.' },
               ].map(({ title, body }) => (
                 <div key={title} style={{ marginBottom: '44px' }}>
                   <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 700, color: '#FDFCFA', margin: '0 0 12px' }}>{title}</h2>
@@ -346,7 +416,7 @@ export function LandingPage({ onStart }: Props) {
               ))}
               <div style={{ marginBottom: '44px', background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.15)', borderRadius: '10px', padding: '28px 24px' }}>
                 <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 700, color: '#FF6B35', margin: '0 0 12px' }}>Core Belief</h2>
-                <p style={{ fontSize: '15px', color: 'rgba(253,252,250,0.7)', lineHeight: 1.75, margin: 0 }}>Founders deserve truth, not reassurance. The agency model is broken. Psychology beats tactics. We diagnose before we prescribe.</p>
+                <p style={{ fontSize: '15px', color: 'rgba(253,252,250,0.7)', lineHeight: 1.75, margin: 0 }}>Clients deserve truth, not reassurance. The agency model is broken. Psychology beats tactics. We diagnose before we prescribe.</p>
               </div>
               <div>
                 <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 700, color: '#FDFCFA', margin: '0 0 24px' }}>Values</h2>
@@ -379,9 +449,7 @@ export function LandingPage({ onStart }: Props) {
           <TypewriterText />
         </div>
         <div className="flex items-center gap-1.5 md:gap-3">
-          <button onClick={() => navigate('/portal/login')} className="px-2.5 py-1.5 md:px-4 md:py-2 rounded-md border border-black/10 text-[#6B6460] text-[10px] md:text-[13px] font-medium font-['Outfit'] hover:bg-black/5 transition-colors">
-            Login
-          </button>
+          <LoginMenu />
           <button onClick={onStart} className="px-3 py-1.5 md:px-5 md:py-2.5 rounded-md bg-[#FF6B35] text-[#FAFAFA] font-['Outfit'] font-semibold text-[11px] md:text-[14px] whitespace-nowrap" style={{ touchAction: 'manipulation' }}>
             <span className="sm:hidden">Start →</span>
             <span className="hidden sm:inline">Start Assessment</span>
@@ -509,7 +577,7 @@ export function LandingPage({ onStart }: Props) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: 32, alignItems: 'start' }}>
               <div>
                 <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who This Is For</div>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 700, color: '#0A0A0A', margin: '0 0 20px', lineHeight: 1.2 }}>Founders ready to bypass the consulting bloat.</h3>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 700, color: '#0A0A0A', margin: '0 0 20px', lineHeight: 1.2 }}>Clients ready to bypass the consulting bloat.</h3>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
                     "Tired of paying retainers for long 'discovery' phases",
@@ -528,7 +596,7 @@ export function LandingPage({ onStart }: Props) {
                 <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(20px, 2.5vw, 26px)', fontStyle: 'italic', color: '#FFB09A', lineHeight: 1.45, margin: '0 0 16px' }}>
                   "The engine asked me three questions in twenty minutes that none of my expensive advisors had asked in six months."
                 </p>
-                <div style={{ fontSize: 12, color: '#6B6460', fontFamily: 'Outfit, sans-serif' }}>— An early Baawa network founder</div>
+                <div style={{ fontSize: 12, color: '#6B6460', fontFamily: 'Outfit, sans-serif' }}>— An early Baawa network client</div>
               </blockquote>
             </div>
           </motion.div>

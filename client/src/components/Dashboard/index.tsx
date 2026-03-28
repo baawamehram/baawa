@@ -103,7 +103,7 @@ function DashboardContent() {
             {isDark ? <LogoDark height={40} /> : <LogoLight height={40} />}
           </div>
           <h2 style={{ fontSize: '24px', fontWeight: 700, color: theme.text, margin: '0 0 8px 0', textAlign: 'center' }}>Dashboard Access</h2>
-          <p style={{ color: theme.textMuted, fontSize: '14px', margin: '0 0 24px 0', textAlign: 'center' }}>Enter your founder API key to continue.</p>
+          <p style={{ color: theme.textMuted, fontSize: '14px', margin: '0 0 24px 0', textAlign: 'center' }}>Enter your consultant API key to continue.</p>
           <PasswordModal onAuth={setToken} />
           
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>

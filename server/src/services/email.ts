@@ -22,14 +22,14 @@ export async function sendProspectAck(to: string): Promise<void> {
       to,
       subject: 'We have your answers',
       html: `<p>Thank you for completing the assessment.</p>
-<p>Our founder is reviewing your answers personally. You will hear from us within 48 hours.</p>`,
+<p>The Baawa team is reviewing your answers personally. You will hear from us within 48 hours.</p>`,
     })
   } catch (err) {
     throw new Error(`Failed to send prospect ACK to ${to}: ${String(err)}`)
   }
 }
 
-// 2. Founder notification (sent immediately with score)
+// 2. Team notification (sent immediately with score)
 export async function sendFounderNotification(
   prospectEmail: string,
   score: number,
@@ -64,7 +64,7 @@ export async function sendOnboardEmail(to: string): Promise<void> {
       to,
       subject: "We'd like to work with you",
       html: `<p>We have reviewed your answers and we would like to explore working together.</p>
-<p>Our founder will be in touch within 24 hours to discuss next steps.</p>`,
+<p>The Baawa team will be in touch within 24 hours to discuss next steps.</p>`,
     })
   } catch (err) {
     throw new Error(`Failed to send onboard email to ${to}: ${String(err)}`)
@@ -106,7 +106,7 @@ export async function sendOptimizerProposal(
   }
 }
 
-// 6. Optimizer run failed — alert founder
+// 6. Optimizer run failed — alert team
 export async function sendOptimizerFailure(errorMessage: string): Promise<void> {
   if (!FOUNDER_EMAIL) return
   try {
@@ -157,7 +157,7 @@ export async function sendMessageNotification(to: string, loginUrl: string): Pro
   }
 }
 
-// 9. Notify founder that a prospect has replied in the portal
+// 9. Notify team that a prospect has replied in the portal
 export async function sendProspectReplyNotification(
   prospectEmail: string,
   snippet: string,

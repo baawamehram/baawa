@@ -21,7 +21,7 @@ interface Props {
 }
 
 const FIELDS: { key: keyof ClientData; label: string; type: string }[] = [
-  { key: 'founder_name', label: 'Founder Name', type: 'text' },
+  { key: 'founder_name', label: 'Client Name', type: 'text' },
   { key: 'company_name', label: 'Company', type: 'text' },
   { key: 'email', label: 'Email', type: 'email' },
   { key: 'website', label: 'Website', type: 'url' },

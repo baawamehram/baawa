@@ -45,7 +45,7 @@ const INITIAL_NODES: OrbNode[] = [
 ]
 
 const BOOT_STEPS = [
-  { delay: 600,  txt: 'Loading founder archetypes...' },
+  { delay: 600,  txt: 'Analyzing client archetypes...' },
   { delay: 1500, txt: 'Warming voice recognition...' },
   { delay: 2400, txt: 'Streaming live market data...' },
   { delay: 3200, txt: 'Calibrating question sequence...' },
@@ -113,7 +113,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
 
   // Boot strip
   const [bootLines, setBootLines] = useState<string[]>([])
-  const [bootCurrent, setBootCurrent] = useState('Calibrating founder context...')
+  const [bootCurrent, setBootCurrent] = useState('Calibrating client context...')
   const [bootDone, setBootDone] = useState(false)
 
   // Live ticker values
@@ -320,7 +320,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
 
   // Boot sequence
   useEffect(() => {
-    let prev = 'Calibrating founder context...'
+    let prev = 'Calibrating client context...'
     const timers: ReturnType<typeof setTimeout>[] = []
 
     BOOT_STEPS.forEach(({ delay, txt }, i) => {
