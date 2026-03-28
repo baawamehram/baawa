@@ -11,7 +11,7 @@ function escapeHtml(text: string): string {
 
 // Initialize Resend with a dummy key if env var is missing to prevent fatal crash on local startup
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key_for_local_dev')
-const FROM = process.env.EMAIL_FROM ?? 'assessment@baawa.com'
+const FROM = process.env.EMAIL_FROM ?? 'hello@baawa.co'
 const FOUNDER_EMAIL = process.env.FOUNDER_EMAIL ?? ''
 
 // 1. Prospect acknowledgement (sent immediately after assessment completes)

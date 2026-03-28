@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import { API_URL, authFetch } from '../../lib/api'
 
+interface Lead {
+  id: number
+  email: string
+  score: number
+  status: 'pending' | 'reviewing'
+  founder_archetype?: string
+  created_at: string
+}
+
 interface Client {
   id: number
   founder_name: string
@@ -17,29 +26,38 @@ interface Props {
   token: string
   on401: () => void
   onSelectClient: (id: number) => void
+  onViewAssessment: (id: number) => void
 }
 
-const STAGES: { key: Client['stage']; label: string }[] = [
+const STAGES: { key: string; label: string }[] = [
+  { key: 'leads', label: 'Leads' },
   { key: 'phase1', label: 'Phase 1' },
   { key: 'phase2', label: 'Phase 2' },
   { key: 'churned', label: 'Churned' },
 ]
 
-export function Pipeline({ token, on401, onSelectClient }: Props) {
+export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Props) {
   const [clients, setClients] = useState<Client[]>([])
+  const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const fetchClients = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await authFetch(`${API_URL}/api/clients`, token, on401)
-      if (!res) return
-      if (!res.ok) {
-        setError('Failed to load clients.')
-        return
-      }
-      const data = await res.json()
-      setClients(data)
+      const [clientsRes, assessmentsRes] = await Promise.all([
+        authFetch(`${API_URL}/api/clients`, token, on401),
+        authFetch(`${API_URL}/api/assessments`, token, on401)
+      ])
+      
+      if (!clientsRes || !assessmentsRes) return
+      
+      const [clientsData, assessmentsData] = await Promise.all([
+        clientsRes.json(),
+        assessmentsRes.json()
+      ])
+      
+      setClients(clientsData)
+      setLeads(assessmentsData.filter((a: any) => ['pending', 'reviewing'].includes(a.status)))
     } catch {
       setError('Network error. Please check your connection.')
     } finally {
@@ -47,7 +65,20 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
     }
   }, [token, on401])
 
-  useEffect(() => { fetchClients() }, [fetchClients])
+  useEffect(() => { fetchData() }, [fetchData])
+
+  const onboardLead = async (assessmentId: number) => {
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/assessments/${assessmentId}/onboard`, token, on401, {
+        method: 'POST'
+      })
+      if (res?.ok) await fetchData()
+      else setError('Failed to onboard lead.')
+    } catch {
+      setError('Failed to onboard lead.')
+    }
+  }
 
   const moveClient = async (clientId: number, newStage: Client['stage']) => {
     setError('')
@@ -56,12 +87,8 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
         method: 'PUT',
         body: JSON.stringify({ stage: newStage }),
       })
-      if (!res) return
-      if (!res.ok) {
-        setError('Something went wrong. Please try again.')
-        return
-      }
-      fetchClients()
+      if (res?.ok) await fetchData()
+      else setError('Something went wrong. Please try again.')
     } catch {
       setError('Network error. Please check your connection.')
     }
@@ -85,47 +112,70 @@ export function Pipeline({ token, on401, onSelectClient }: Props) {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
         {STAGES.map((stage) => {
-          const stageClients = clients.filter((c) => c.stage === stage.key)
+          const isLeads = stage.key === 'leads'
+          const stageItems = isLeads ? leads : clients.filter((c) => c.stage === stage.key)
+          
           return (
             <div key={stage.key} style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '16px' }}>
-              <h3 style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {stage.label} <span style={{ color: '#666666' }}>({stageClients.length})</span>
+              <h3 style={{ fontSize: '12px', fontWeight: 600, color: isLeads ? '#FF6B35' : '#ffffff', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {stage.label} <span style={{ color: '#666666' }}>({stageItems.length})</span>
               </h3>
+              
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {stageClients.map((client) => (
+                {stageItems.map((item: any) => (
                   <div
-                    key={client.id}
+                    key={item.id}
                     style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '16px' }}
                   >
                     <div
                       style={{ cursor: 'pointer' }}
-                      onClick={() => onSelectClient(client.id)}
+                      onClick={() => isLeads ? onViewAssessment(item.id) : onSelectClient(item.id)}
                     >
-                      <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 2px 0' }}>{client.founder_name}</p>
-                      <p style={{ color: '#aaaaaa', fontSize: '12px', margin: '0 0 8px 0' }}>{client.company_name}</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: '#666666' }}>
-                        <span>Score: {client.score ?? 'N/A'}</span>
-                        <span>{daysSince(client.start_date)}d</span>
-                        {client.phase2_monthly_fee > 0 && <span>${client.phase2_monthly_fee}/mo</span>}
+                      <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 2px 0' }}>
+                        {isLeads ? item.email : item.founder_name}
+                      </p>
+                      <p style={{ color: '#aaaaaa', fontSize: '12px', margin: '0 0 8px 0' }}>
+                        {isLeads ? (item.score_summary || 'Submission under review') : item.company_name}
+                      </p>
+                      
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#666666' }}>
+                        <span style={{ color: item.score > 70 ? '#4ade80' : '#666666' }}>Score: {item.score ?? 'N/A'}</span>
+                        <span>{daysSince(item.created_at || item.start_date)}d</span>
+                        {item.founder_archetype && (
+                          <span style={{ color: '#FF6B35', border: '1px solid #FF6B35', padding: '1px 6px', borderRadius: '10px', fontSize: '10px' }}>
+                            {item.founder_archetype}
+                          </span>
+                        )}
                       </div>
                     </div>
+
                     <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                      {STAGES.filter((s) => s.key !== client.stage).map((s) => (
+                      {isLeads ? (
                         <button
-                          key={s.key}
-                          onClick={() => moveClient(client.id, s.key)}
-                          style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '4px', background: '#333333', color: '#ffffff', border: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                          onClick={() => onboardLead(item.id)}
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 10px', borderRadius: '4px', background: '#FF6B35', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
                         >
-                          → {s.label}
+                          Onboard Client
                         </button>
-                      ))}
+                      ) : (
+                        STAGES.filter((s) => s.key !== 'leads' && s.key !== item.stage).map((s) => (
+                          <button
+                            key={s.key}
+                            onClick={() => moveClient(item.id, s.key as any)}
+                            style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#333333', color: '#ffffff', border: 'none', cursor: 'pointer' }}
+                          >
+                            → {s.label}
+                          </button>
+                        ))
+                      )}
                     </div>
                   </div>
                 ))}
-                {stageClients.length === 0 && (
-                  <p style={{ color: '#666666', fontSize: '12px', textAlign: 'center', padding: '16px 0', margin: 0 }}>No clients</p>
+                
+                {stageItems.length === 0 && (
+                  <p style={{ color: '#666666', fontSize: '12px', textAlign: 'center', padding: '16px 0', margin: 0 }}>Empty</p>
                 )}
               </div>
             </div>

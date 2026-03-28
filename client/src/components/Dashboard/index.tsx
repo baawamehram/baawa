@@ -119,7 +119,7 @@ export default function Dashboard() {
         />
       )
     }
-    if (section === 'pipeline') {
+    if (section === 'pipeline' || section === 'clients') {
       if (selectedClientId !== null) {
         return (
           <ClientDetail
@@ -135,25 +135,10 @@ export default function Dashboard() {
           token={token}
           on401={handle401}
           onSelectClient={(id) => setSelectedClientId(id)}
-        />
-      )
-    }
-    if (section === 'clients') {
-      if (selectedClientId !== null) {
-        return (
-          <ClientDetail
-            id={selectedClientId}
-            token={token}
-            on401={handle401}
-            onBack={() => setSelectedClientId(null)}
-          />
-        )
-      }
-      return (
-        <Pipeline
-          token={token}
-          on401={handle401}
-          onSelectClient={(id) => setSelectedClientId(id)}
+          onViewAssessment={(id) => {
+            setSection('assessments')
+            setSelectedAssessmentId(id)
+          }}
         />
       )
     }

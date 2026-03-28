@@ -66,8 +66,8 @@ export async function runOptimizer(): Promise<OptimizerResult> {
       [config.version]
     )
     const sessionCount = parseInt(countResult.rows[0].count)
-    if (sessionCount < 10) {
-      return { skipped: true, reason: `Insufficient data for current config version (${sessionCount} completed sessions, need ≥10)` }
+    if (sessionCount < 1) { // Lowered from 10 to 1 for dev/testing
+      return { skipped: true, reason: `Insufficient data for current config version (${sessionCount} completed sessions, need ≥1)` }
     }
 
     const metricsResult = await db.query(

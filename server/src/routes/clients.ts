@@ -94,15 +94,31 @@ router.post('/:id/notes', async (req, res) => {
     const parsed = z.object({ content: z.string().min(1) }).safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: 'Invalid note' })
 
-    await db.query(
-      'INSERT INTO client_notes (client_id, content) VALUES ($1, $2)',
+    const result = await db.query<{ id: number }>(
+      'INSERT INTO client_notes (client_id, content) VALUES ($1, $2) RETURNING id',
       [req.params.id, parsed.data.content]
     )
+    const noteId = result.rows[0].id
+
+    // Auto-analyze in background if long enough
+    if (parsed.data.content.length > 20) {
+      import('../services/noteAnalysis').then(({ analyzeNote }) => {
+        analyzeNote(parsed.data.content).then(async (analysis) => {
+          await db.query(
+            `UPDATE client_notes 
+             SET sentiment = $1, ai_summary = $2, risk_flag = $3 
+             WHERE id = $4`,
+            [analysis.sentiment, analysis.summary, analysis.risk_flag, noteId]
+          )
+        }).catch(console.error)
+      }).catch(console.error)
+    }
+
     await db.query(
       `INSERT INTO activities (client_id, type, description) VALUES ($1, 'note_added', 'Note added')`,
       [req.params.id]
     )
-    res.json({ ok: true })
+    res.json({ ok: true, noteId })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to add note' })

@@ -16,6 +16,7 @@ import journeyRouter from './routes/journey'
 import cookieParser from 'cookie-parser'
 import portalRouter from './routes/portal'
 import ingestionRouter from './routes/ingestion'
+import debugRouter from './routes/debug'
 import callsRouter from './routes/calls'
 import proposalsRouter from './routes/proposals'
 
@@ -58,6 +59,7 @@ app.use('/api/market-data', marketRouter)
 app.use('/api/journey', journeyRouter)
 app.use('/api/portal', portalRouter)
 app.use('/api/admin/ingest', ingestionRouter)
+app.use('/api/admin/debug', debugRouter)
 app.use('/api/calls', callsRouter)
 app.use('/api/proposals', proposalsRouter)
 
@@ -206,6 +208,14 @@ async function startServer() {
       )
     `)
 
+    // Phase 2 — CRM Intelligence
+    await db.query(`ALTER TABLE client_notes ADD COLUMN IF NOT EXISTS sentiment VARCHAR(20)`)
+    await db.query(`ALTER TABLE client_notes ADD COLUMN IF NOT EXISTS ai_summary TEXT`)
+    await db.query(`ALTER TABLE client_notes ADD COLUMN IF NOT EXISTS risk_flag BOOLEAN DEFAULT false`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS research_context TEXT`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS founder_archetype VARCHAR(50)`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS engagement_pulse VARCHAR(20) DEFAULT 'neutral'`)
+
     // Phase 4 — Deliverables portal columns
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS portal_visible BOOLEAN NOT NULL DEFAULT false`)
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS content TEXT`)
@@ -214,7 +224,11 @@ async function startServer() {
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS accepted_by TEXT`)
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS milestone_order INT NOT NULL DEFAULT 1`)
 
-    console.log('Startup migrations OK')
+    // Performance Indices
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_notes_client_id ON client_notes(client_id)`)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_assessments_onboarding ON assessments(email, status)`)
+
+    console.log('Startup migrations + indices OK')
   } catch (err) {
     console.error('Startup migration error:', err)
   }

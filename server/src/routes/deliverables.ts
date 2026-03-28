@@ -28,4 +28,16 @@ router.put('/:id', async (req: Request, res: Response) => {
   }
 })
 
+// POST /api/deliverables/:id/draft
+router.post('/:id/draft', async (req: Request, res: Response) => {
+  try {
+    const { draftDeliverableContent } = await import('../services/drafting')
+    const draft = await draftDeliverableContent(parseInt(req.params.id))
+    res.json({ draft })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: (err as Error).message })
+  }
+})
+
 export default router

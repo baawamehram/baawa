@@ -8,6 +8,7 @@ interface Deliverable {
   status: 'pending' | 'in_progress' | 'completed'
   due_date: string
   completed_at: string | null
+  research_context?: string
 }
 
 interface Props {
@@ -34,6 +35,8 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
   const [newTitle, setNewTitle] = useState('')
   const [newDueDate, setNewDueDate] = useState('')
   const [adding, setAdding] = useState(false)
+  const [draftingId, setDraftingId] = useState<number | null>(null)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
   const [error, setError] = useState('')
 
   const updateStatus = async (delId: number, status: Deliverable['status']) => {
@@ -43,14 +46,28 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
         method: 'PUT',
         body: JSON.stringify({ status }),
       })
-      if (!res) return
-      if (!res.ok) {
-        setError('Something went wrong. Please try again.')
-        return
-      }
-      onUpdate()
+      if (res?.ok) onUpdate()
+      else setError('Failed to update status.')
     } catch {
       setError('Network error. Please check your connection.')
+    }
+  }
+
+  const draftWithAI = async (delId: number) => {
+    setDraftingId(delId)
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/deliverables/${delId}/draft`, token, on401, {
+        method: 'POST'
+      })
+      if (res?.ok) {
+        onUpdate()
+        setExpandedId(delId)
+      } else setError('Failed to generate AI draft.')
+    } catch {
+      setError('Failed to generate AI draft.')
+    } finally {
+      setDraftingId(null)
     }
   }
 
@@ -63,14 +80,11 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
         method: 'POST',
         body: JSON.stringify({ title: newTitle, due_date: newDueDate || null }),
       })
-      if (!res) return
-      if (!res.ok) {
-        setError('Something went wrong. Please try again.')
-        return
-      }
-      setNewTitle('')
-      setNewDueDate('')
-      onUpdate()
+      if (res?.ok) {
+        setNewTitle('')
+        setNewDueDate('')
+        onUpdate()
+      } else setError('Failed to add deliverable.')
     } catch {
       setError('Network error. Please check your connection.')
     } finally {
@@ -90,24 +104,42 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
         {deliverables.map((d) => (
-          <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1a1a1a', borderRadius: '6px', padding: '12px 16px' }}>
-            <div>
-              <p style={{ color: '#ffffff', fontSize: '14px', margin: '0 0 2px 0' }}>{d.title}</p>
-              {d.due_date && (
-                <p style={{ color: '#aaaaaa', fontSize: '12px', margin: 0 }}>
-                  Due: {new Date(d.due_date).toLocaleDateString()}
-                </p>
-              )}
+          <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: '#1a1a1a', borderRadius: '6px', overflow: 'hidden', border: '1px solid #333333' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px' }}>
+              <div style={{ cursor: 'pointer' }} onClick={() => setExpandedId(expandedId === d.id ? null : d.id)}>
+                <p style={{ color: '#ffffff', fontSize: '14px', margin: '0 0 2px 0', fontWeight: 600 }}>{d.title}</p>
+                {d.due_date && (
+                  <p style={{ color: '#aaaaaa', fontSize: '10px', margin: 0, textTransform: 'uppercase' }}>
+                    Due: {new Date(d.due_date).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <button
+                  onClick={() => draftWithAI(d.id)}
+                  disabled={draftingId !== null}
+                  style={{ background: 'none', border: 'none', color: '#FF6B35', fontSize: '12px', cursor: 'pointer', fontWeight: 600, opacity: draftingId === d.id ? 0.5 : 1 }}
+                >
+                  {draftingId === d.id ? 'Drafting...' : '🪄 AI Draft'}
+                </button>
+                <select
+                  value={d.status}
+                  onChange={(e) => updateStatus(d.id, e.target.value as Deliverable['status'])}
+                  style={{ background: '#000000', border: '1px solid #333333', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: STATUS_COLORS[d.status] || '#aaaaaa', outline: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <select
-              value={d.status}
-              onChange={(e) => updateStatus(d.id, e.target.value as Deliverable['status'])}
-              style={{ background: '#1a1a1a', border: 'none', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: STATUS_COLORS[d.status] || '#aaaaaa', outline: 'none', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
-            >
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            {expandedId === d.id && (
+              <div style={{ padding: '0 16px 16px 16px', borderTop: '1px solid #222222' }}>
+                <p style={{ color: '#888888', fontSize: '13px', whiteSpace: 'pre-wrap', lineHeight: '1.6', margin: '16px 0 0 0' }}>
+                  {d.research_context || 'No strategy draft yet. Click "AI Draft" to generate one.'}
+                </p>
+              </div>
+            )}
           </div>
         ))}
         {deliverables.length === 0 && (

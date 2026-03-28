@@ -149,6 +149,26 @@ export function Intelligence({ token, on401 }: Props) {
     )
   }
 
+  // Zero State: No metrics yet
+  const totalSessions = (metrics?.windows['90d'].completion_rate !== null) ? 1 : 0
+  if (!metrics || !metrics.windows['30d'].completion_rate && configs.length <= 1) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto', fontFamily: "'Outfit', sans-serif" }}>
+        <div style={{ fontSize: '48px', marginBottom: '20px' }}>👁️</div>
+        <h2 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 600, marginBottom: '12px' }}>Awaiting First Journey</h2>
+        <p style={{ color: '#888888', fontSize: '15px', lineHeight: 1.6, marginBottom: '32px' }}>
+          The Intelligence engine needs data from completed assessments to generate insights and optimize your funnel. Start a "Cosmic Journey" on your landing page to see the stats appear here!
+        </p>
+        <button
+          onClick={() => void fetchData()}
+          style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '10px 20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+        >
+          Refresh Data
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div style={{ paddingTop: '24px', paddingBottom: '24px', maxWidth: '900px', fontFamily: "'Outfit', sans-serif" }}>
       {/* Header */}
