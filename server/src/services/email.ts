@@ -10,27 +10,35 @@ function escapeHtml(text: string): string {
 }
 
 // Initialize Resend with a dummy key if env var is missing to prevent fatal crash on local startup
-const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key_for_local_dev')
+const apiKey = process.env.RESEND_API_KEY
+if (!apiKey) {
+  console.warn('⚠️ RESEND_API_KEY is missing. Emails will not be sent.')
+}
+const resend = apiKey ? new Resend(apiKey) : null
 const FROM = process.env.EMAIL_FROM ?? 'hello@baawa.co'
 const FOUNDER_EMAIL = process.env.FOUNDER_EMAIL ?? ''
 
 // 1. Prospect acknowledgement (sent immediately after assessment completes)
 export async function sendProspectAck(to: string): Promise<void> {
   try {
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject: 'Data is easy. Interpretation is everything.',
-      html: `
-        <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
-          <p>Thank you for sharing your business's DNA with us.</p>
-          <p>The Baawa team is now applying our own brand of alchemy to your answers. We don't just look at what you said—we look at why it matters.</p>
-          <p>Expect a distillation of our findings within 48 hours.</p>
-          <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
-          <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to,
+        subject: 'Data is easy. Interpretation is everything.',
+        html: `
+          <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
+            <p>Thank you for sharing your business's DNA with us.</p>
+            <p>The Baawa team is now applying our own brand of alchemy to your answers. We don't just look at what you said—we look at why it matters.</p>
+            <p>Expect a distillation of our findings within 48 hours.</p>
+            <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
+            <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
+          </div>
+        `,
+      })
+    } else {
+        console.warn(`Skipping Prospect Ack for ${to}: RESEND_API_KEY missing.`)
+    }
   } catch (err) {
     throw new Error(`Failed to send prospect ACK to ${to}: ${String(err)}`)
   }
@@ -46,22 +54,24 @@ export async function sendFounderNotification(
 ): Promise<void> {
   if (!FOUNDER_EMAIL) return  // silently skip if not configured
   try {
-    await resend.emails.send({
-      from: FROM,
-      to: FOUNDER_EMAIL,
-      subject: `New Intelligence: ${escapeHtml(prospectEmail)} — Score ${score}/100`,
-      html: `
-        <div style="font-family:sans-serif;color:#111">
-          <h2>A New Puzzle Has Arrived</h2>
-          <p><strong>From:</strong> ${escapeHtml(prospectEmail)}</p>
-          <p><strong>Initial Scan:</strong> ${score}/100</p>
-          <p><strong>Summary:</strong> ${escapeHtml(summary)}</p>
-          <p><strong>Biggest Opportunity:</strong> ${escapeHtml(biggestOpportunity)}</p>
-          <p><strong>Biggest Risk:</strong> ${escapeHtml(biggestRisk)}</p>
-          <p><a href="${process.env.DASHBOARD_URL ?? '#'}/dashboard/assessments" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">Apply Human Ingenuity →</a></p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to: FOUNDER_EMAIL,
+        subject: `New Intelligence: ${escapeHtml(prospectEmail)} — Score ${score}/100`,
+        html: `
+          <div style="font-family:sans-serif;color:#111">
+            <h2>A New Puzzle Has Arrived</h2>
+            <p><strong>From:</strong> ${escapeHtml(prospectEmail)}</p>
+            <p><strong>Initial Scan:</strong> ${score}/100</p>
+            <p><strong>Summary:</strong> ${escapeHtml(summary)}</p>
+            <p><strong>Biggest Opportunity:</strong> ${escapeHtml(biggestOpportunity)}</p>
+            <p><strong>Biggest Risk:</strong> ${escapeHtml(biggestRisk)}</p>
+            <p><a href="${process.env.DASHBOARD_URL ?? '#'}/dashboard/assessments" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">Apply Human Ingenuity →</a></p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     throw new Error(`Failed to send founder notification for ${prospectEmail}: ${String(err)}`)
   }
@@ -70,20 +80,22 @@ export async function sendFounderNotification(
 // 3. Onboard email (sent when founder clicks Onboard in dashboard)
 export async function sendOnboardEmail(to: string): Promise<void> {
   try {
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject: "We see something intriguing in your business.",
-      html: `
-        <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
-          <p>We've reviewed your assessment and found a particularly interesting gap—one that we are uniquely equipped to bridge.</p>
-          <p>We'd like to explore how Baawa's agentic systems can help you find the irrational paths to growth.</p>
-          <p>A consultant will be in touch within 24 hours to initiate the next phase of play.</p>
-          <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
-          <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to,
+        subject: "We see something intriguing in your business.",
+        html: `
+          <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
+            <p>We've reviewed your assessment and found a particularly interesting gap—one that we are uniquely equipped to bridge.</p>
+            <p>We'd like to explore how Baawa's agentic systems can help you find the irrational paths to growth.</p>
+            <p>A consultant will be in touch within 24 hours to initiate the next phase of play.</p>
+            <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
+            <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     throw new Error(`Failed to send onboard email to ${to}: ${String(err)}`)
   }
@@ -92,12 +104,14 @@ export async function sendOnboardEmail(to: string): Promise<void> {
 // 4. Defer email (body generated by AI, passed in as plain text)
 export async function sendDeferEmail(to: string, body: string): Promise<void> {
   try {
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject: 'Regarding your assessment',
-      html: escapeHtml(body).split('\n').map((line) => `<p>${line}</p>`).join(''),
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to,
+        subject: 'Regarding your assessment',
+        html: escapeHtml(body).split('\n').map((line) => `<p>${line}</p>`).join(''),
+      })
+    }
   } catch (err) {
     throw new Error(`Failed to send defer email to ${to}: ${String(err)}`)
   }
@@ -110,19 +124,21 @@ export async function sendOptimizerProposal(
 ): Promise<void> {
   if (!FOUNDER_EMAIL) return
   try {
-    await resend.emails.send({
-      from: FROM,
-      to: FOUNDER_EMAIL,
-      subject: 'Portal Agent: A new move in the grand game.',
-      html: `
-        <div style="font-family:sans-serif;color:#111">
-          <h2>Strategy Proposal</h2>
-          <p>The journey optimizer has proposed a high-risk configuration change. In our world, the opposite of a good idea can also be a good idea, but this requires a human signature.</p>
-          <p><strong>Summary:</strong> ${escapeHtml(changeSummary)}</p>
-          <p><a href="${escapeHtml(dashboardUrl)}/dashboard/intelligence" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">Review the Move →</a></p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to: FOUNDER_EMAIL,
+        subject: 'Portal Agent: A new move in the grand game.',
+        html: `
+          <div style="font-family:sans-serif;color:#111">
+            <h2>Strategy Proposal</h2>
+            <p>The journey optimizer has proposed a high-risk configuration change. In our world, the opposite of a good idea can also be a good idea, but this requires a human signature.</p>
+            <p><strong>Summary:</strong> ${escapeHtml(changeSummary)}</p>
+            <p><a href="${escapeHtml(dashboardUrl)}/dashboard/intelligence" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">Review the Move →</a></p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     throw new Error(`Failed to send optimizer proposal email: ${String(err)}`)
   }
@@ -132,19 +148,21 @@ export async function sendOptimizerProposal(
 export async function sendOptimizerFailure(errorMessage: string): Promise<void> {
   if (!FOUNDER_EMAIL) return
   try {
-    await resend.emails.send({
-      from: FROM,
-      to: FOUNDER_EMAIL,
-      subject: 'Portal Agent: A glitch in the matrix.',
-      html: `
-        <div style="font-family:sans-serif;color:#111">
-          <h2>System Alert</h2>
-          <p>Our agentic systems encountered an unexpected friction point. Even the best logic occasionally trips over reality.</p>
-          <p><strong>Error:</strong> ${escapeHtml(errorMessage)}</p>
-          <p>Check the dashboard for full diagnostics.</p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to: FOUNDER_EMAIL,
+        subject: 'Portal Agent: A glitch in the matrix.',
+        html: `
+          <div style="font-family:sans-serif;color:#111">
+            <h2>System Alert</h2>
+            <p>Our agentic systems encountered an unexpected friction point. Even the best logic occasionally trips over reality.</p>
+            <p><strong>Error:</strong> ${escapeHtml(errorMessage)}</p>
+            <p>Check the dashboard for full diagnostics.</p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     console.error('Failed to send optimizer failure email:', err)
   }
@@ -153,22 +171,24 @@ export async function sendOptimizerFailure(errorMessage: string): Promise<void> 
 // 7. 6-digit OTP for portal login
 export async function sendPortalOTP(to: string, code: string): Promise<void> {
   try {
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject: 'Your Key to the Digital Vault',
-      html: `
-        <div style="font-family:'Outfit',sans-serif;max-width:400px;margin:20px auto;padding:24px;border:1px solid #EEE;border-radius:12px;color:#111">
-          <h2 style="font-size:20px;margin-bottom:16px">The Digital Key</h2>
-          <p style="font-size:14px;color:#666;margin-bottom:24px">In an age of endless data, privacy is the ultimate luxury. Use this one-time access code to enter your Baawa hub.</p>
-          <div style="font-size:32px;font-weight:bold;letter-spacing:8px;padding:16px;background:#FAFAFA;border-radius:8px;text-align:center;margin-bottom:24px;color:#000">
-            ${code}
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to,
+        subject: 'Your Key to the Digital Vault',
+        html: `
+          <div style="font-family:'Outfit',sans-serif;max-width:400px;margin:20px auto;padding:24px;border:1px solid #EEE;border-radius:12px;color:#111">
+            <h2 style="font-size:20px;margin-bottom:16px">The Digital Key</h2>
+            <p style="font-size:14px;color:#666;margin-bottom:24px">In an age of endless data, privacy is the ultimate luxury. Use this one-time access code to enter your Baawa hub.</p>
+            <div style="font-size:32px;font-weight:bold;letter-spacing:8px;padding:16px;background:#FAFAFA;border-radius:8px;text-align:center;margin-bottom:24px;color:#000">
+              ${code}
+            </div>
+            <p style="font-size:12px;color:#888;line-height:1.5">Like a fine single malt, it doesn't stay fresh forever—this code expires in 15 minutes.</p>
+            <p style="color:#CCC;font-size:10px;margin-top:24px">Baawa Consultancy Hub</p>
           </div>
-          <p style="font-size:12px;color:#888;line-height:1.5">Like a fine single malt, it doesn't stay fresh forever—this code expires in 15 minutes.</p>
-          <p style="color:#CCC;font-size:10px;margin-top:24px">Baawa Consultancy Hub</p>
-        </div>
-      `,
-    })
+        `,
+      })
+    }
   } catch (err) {
     throw new Error(`Failed to send portal OTP to ${to}: ${String(err)}`)
   }
@@ -177,20 +197,22 @@ export async function sendPortalOTP(to: string, code: string): Promise<void> {
 // 8. Notify prospect that the Baawa team has sent them a portal message
 export async function sendMessageNotification(to: string, loginUrl: string): Promise<void> {
   try {
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject: 'A New Move in the Grand Game.',
-      html: `
-        <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
-          <p>The Baawa consultants have applied some lateral thinking to your case and left a message in your portal.</p>
-          <p>Context is everything. Log in to explore the possibilities.</p>
-          <p><a href="${loginUrl}" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">View the Intelligence →</a></p>
-          <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
-          <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to,
+        subject: 'A New Move in the Grand Game.',
+        html: `
+          <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
+            <p>The Baawa consultants have applied some lateral thinking to your case and left a message in your portal.</p>
+            <p>Context is everything. Log in to explore the possibilities.</p>
+            <p><a href="${loginUrl}" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">View the Intelligence →</a></p>
+            <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
+            <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     console.error(`sendMessageNotification failed for ${to}:`, err)
   }
@@ -204,19 +226,21 @@ export async function sendProspectReplyNotification(
 ): Promise<void> {
   if (!FOUNDER_EMAIL) return
   try {
-    await resend.emails.send({
-      from: FROM,
-      to: FOUNDER_EMAIL,
-      subject: `Intelligence Alert: ${escapeHtml(prospectEmail)} has responded.`,
-      html: `
-        <div style="font-family:sans-serif;color:#111">
-          <h2>Update from the Field</h2>
-          <p><strong>From:</strong> ${escapeHtml(prospectEmail)}</p>
-          <p><strong>Message Snippet:</strong> "${escapeHtml(snippet)}"</p>
-          <p><a href="${escapeHtml(dashboardUrl)}/dashboard/assessments" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">Join the Conversation →</a></p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to: FOUNDER_EMAIL,
+        subject: `Intelligence Alert: ${escapeHtml(prospectEmail)} has responded.`,
+        html: `
+          <div style="font-family:sans-serif;color:#111">
+            <h2>Update from the Field</h2>
+            <p><strong>From:</strong> ${escapeHtml(prospectEmail)}</p>
+            <p><strong>Message Snippet:</strong> "${escapeHtml(snippet)}"</p>
+            <p><a href="${escapeHtml(dashboardUrl)}/dashboard/assessments" style="display:inline-block;padding:12px 24px;background:#000;color:#FFF;text-decoration:none;border-radius:6px">Join the Conversation →</a></p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     console.error(`sendProspectReplyNotification failed:`, err)
   }
@@ -238,22 +262,24 @@ export async function sendCallConfirmation(
       ? `A client has selected a slot for a meeting of minds.`
       : `We have successfully negotiated with the cosmic forces (and our Outlook calendars) to secure your strategy session.`
 
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject,
-      html: `
-        <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
-          <h2 style="font-size:24px;margin-bottom:16px">Session Confirmed</h2>
-          <p>${intro}</p>
-          <p><strong>Time:</strong> ${escapeHtml(datetime)}</p>
-          <p><strong>With:</strong> ${type === 'founder' ? escapeHtml(prospectEmail) : 'The Baawa Team'}</p>
-          <p>A calendar invitation will follow shortly. Efficiency is the enemy of effectiveness, but punctuality is always appreciated.</p>
-          <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
-          <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
-        </div>
-      `,
-    })
+    if (resend) {
+      await resend.emails.send({
+        from: FROM,
+        to,
+        subject,
+        html: `
+          <div style="font-family:'Outfit',sans-serif;max-width:500px;margin:20px auto;color:#111;line-height:1.6">
+            <h2 style="font-size:24px;margin-bottom:16px">Session Confirmed</h2>
+            <p>${intro}</p>
+            <p><strong>Time:</strong> ${escapeHtml(datetime)}</p>
+            <p><strong>With:</strong> ${type === 'founder' ? escapeHtml(prospectEmail) : 'The Baawa Team'}</p>
+            <p>A calendar invitation will follow shortly. Efficiency is the enemy of effectiveness, but punctuality is always appreciated.</p>
+            <hr style="border:none;border-top:1px solid #EEE;margin:20px 0" />
+            <p style="font-size:12px;color:#888">Sent by the Baawa Consultancy</p>
+          </div>
+        `,
+      })
+    }
   } catch (err) {
     console.error(`sendCallConfirmation (${type}) failed for ${to}:`, err)
   }
