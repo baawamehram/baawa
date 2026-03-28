@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { API_URL, authFetch } from '../../lib/api'
+import { useDashboardTheme } from './ThemeContext'
 
 interface Lead {
   id: number
@@ -8,6 +9,8 @@ interface Lead {
   status: 'pending' | 'reviewing'
   founder_archetype?: string
   created_at: string
+  founder_name?: string
+  company_name?: string
 }
 
 interface Client {
@@ -37,6 +40,7 @@ const STAGES: { key: string; label: string }[] = [
 ]
 
 export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Props) {
+  const { theme } = useDashboardTheme()
   const [clients, setClients] = useState<Client[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -100,11 +104,11 @@ export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Pro
     return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
   }
 
-  if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
+  if (loading) return <p style={{ color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 24px 0' }}>Pipeline</h2>
+      <h2 style={{ fontSize: '24px', fontWeight: 700, color: theme.text, margin: '0 0 24px 0' }}>Pipeline</h2>
 
       {error && (
         <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
@@ -118,33 +122,33 @@ export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Pro
           const stageItems = isLeads ? leads : clients.filter((c) => c.stage === stage.key)
           
           return (
-            <div key={stage.key} style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '16px' }}>
-              <h3 style={{ fontSize: '12px', fontWeight: 600, color: isLeads ? '#FF6B35' : '#ffffff', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {stage.label} <span style={{ color: '#666666' }}>({stageItems.length})</span>
+            <div key={stage.key} style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '16px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 600, color: isLeads ? theme.accent : theme.text, margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {stage.label} <span style={{ color: theme.textMuted }}>({stageItems.length})</span>
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {stageItems.map((item: any) => (
                   <div
                     key={item.id}
-                    style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '16px' }}
+                    style={{ background: theme.input, border: `1px solid ${theme.border}`, borderRadius: '6px', padding: '16px' }}
                   >
                     <div
                       style={{ cursor: 'pointer' }}
                       onClick={() => isLeads ? onViewAssessment(item.id) : onSelectClient(item.id)}
                     >
-                      <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 2px 0' }}>
-                        {isLeads ? item.email : item.founder_name}
+                      <p style={{ color: theme.text, fontSize: '14px', fontWeight: 600, margin: '0 0 2px 0' }}>
+                        {isLeads ? (item.founder_name || item.email) : item.founder_name}
                       </p>
-                      <p style={{ color: '#aaaaaa', fontSize: '12px', margin: '0 0 8px 0' }}>
-                        {isLeads ? (item.score_summary || 'Submission under review') : item.company_name}
+                      <p style={{ color: theme.textMuted, fontSize: '12px', margin: '0 0 8px 0' }}>
+                        {isLeads ? (item.company_name || item.score_summary || 'Submission under review') : item.company_name}
                       </p>
                       
-                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#666666' }}>
-                        <span style={{ color: item.score > 70 ? '#4ade80' : '#666666' }}>Score: {item.score ?? 'N/A'}</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', fontSize: '12px', color: theme.textMuted }}>
+                        <span style={{ color: item.score > 70 ? '#4ade80' : theme.textMuted }}>Score: {item.score ?? 'N/A'}</span>
                         <span>{daysSince(item.created_at || item.start_date)}d</span>
                         {item.founder_archetype && (
-                          <span style={{ color: '#FF6B35', border: '1px solid #FF6B35', padding: '1px 6px', borderRadius: '10px', fontSize: '10px' }}>
+                          <span style={{ color: theme.accent, border: `1px solid ${theme.accent}`, padding: '1px 6px', borderRadius: '10px', fontSize: '10px' }}>
                             {item.founder_archetype}
                           </span>
                         )}
@@ -155,7 +159,7 @@ export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Pro
                       {isLeads ? (
                         <button
                           onClick={() => onboardLead(item.id)}
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 10px', borderRadius: '4px', background: '#FF6B35', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 10px', borderRadius: '4px', background: theme.accent, color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
                         >
                           Onboard Client
                         </button>
@@ -164,7 +168,7 @@ export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Pro
                           <button
                             key={s.key}
                             onClick={() => moveClient(item.id, s.key as any)}
-                            style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#333333', color: '#ffffff', border: 'none', cursor: 'pointer' }}
+                            style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: theme.border, color: theme.text, border: 'none', cursor: 'pointer' }}
                           >
                             → {s.label}
                           </button>
@@ -175,7 +179,7 @@ export function Pipeline({ token, on401, onSelectClient, onViewAssessment }: Pro
                 ))}
                 
                 {stageItems.length === 0 && (
-                  <p style={{ color: '#666666', fontSize: '12px', textAlign: 'center', padding: '16px 0', margin: 0 }}>Empty</p>
+                  <p style={{ color: theme.textMuted, fontSize: '12px', textAlign: 'center', padding: '16px 0', margin: 0 }}>Empty</p>
                 )}
               </div>
             </div>

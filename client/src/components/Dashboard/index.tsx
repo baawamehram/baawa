@@ -10,6 +10,8 @@ import { KnowledgeBase } from './KnowledgeBase'
 import { Intelligence } from './Intelligence'
 import { API_URL } from '../../lib/api'
 
+import { DashboardThemeProvider, useDashboardTheme } from './ThemeContext'
+
 type Section = 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge' | 'intelligence'
 
 const NAV_ITEMS: { key: Section; label: string }[] = [
@@ -43,7 +45,7 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ position: 'fixed', inset: 0, background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, fontFamily: "'Outfit', sans-serif" }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -84,7 +86,8 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
   )
 }
 
-export default function Dashboard() {
+function DashboardContent() {
+  const { theme, isDark, toggleTheme } = useDashboardTheme()
   const [token, setToken] = useState<string | null>(null)
   const [section, setSection] = useState<Section>('assessments')
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null)
@@ -162,14 +165,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#000000', fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ display: 'flex', height: '100vh', background: theme.bg, fontFamily: "'Outfit', sans-serif", color: theme.text }}>
       {/* Mobile header bar */}
-      <div style={{ display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#000000', borderBottom: '1px solid #333333' }}
+      <div style={{ display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: theme.sidebar, borderBottom: `1px solid ${theme.border}` }}
         className="mobile-header">
         <LogoIcon height={28} />
         <button
           onClick={() => setMobileNavOpen((o) => !o)}
-          style={{ color: '#aaaaaa', background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}
+          style={{ color: theme.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}
           aria-label="Toggle navigation"
           aria-expanded={mobileNavOpen}
         >
@@ -179,7 +182,7 @@ export default function Dashboard() {
 
       {/* Mobile dropdown nav */}
       {mobileNavOpen && (
-        <div style={{ position: 'fixed', top: '48px', left: 0, right: 0, zIndex: 30, background: '#111111', borderBottom: '1px solid #333333', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ position: 'fixed', top: '48px', left: 0, right: 0, zIndex: 30, background: theme.sidebar, borderBottom: `1px solid ${theme.border}`, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
@@ -191,23 +194,37 @@ export default function Dashboard() {
                 fontSize: '14px',
                 border: 'none',
                 cursor: 'pointer',
-                background: section === item.key ? '#ffffff' : 'transparent',
-                color: section === item.key ? '#000000' : '#aaaaaa',
+                background: section === item.key ? theme.primary : 'transparent',
+                color: section === item.key ? theme.primaryText : theme.textMuted,
                 fontFamily: "'Outfit', sans-serif",
+                fontWeight: section === item.key ? 600 : 400
               }}
             >
               {item.label}
             </button>
           ))}
+          <button
+            onClick={toggleTheme}
+            style={{ textAlign: 'left', padding: '10px 16px', borderRadius: '6px', fontSize: '14px', border: 'none', cursor: 'pointer', background: 'transparent', color: theme.textMuted, fontFamily: "'Outfit', sans-serif", marginTop: '8px', borderTop: `1px solid ${theme.border}` }}
+          >
+            {isDark ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </button>
         </div>
       )}
 
       {/* Sidebar — desktop only */}
-      <aside style={{ width: '256px', background: '#111111', borderRight: '1px solid #333333', display: 'flex', flexDirection: 'column', padding: '24px 16px', flexShrink: 0 }}>
-        <div style={{ marginBottom: '32px', padding: '0 8px' }}>
-          <LogoDark height={32} />
+      <aside style={{ width: '256px', background: theme.sidebar, borderRight: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', padding: '24px 16px', flexShrink: 0 }}>
+        <div style={{ marginBottom: '32px', padding: '0 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {isDark ? <LogoDark height={32} /> : <LogoIcon height={32} />}
+          <button
+            onClick={toggleTheme}
+            style={{ background: theme.input, border: `1px solid ${theme.border}`, cursor: 'pointer', padding: '6px', borderRadius: '6px', color: theme.text, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDark ? '☀️' : '🌙'}
+          </button>
         </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
@@ -219,22 +236,28 @@ export default function Dashboard() {
                 fontSize: '14px',
                 border: 'none',
                 cursor: 'pointer',
-                background: section === item.key ? '#ffffff' : 'transparent',
-                color: section === item.key ? '#000000' : '#aaaaaa',
+                background: section === item.key ? theme.primary : 'transparent',
+                color: section === item.key ? theme.primaryText : theme.textMuted,
                 fontFamily: "'Outfit', sans-serif",
+                fontWeight: section === item.key ? 600 : 400,
+                transition: 'background 0.2s, color 0.2s'
               }}
             >
               {item.label}
             </button>
           ))}
         </nav>
+        
+        <div style={{ paddingTop: '16px', borderTop: `1px solid ${theme.border}`, color: theme.textMuted, fontSize: '12px', textAlign: 'center' }}>
+          Baawa Consultancy CRM v1.1
+        </div>
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, overflowY: 'auto', padding: '32px', background: '#000000' }}>
+      <main style={{ flex: 1, overflowY: 'auto', padding: '32px', background: theme.bgMain }}>
         <AnimatePresence mode="wait">
           <motion.div
-            key={`${section}-${selectedAssessmentId}-${selectedClientId}`}
+            key={`${section}-${selectedAssessmentId}-${selectedClientId}-${isDark}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -245,5 +268,13 @@ export default function Dashboard() {
         </AnimatePresence>
       </main>
     </div>
+  )
+}
+
+export default function Dashboard() {
+  return (
+    <DashboardThemeProvider>
+      <DashboardContent />
+    </DashboardThemeProvider>
   )
 }
