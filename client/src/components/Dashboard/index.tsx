@@ -8,15 +8,17 @@ import { ClientDetail } from './ClientDetail'
 import { RevenueOverview } from './RevenueOverview'
 import { KnowledgeBase } from './KnowledgeBase'
 import { Intelligence } from './Intelligence'
+import { CommandCenter } from './CommandCenter'
 import { API_URL } from '../../lib/api'
 
 import { DashboardThemeProvider, useDashboardTheme } from './ThemeContext'
 
-type Section = 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge' | 'intelligence'
+type Section = 'agent' | 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge' | 'intelligence'
 
 const NAV_ITEMS: { key: Section; label: string }[] = [
-  { key: 'assessments', label: 'Assessments' },
+  { key: 'agent', label: 'Agent 🤖' },
   { key: 'pipeline', label: 'Pipeline' },
+  { key: 'assessments', label: 'Leads' },
   { key: 'clients', label: 'Clients' },
   { key: 'revenue', label: 'Revenue' },
   { key: 'knowledge', label: 'Knowledge Base' },
@@ -32,11 +34,14 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
     e.preventDefault()
     setError('')
     try {
-      const res = await fetch(`${API_URL}/api/assessments`, {
-        headers: { Authorization: `Bearer ${password}` },
+      const res = await fetch(`${API_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
       })
       if (res.ok) {
-        onAuth(password)
+        const { token } = await res.json()
+        onAuth(token)
       } else {
         setError('Invalid password')
       }
@@ -80,7 +85,7 @@ function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
 function DashboardContent() {
   const { theme, isDark, toggleTheme } = useDashboardTheme()
   const [token, setToken] = useState<string | null>(null)
-  const [section, setSection] = useState<Section>('assessments')
+  const [section, setSection] = useState<Section>('agent')
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null)
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -118,17 +123,46 @@ function DashboardContent() {
   }
 
   const renderContent = () => {
+    if (selectedAssessmentId !== null) {
+      return (
+        <SubmissionDetail
+          id={selectedAssessmentId}
+          token={token}
+          on401={handle401}
+          onBack={() => setSelectedAssessmentId(null)}
+        />
+      )
+    }
+    if (selectedClientId !== null) {
+      return (
+        <ClientDetail
+          id={selectedClientId}
+          token={token}
+          on401={handle401}
+          onBack={() => setSelectedClientId(null)}
+        />
+      )
+    }
+
+    if (section === 'agent') {
+      return (
+        <CommandCenter
+          token={token}
+          on401={handle401}
+          onNavigate={(target, id) => {
+            if (target === 'submissions' && id) {
+              setSection('assessments')
+              setSelectedAssessmentId(id)
+            } else if (target === 'pipeline') {
+              setSection('pipeline')
+            } else if (target === 'intelligence') {
+              setSection('intelligence')
+            }
+          }}
+        />
+      )
+    }
     if (section === 'assessments') {
-      if (selectedAssessmentId !== null) {
-        return (
-          <SubmissionDetail
-            id={selectedAssessmentId}
-            token={token}
-            on401={handle401}
-            onBack={() => setSelectedAssessmentId(null)}
-          />
-        )
-      }
       return (
         <SubmissionList
           token={token}
@@ -138,16 +172,6 @@ function DashboardContent() {
       )
     }
     if (section === 'pipeline' || section === 'clients') {
-      if (selectedClientId !== null) {
-        return (
-          <ClientDetail
-            id={selectedClientId}
-            token={token}
-            on401={handle401}
-            onBack={() => setSelectedClientId(null)}
-          />
-        )
-      }
       return (
         <Pipeline
           token={token}
@@ -251,10 +275,10 @@ function DashboardContent() {
                 fontSize: '14px',
                 border: 'none',
                 cursor: 'pointer',
-                background: section === item.key ? theme.primary : 'transparent',
-                color: section === item.key ? theme.primaryText : theme.textMuted,
+                background: (section === item.key || (selectedAssessmentId && item.key === 'assessments') || (selectedClientId && item.key === 'clients')) ? theme.primary : 'transparent',
+                color: (section === item.key || (selectedAssessmentId && item.key === 'assessments') || (selectedClientId && item.key === 'clients')) ? theme.primaryText : theme.textMuted,
                 fontFamily: "'Outfit', sans-serif",
-                fontWeight: section === item.key ? 600 : 400,
+                fontWeight: (section === item.key || (selectedAssessmentId && item.key === 'assessments') || (selectedClientId && item.key === 'clients')) ? 600 : 400,
                 transition: 'background 0.2s, color 0.2s'
               }}
             >

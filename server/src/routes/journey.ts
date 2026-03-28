@@ -168,4 +168,72 @@ router.get('/metrics', requireAuth, async (_req: Request, res: Response) => {
   }
 })
 
+// GET /api/journey/suggestions — smart actionable suggestions (auth required)
+router.get('/suggestions', requireAuth, async (_req: Request, res: Response) => {
+  try {
+    const suggestions: any[] = []
+
+    // 1. High-value leads pending review
+    const highLeads = await db.query(
+      `SELECT id, email, founder_name, company_name, score
+       FROM assessments WHERE status = 'pending' AND score >= 70
+       ORDER BY score DESC LIMIT 5`
+    )
+    highLeads.rows.forEach(l => {
+      suggestions.push({
+        type: 'lead',
+        priority: 'high',
+        title: `High-Value Lead: ${l.founder_name || l.email}`,
+        description: `${l.founder_name || 'A founder'} from ${l.company_name || 'a new company'} scored ${l.score}/100. They are a prime candidate for onboarding.`,
+        action_label: 'View Submission',
+        link: `/assessments/${l.id}`
+      })
+    })
+
+    // 2. Upcoming deliverables
+    const dueDeliverables = await db.query(
+      `SELECT d.id, d.title, d.due_date, c.founder_name, c.company_name
+       FROM deliverables d
+       JOIN clients c ON d.client_id = c.id
+       WHERE d.status IN ('pending', 'in_progress')
+       AND d.due_date <= (NOW() + INTERVAL '7 days')::date
+       ORDER BY d.due_date ASC LIMIT 5`
+    )
+    dueDeliverables.rows.forEach(d => {
+      suggestions.push({
+        type: 'work',
+        priority: d.due_date <= new Date().toISOString().split('T')[0] ? 'high' : 'medium',
+        title: `Deliverable Due: ${d.title}`,
+        description: `Working with ${d.founder_name} (${d.company_name}). Due on ${new Date(d.due_date).toLocaleDateString()}.`,
+        action_label: 'Manage Deliverables',
+        link: `/clients` // ideally link to specific client, but /clients works for now
+      })
+    })
+
+    // 3. Funnel performance
+    const completionRes = await db.query(
+      `SELECT
+         (COUNT(*) FILTER (WHERE completed = true)::float / NULLIF(COUNT(*), 0)) * 100 as rate
+       FROM session_analytics
+       WHERE created_at > NOW() - INTERVAL '30 days'`
+    )
+    const rate = completionRes.rows[0]?.rate
+    if (rate !== null && rate < 40) {
+      suggestions.push({
+        type: 'system',
+        priority: 'medium',
+        title: 'Low Funnel Completion Rate',
+        description: `Completion rate is at ${Math.round(rate)}% over the last 30 days. Consider running the AI Journey Optimizer to reduce drop-offs.`,
+        action_label: 'Open Intelligence',
+        link: '/intelligence'
+      })
+    }
+
+    res.json(suggestions)
+  } catch (err) {
+    console.error('GET /journey/suggestions error:', err)
+    res.status(500).json({ error: 'Failed to generate suggestions' })
+  }
+})
+
 export default router

@@ -177,4 +177,34 @@ router.get('/:id/messages', async (req: Request, res: Response) => {
   }
 })
 
+// PUT /api/assessments/:id/identity — update owner/company names
+router.put('/:id/identity', async (req: Request, res: Response) => {
+  try {
+    const schema = z.object({
+      founder_name: z.string().optional(),
+      company_name: z.string().optional()
+    })
+    const parsed = schema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ error: 'Invalid identity' })
+
+    const { founder_name, company_name } = parsed.data
+
+    await db.query(
+      `UPDATE assessments SET founder_name = $1, company_name = $2, updated_at = NOW() WHERE id = $3`,
+      [founder_name || null, company_name || null, req.params.id]
+    )
+
+    // Also update associated client if exists
+    await db.query(
+      `UPDATE clients SET founder_name = $1, company_name = $2, updated_at = NOW() WHERE assessment_id = $3`,
+      [founder_name || null, company_name || null, req.params.id]
+    )
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('PUT /assessments/:id/identity error:', err)
+    res.status(500).json({ error: 'Failed to update identity' })
+  }
+})
+
 export default router

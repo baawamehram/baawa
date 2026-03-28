@@ -72,7 +72,7 @@ const DOMAIN_COLORS: Record<string, string> = {
 }
 
 export function SubmissionDetail({ id, token, on401, onBack }: Props) {
-  const { theme, isDark } = useDashboardTheme()
+  const { theme } = useDashboardTheme()
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [loading, setLoading] = useState(true)
   const [notes, setNotes] = useState('')
@@ -83,6 +83,11 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const [messageBody, setMessageBody] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
+
+  // Identity state
+  const [isEditingIdentity, setIsEditingIdentity] = useState(false)
+  const [editFounder, setEditFounder] = useState('')
+  const [editCompany, setEditCompany] = useState('')
 
   // CRM State
   const [call, setCall] = useState<CallSlot | null>(null)
@@ -110,6 +115,8 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         const data = await res.json()
         setAssessment(data)
         setNotes(data.founder_notes || '')
+        setEditFounder(data.founder_name || '')
+        setEditCompany(data.company_name || '')
       }
       if (msgsRes?.ok) setMessages(await msgsRes.json())
       if (callRes?.ok) setCall(await callRes.json())
@@ -122,6 +129,28 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   }, [id, token, on401])
 
   useEffect(() => { void loadAll() }, [loadAll])
+
+  const saveIdentity = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/assessments/${id}/identity`, token, on401, {
+        method: 'PUT',
+        body: JSON.stringify({ founder_name: editFounder, company_name: editCompany }),
+      })
+      if (res?.ok) {
+        setAssessment(prev => prev ? { ...prev, founder_name: editFounder, company_name: editCompany } : null)
+        setIsEditingIdentity(false)
+        setActionMsg('Identity updated across platform.')
+      } else {
+        setError('Failed to update identity.')
+      }
+    } catch {
+      setError('Network error.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const saveNotes = async () => {
     setSaving(true)
@@ -212,10 +241,32 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: 700, color: theme.text, margin: 0 }}>
-              {assessment.founder_name || assessment.email}
-            </h2>
-            <span style={{ fontSize: '12px', color: theme.textMuted }}>ID: {assessment.id} {assessment.company_name && `• ${assessment.company_name}`}</span>
+            {isEditingIdentity ? (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  value={editFounder}
+                  onChange={e => setEditFounder(e.target.value)}
+                  placeholder="Founder Name"
+                  style={{ background: theme.bg, color: theme.text, border: `1px solid ${theme.border}`, padding: '4px 8px', borderRadius: '4px', fontSize: '20px', fontWeight: 700 }}
+                />
+                <input
+                  value={editCompany}
+                  onChange={e => setEditCompany(e.target.value)}
+                  placeholder="Company Name"
+                  style={{ background: theme.bg, color: theme.text, border: `1px solid ${theme.border}`, padding: '4px 8px', borderRadius: '4px', fontSize: '14px' }}
+                />
+                <button onClick={saveIdentity} style={{ background: theme.accent, color: '#000', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>SAVE</button>
+                <button onClick={() => setIsEditingIdentity(false)} style={{ background: 'transparent', color: theme.textMuted, border: `1px solid ${theme.border}`, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>CANCEL</button>
+              </div>
+            ) : (
+              <>
+                <h2 style={{ fontSize: '28px', fontWeight: 700, color: theme.text, margin: 0 }}>
+                  {assessment.founder_name || assessment.email}
+                </h2>
+                <span style={{ fontSize: '12px', color: theme.textMuted }}>ID: {assessment.id} {assessment.company_name && `• ${assessment.company_name}`}</span>
+                <button onClick={() => setIsEditingIdentity(true)} style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '11px', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Edit Identity</button>
+              </>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
             <span style={{ color: theme.primaryText, background: theme.primary, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{assessment.status}</span>
