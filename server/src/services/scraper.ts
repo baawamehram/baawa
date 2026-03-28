@@ -19,7 +19,7 @@ interface SourceConfig {
 const SOURCES: SourceConfig[] = [
   {
     name: 'Harvard Business Review',
-    feedUrl: 'https://feeds.hbr.org/harvardbusiness',
+    feedUrl: 'https://feeds.feedburner.com/harvardbusiness',
     contentSelectors: ['article', '.article-body', '.content-body'],
     maxArticles: 60,
     rateLimit: 1200,
@@ -147,7 +147,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 12000): Promise<string>
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Research-Bot/1.0; +https://baawa.co/research)',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
     })

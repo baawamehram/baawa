@@ -2,6 +2,7 @@ import { db } from '../db/client'
 import { scrapeAllSources, type ScrapedArticle } from './scraper'
 import { getEmbedding } from './knowledge'
 import fs from 'fs/promises'
+import { existsSync } from 'fs'
 import path from 'path'
 
 // Shared state for admin status endpoint
@@ -14,13 +15,23 @@ export const ingestionState = {
 
 // Local file ingestion logic (Markdown files in the workspace)
 async function ingestLocalKnowledgeFiles(): Promise<Record<string, number>> {
-  const dirPath = path.join(process.cwd(), '..', 'knowledge-base')
+  // Smarter path discovery for Railway monorepos
+  let dirPath = path.join(process.cwd(), '..', 'knowledge-base')
+  if (!existsSync(dirPath)) {
+    dirPath = path.join(process.cwd(), 'knowledge-base')
+  }
+
   const stats: Record<string, number> = {}
 
   try {
+    if (!existsSync(dirPath)) {
+      console.warn(`[ingestion] Knowledge base directory not found at ${dirPath}`)
+      return stats
+    }
+
     const files = await fs.readdir(dirPath)
     const mdFiles = files.filter(f => f.endsWith('.md'))
-    console.log(`[ingestion] Found ${mdFiles.length} local knowledge files in ${dirPath}`)
+    console.log(`[ingestion] ── Found ${mdFiles.length} local knowledge files in ${dirPath} ──`)
 
     for (const file of mdFiles) {
       const filePath = path.join(dirPath, file)
@@ -49,7 +60,7 @@ async function ingestLocalKnowledgeFiles(): Promise<Record<string, number>> {
             ]
           )
           stored++
-          await sleep(200) // avoid rate limits
+          await sleep(1150) // strictly avoid 429 rate limits (60 RPM)
         } catch (err) {
           console.warn(`[ingestion] Local file ${file} chunk ${i} failed:`, (err as Error).message)
         }
@@ -109,7 +120,7 @@ async function ingestArticle(article: ScrapedArticle): Promise<number> {
         ]
       )
       stored++
-      await sleep(250) // stay within embedding API rate limit
+      await sleep(1150) // stay within embedding API rate limit
     } catch (err) {
       console.warn(`[ingestion] Chunk ${i} failed for ${article.url}:`, (err as Error).message)
     }

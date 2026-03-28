@@ -12,7 +12,10 @@ export async function getEmbedding(text: string): Promise<number[]> {
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: { parts: [{ text: safeText }] } }),
+      body: JSON.stringify({
+        content: { parts: [{ text: safeText }] },
+        output_dimensionality: 768,
+      }),
     }
   )
 
