@@ -236,6 +236,15 @@ async function startServer() {
     // Phase 4 — Deliverables portal columns
     await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS founder_name VARCHAR(255)`)
     await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS company_name VARCHAR(255)`)
+
+    // Missing columns causing Dashboard loading failure
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending'`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS city VARCHAR(255)`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS country VARCHAR(255)`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS score_summary TEXT`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS biggest_opportunity TEXT`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS biggest_risk TEXT`)
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS founder_notes TEXT`)
     
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS portal_visible BOOLEAN NOT NULL DEFAULT false`)
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS content TEXT`)
