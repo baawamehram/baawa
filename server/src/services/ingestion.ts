@@ -1,5 +1,8 @@
 import { db } from '../db/client'
 import { scrapeAllSources, type ScrapedArticle } from './scraper'
+import { getEmbedding } from './knowledge'
+import fs from 'fs/promises'
+import path from 'path'
 
 // Shared state for admin status endpoint
 export const ingestionState = {
@@ -9,24 +12,55 @@ export const ingestionState = {
   lastError: null as string | null,
 }
 
-async function getEmbedding(text: string): Promise<number[]> {
-  const apiKey = process.env.GOOGLE_AI_API_KEY ?? ''
-  if (!apiKey) throw new Error('GOOGLE_AI_API_KEY not set')
-  // Cap to 8000 chars to stay within API limits
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: { parts: [{ text: text.slice(0, 8000) }] } }),
+// Local file ingestion logic (Markdown files in the workspace)
+async function ingestLocalKnowledgeFiles(): Promise<Record<string, number>> {
+  const dirPath = path.join(process.cwd(), '..', 'knowledge-base')
+  const stats: Record<string, number> = {}
+
+  try {
+    const files = await fs.readdir(dirPath)
+    const mdFiles = files.filter(f => f.endsWith('.md'))
+    console.log(`[ingestion] Found ${mdFiles.length} local knowledge files in ${dirPath}`)
+
+    for (const file of mdFiles) {
+      const filePath = path.join(dirPath, file)
+      const content = await fs.readFile(filePath, 'utf-8')
+      const sourceName = `Local: ${file}`
+      console.log(`[ingestion] Processing local file: ${file}`)
+
+      // Delete existing chunks for this specific file to ensure clean update
+      await db.query('DELETE FROM knowledge_chunks WHERE source_name = $1', [sourceName])
+
+      const chunks = chunkText(content)
+      let stored = 0
+
+      for (let i = 0; i < chunks.length; i++) {
+        try {
+          const embedding = await getEmbedding(chunks[i])
+          await db.query(
+            `INSERT INTO knowledge_chunks (content, embedding, source_name, source_url, chunk_index, is_active, ingested_at)
+             VALUES ($1, $2::vector, $3, $4, $5, true, NOW())`,
+            [
+              chunks[i],
+              `[${embedding.join(',')}]`,
+              sourceName,
+              file, // source_url for local files is just the filename
+              i
+            ]
+          )
+          stored++
+          await sleep(200) // avoid rate limits
+        } catch (err) {
+          console.warn(`[ingestion] Local file ${file} chunk ${i} failed:`, (err as Error).message)
+        }
+      }
+      stats[sourceName] = stored
     }
-  )
-  if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`Embedding API failed: ${res.status} — ${body}`)
+  } catch (err) {
+    console.error(`[ingestion] Local file ingestion failed:`, (err as Error).message)
   }
-  const data = (await res.json()) as { embedding: { values: number[] } }
-  return data.embedding.values
+
+  return stats
 }
 
 function chunkText(text: string, chunkSize = 700, overlap = 80): string[] {
@@ -96,11 +130,19 @@ export async function runFullIngestion(): Promise<void> {
   console.log('[ingestion] ── Starting full knowledge base ingestion ──')
 
   try {
-    const articles = await scrapeAllSources()
-    console.log(`[ingestion] Total articles collected: ${articles.length}`)
-
     const stats: Record<string, number> = {}
     let totalChunks = 0
+
+    // 1. Process local files first
+    console.log('[ingestion] ── Ingesting local files ──')
+    const localStats = await ingestLocalKnowledgeFiles()
+    Object.assign(stats, localStats)
+    totalChunks += Object.values(localStats).reduce((a, b) => a + b, 0)
+
+    // 2. Scrape external sources
+    console.log('[ingestion] ── Scraping external sources ──')
+    const articles = await scrapeAllSources()
+    console.log(`[ingestion] Total articles collected: ${articles.length}`)
 
     for (const article of articles) {
       const chunksStored = await ingestArticle(article)
@@ -110,7 +152,7 @@ export async function runFullIngestion(): Promise<void> {
 
     ingestionState.lastStats = stats
     ingestionState.lastRun = new Date()
-    console.log(`[ingestion] ── Done! Stored ${totalChunks} new chunks ──`, stats)
+    console.log(`[ingestion] ── Done! Stored ${totalChunks} total chunks ──`, stats)
   } catch (err) {
     ingestionState.lastError = (err as Error).message
     console.error('[ingestion] Fatal error:', err)
@@ -127,7 +169,6 @@ export async function getIngestionStatus() {
   }>(
     `SELECT source_name, COUNT(*) as count, MAX(ingested_at) as last_ingested
      FROM knowledge_chunks
-     WHERE source_url IS NOT NULL
      GROUP BY source_name
      ORDER BY count DESC`
   )

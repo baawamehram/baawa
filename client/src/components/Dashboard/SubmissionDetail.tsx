@@ -1,5 +1,30 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { API_URL, authFetch } from '../../lib/api'
+
+interface ProblemDomain {
+  domain: string
+  subCategory: string
+  confidence: number
+  rationale: string
+}
+
+interface CallSlot {
+  id: number
+  proposed_slots: { datetime: string; label: string }[]
+  selected_slot: string | null
+  meeting_link: string | null
+  status: 'pending' | 'confirmed' | 'completed'
+}
+
+interface Proposal {
+  id: number
+  title: string
+  summary: string | null
+  packages: any[]
+  total_price: number
+  status: 'draft' | 'sent' | 'approved' | 'rejected'
+  created_at: string
+}
 
 interface Assessment {
   id: number
@@ -14,6 +39,7 @@ interface Assessment {
   conversation: Array<{ role: 'user' | 'assistant'; content: string }>
   created_at: string
   results_unlocked?: boolean
+  problem_domains?: ProblemDomain[] | null
 }
 
 interface Props {
@@ -31,6 +57,17 @@ const DIMENSION_LABELS: Record<string, string> = {
   revenue: 'Revenue',
 }
 
+const DOMAIN_COLORS: Record<string, string> = {
+  Marketing: '#FF6B35',
+  Sales: '#E85520',
+  Engineering: '#3B82F6',
+  Operations: '#8B5CF6',
+  Strategy: '#F59E0B',
+  Finance: '#10B981',
+  Research: '#EC4899',
+  Product: '#06B6D4',
+}
+
 export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [loading, setLoading] = useState(true)
@@ -41,36 +78,46 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const [messages, setMessages] = useState<Array<{ id: number; sender: string; body: string; created_at: string }>>([])
   const [messageBody, setMessageBody] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
-  const [msgError, setMsgError] = useState('')
   const [unlocking, setUnlocking] = useState(false)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await authFetch(`${API_URL}/api/assessments/${id}`, token, on401)
-        if (!res) return
-        if (!res.ok) {
-          setError('Failed to load assessment.')
-          return
-        }
+  // CRM State
+  const [call, setCall] = useState<CallSlot | null>(null)
+  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [showCallForm, setShowCallForm] = useState(false)
+  const [newSlots, setNewSlots] = useState([{ datetime: '', label: '' }])
+  const [meetingLink, setMeetingLink] = useState('')
+  
+  const [showPropForm, setShowPropForm] = useState(false)
+  const [propTitle, setPropTitle] = useState('')
+  const [propSummary, setPropSummary] = useState('')
+  const [propPrice, setPropPrice] = useState(0)
+  const [propPackages] = useState([{ name: '', description: '', price: 0, deliverables: [''] }])
+
+  const loadAll = useCallback(async () => {
+    try {
+      const [res, msgsRes, callRes, propRes] = await Promise.all([
+        authFetch(`${API_URL}/api/assessments/${id}`, token, on401),
+        authFetch(`${API_URL}/api/assessments/${id}/messages`, token, on401),
+        authFetch(`${API_URL}/api/calls/${id}`, token, on401),
+        authFetch(`${API_URL}/api/proposals/assessment/${id}`, token, on401)
+      ])
+      
+      if (res?.ok) {
         const data = await res.json()
         setAssessment(data)
         setNotes(data.founder_notes || '')
-        try {
-          const msgsRes = await authFetch(`${API_URL}/api/assessments/${id}/messages`, token, on401)
-          if (msgsRes?.ok) {
-            const msgsData = await msgsRes.json()
-            setMessages(msgsData)
-          }
-        } catch { /* non-critical */ }
-      } catch {
-        setError('Network error. Please check your connection.')
-      } finally {
-        setLoading(false)
       }
+      if (msgsRes?.ok) setMessages(await msgsRes.json())
+      if (callRes?.ok) setCall(await callRes.json())
+      if (propRes?.ok) setProposals(await propRes.json())
+    } catch {
+      setError('Network error loading detailed view.')
+    } finally {
+      setLoading(false)
     }
-    load()
   }, [id, token, on401])
+
+  useEffect(() => { void loadAll() }, [loadAll])
 
   const saveNotes = async () => {
     setSaving(true)
@@ -80,42 +127,70 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
         method: 'PUT',
         body: JSON.stringify({ notes }),
       })
-      if (!res) return
-      if (!res.ok) {
-        setError('Something went wrong. Please try again.')
-      }
-    } catch {
-      setError('Network error. Please check your connection.')
-    } finally {
-      setSaving(false)
-    }
+      if (!res?.ok) setError('Failed to save notes.')
+    } catch { setError('Network error.') }
+    finally { setSaving(false) }
   }
 
   const handleAction = async (action: 'onboard' | 'defer') => {
-    if (action === 'defer' && !window.confirm('Send defer email to this founder? This cannot be undone.')) return
+    if (action === 'defer' && !window.confirm('Send defer email to this founder?')) return
     setError('')
     try {
-      const res = await authFetch(`${API_URL}/api/assessments/${id}/${action}`, token, on401, {
+      const res = await authFetch(`${API_URL}/api/assessments/${id}/${action}`, token, on401, { method: 'POST' })
+      if (!res?.ok) return setError('Action failed.')
+      setActionMsg(action === 'onboard' ? 'Client onboarded!' : 'Email sent.')
+      void loadAll()
+    } catch { setError('Network error.') }
+  }
+
+  const proposeCall = async () => {
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/calls`, token, on401, {
         method: 'POST',
+        body: JSON.stringify({
+          assessment_id: id,
+          proposed_slots: newSlots.filter(s => s.datetime),
+          meeting_link: meetingLink
+        })
       })
-      if (!res) return
-      if (!res.ok) {
-        setError('Something went wrong. Please try again.')
-        return
+      if (res?.ok) {
+        setShowCallForm(false)
+        setActionMsg('Call slots sent to portal.')
+        void loadAll()
       }
-      setActionMsg(action === 'onboard' ? 'Client onboarded successfully!' : 'Assessment deferred. Email sent.')
-      try {
-        const updated = await authFetch(`${API_URL}/api/assessments/${id}`, token, on401)
-        if (updated?.ok) {
-          const data = await updated.json()
-          setAssessment(data)
-        }
-      } catch {
-        // Refresh failed but action succeeded — not critical
+    } catch { setError('Failed to propose call.') }
+  }
+
+  const createProposal = async () => {
+    setError('')
+    try {
+      const res = await authFetch(`${API_URL}/api/proposals`, token, on401, {
+        method: 'POST',
+        body: JSON.stringify({
+          assessment_id: id,
+          title: propTitle,
+          summary: propSummary,
+          packages: propPackages,
+          total_price: propPrice
+        })
+      })
+      if (res?.ok) {
+        setShowPropForm(false)
+        setActionMsg('Proposal draft created.')
+        void loadAll()
       }
-    } catch {
-      setError('Network error. Please check your connection.')
-    }
+    } catch { setError('Failed to create proposal.') }
+  }
+
+  const sendProposal = async (propId: number) => {
+    try {
+      const res = await authFetch(`${API_URL}/api/proposals/${propId}/send`, token, on401, { method: 'PUT' })
+      if (res?.ok) {
+        setActionMsg('Proposal pushed to portal.')
+        void loadAll()
+      }
+    } catch { setError('Failed to send proposal.') }
   }
 
   if (loading) return <p style={{ color: '#aaaaaa', fontFamily: "'Outfit', sans-serif" }}>Loading...</p>
@@ -124,18 +199,24 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
   const breakdown = assessment.score_breakdown || {}
 
   return (
-    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ fontFamily: "'Outfit', sans-serif", paddingBottom: '100px' }}>
       <button onClick={onBack} style={{ color: '#aaaaaa', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', marginBottom: '24px', display: 'inline-block', padding: 0 }}>
         &larr; Back to list
       </button>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#ffffff', margin: '0 0 4px 0' }}>{assessment.email}</h2>
-          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>
-            Score: <span style={{ color: '#ffffff', fontWeight: 600 }}>{assessment.score}</span> &middot; Status:{' '}
-            <span style={{ color: '#ffffff' }}>{assessment.status}</span>
-          </p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', margin: 0 }}>{assessment.email}</h2>
+            <span style={{ fontSize: '12px', color: '#aaaaaa' }}>ID: {assessment.id}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+            <span style={{ color: '#ffffff', background: '#333', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>{assessment.status}</span>
+            {(assessment.problem_domains || []).map(d => (
+              <span key={d.domain} style={{ background: `${DOMAIN_COLORS[d.domain] || '#FF6B35'}20`, color: DOMAIN_COLORS[d.domain] || '#FF6B35', border: `1px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}40`, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{d.domain}</span>
+            ))}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           {!assessment.results_unlocked && (
@@ -144,177 +225,221 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
                 setUnlocking(true)
                 try {
                   const res = await authFetch(`${API_URL}/api/assessments/${id}/unlock-results`, token, on401, { method: 'POST' })
-                  if (res?.ok) {
-                    setAssessment((prev) => prev ? { ...prev, results_unlocked: true } : prev)
-                    setActionMsg('Results unlocked — the prospect can now see their score.')
+                  if (res?.ok) { 
+                    setAssessment(p => p ? { ...p, results_unlocked: true } : p)
+                    setActionMsg('Results visible in portal.')
                   }
-                } catch { setError('Failed to unlock results.') }
-                finally { setUnlocking(false) }
+                } finally { setUnlocking(false) }
               }}
-              disabled={unlocking}
-              style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: unlocking ? 'default' : 'pointer', opacity: unlocking ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
+              style={{ background: '#ffffff', color: '#000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', opacity: unlocking ? 0.5 : 1 }}
             >
-              {unlocking ? 'Unlocking…' : 'Unlock Results'}
+              Unlock Results
             </button>
           )}
-          <button
-            onClick={() => handleAction('onboard')}
-            style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
-          >
-            Onboard
-          </button>
-          <button
-            onClick={() => handleAction('defer')}
-            style={{ background: '#333333', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}
-          >
-            Defer
-          </button>
+          <button onClick={() => handleAction('onboard')} style={{ background: '#FF6B35', color: '#000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Onboard</button>
+          <button onClick={() => handleAction('defer')} style={{ background: 'transparent', color: '#fff', border: '1px solid #333', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Defer</button>
         </div>
       </div>
 
-      {actionMsg && (
-        <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
-          {actionMsg}
-        </div>
-      )}
+      {actionMsg && <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>{actionMsg}</div>}
+      {error && <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>{error}</div>}
 
-      {error && (
-        <div style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '6px', marginBottom: '24px', fontSize: '14px' }}>
-          {error}
-        </div>
-      )}
-
-      {/* Score Breakdown */}
-      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Score Breakdown</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {Object.entries(breakdown).map(([key, value]) => (
-            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span style={{ color: '#aaaaaa', fontSize: '14px', width: '144px', flexShrink: 0 }}>{DIMENSION_LABELS[key] || key}</span>
-              <div style={{ flex: 1, background: '#1a1a1a', borderRadius: '999px', height: '12px', overflow: 'hidden' }}>
-                <div
-                  style={{ height: '100%', background: '#ffffff', borderRadius: '999px', width: `${value}%`, transition: 'width 0.3s' }}
-                />
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '24px' }}>
+        
+        {/* Left Column: Intelligence & Lifecycle */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          {/* AI Intelligence Card */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', margin: '0 0 16px 0', borderBottom: '1px solid #222', paddingBottom: '12px' }}>AI Classification</h3>
+            {assessment.problem_domains && assessment.problem_domains.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {assessment.problem_domains.map((d, i) => (
+                  <div key={i} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', borderLeft: `3px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 700, color: '#fff', fontSize: '14px' }}>{d.domain} &middot; {d.subCategory}</span>
+                      <span style={{ color: '#FF6B35', fontSize: '12px', fontWeight: 700 }}>{d.confidence}% match</span>
+                    </div>
+                    <p style={{ color: '#aaa', fontSize: '13px', margin: '6px 0 0', lineHeight: 1.5 }}>{d.rationale}</p>
+                  </div>
+                ))}
               </div>
-              <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, width: '32px', textAlign: 'right' }}>{value}</span>
+            ) : (
+              <p style={{ color: '#555', fontSize: '14px', fontStyle: 'italic' }}>AI is still classifying this assessment based on the interview transcript...</p>
+            )}
+          </div>
+
+          {/* Call Scheduler Card */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', margin: 0 }}>Strategic Call</h3>
+              {!call && !showCallForm && <button onClick={() => setShowCallForm(true)} style={{ background: '#fff', color: '#000', border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>+ PROPOSE SLOTS</button>}
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Opportunity & Risk */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#4ade80', margin: '0 0 8px 0' }}>Biggest Opportunity</h3>
-          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>{assessment.biggest_opportunity || 'N/A'}</p>
-        </div>
-        <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#f87171', margin: '0 0 8px 0' }}>Biggest Risk</h3>
-          <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>{assessment.biggest_risk || 'N/A'}</p>
-        </div>
-      </div>
+            {call && (
+              <div style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', border: `1px solid ${call.status === 'confirmed' ? '#4ade80' : '#333'}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                   <span style={{ fontSize: '13px', color: '#aaa' }}>Status: <b style={{ color: '#fff' }}>{call.status.toUpperCase()}</b></span>
+                   {call.status === 'pending' && <span style={{ color: '#facc15', fontSize: '11px' }}>Waiting for founder...</span>}
+                </div>
+                {call.selected_slot ? (
+                  <div style={{ marginTop: '8px', color: '#4ade80', fontWeight: 700, fontSize: '15px' }}>
+                    {new Date(call.selected_slot).toLocaleString()}
+                  </div>
+                ) : (
+                  <div style={{ marginTop: '8px', color: '#aaa', fontSize: '12px' }}>Proposed: {call.proposed_slots.length} slots</div>
+                )}
+                {call.meeting_link && <div style={{ marginTop: '8px', fontSize: '12px', color: '#3B82F6' }}>Link: {call.meeting_link}</div>}
+              </div>
+            )}
 
-      {/* Notes */}
-      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Founder Notes</h3>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '12px 16px', color: '#ffffff', fontSize: '14px', outline: 'none', minHeight: '100px', resize: 'vertical', boxSizing: 'border-box', fontFamily: "'Outfit', sans-serif" }}
-          placeholder="Add notes about this assessment..."
-        />
-        <button
-          onClick={saveNotes}
-          disabled={saving}
-          style={{ marginTop: '12px', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.5 : 1, fontFamily: "'Outfit', sans-serif" }}
-        >
-          {saving ? 'Saving...' : 'Save Notes'}
-        </button>
-      </div>
+            {showCallForm && (
+              <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <label style={{ fontSize: '12px', color: '#aaa' }}>Propose up to 3 date/time options:</label>
+                {newSlots.map((s, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '8px' }}>
+                    <input type="datetime-local" value={s.datetime} onChange={e => {
+                        const next = [...newSlots]; next[i].datetime = e.target.value; setNewSlots(next);
+                    }} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '6px', flex: 2, fontSize: '13px' }} />
+                    <input placeholder="Label (e.g. Afternoon)" value={s.label} onChange={e => {
+                        const next = [...newSlots]; next[i].label = e.target.value; setNewSlots(next);
+                    }} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '6px', flex: 1, fontSize: '13px' }} />
+                  </div>
+                ))}
+                <button onClick={() => setNewSlots([...newSlots, { datetime: '', label: '' }])} style={{ color: '#aaa', fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>+ Add Option</button>
+                <input placeholder="Meeting Link (GMeet/Zoom)" value={meetingLink} onChange={e => setMeetingLink(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '6px', fontSize: '13px' }} />
+                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                  <button onClick={proposeCall} style={{ background: '#FF6B35', border: 'none', color: '#000', fontWeight: 700, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Send to Portal</button>
+                  <button onClick={() => setShowCallForm(false)} style={{ background: 'transparent', border: '1px solid #333', color: '#fff', padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
 
-      {/* Conversation Transcript */}
-      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Conversation</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '500px', overflowY: 'auto', paddingRight: '8px' }}>
-          {(assessment.conversation || []).map((msg, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              <div
-                style={{
-                  maxWidth: '75%',
-                  padding: '12px 16px',
-                  borderRadius: '16px',
-                  fontSize: '14px',
-                  background: msg.role === 'user' ? '#333333' : '#1a1a1a',
-                  color: msg.role === 'user' ? '#ffffff' : '#aaaaaa',
-                  borderBottomRightRadius: msg.role === 'user' ? '4px' : '16px',
-                  borderBottomLeftRadius: msg.role === 'user' ? '16px' : '4px',
+          {/* Proposal Management */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+               <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', margin: 0 }}>Proposals</h3>
+               {!showPropForm && <button onClick={() => setShowPropForm(true)} style={{ background: '#fff', color: '#000', border: 'none', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>+ NEW DRAFT</button>}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {proposals.map(p => (
+                <div key={p.id} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>{p.title}</div>
+                    <div style={{ color: '#aaa', fontSize: '11px' }}>Total: £{p.total_price.toLocaleString()} &middot; Status: <span style={{ color: p.status === 'approved' ? '#4ade80' : p.status === 'sent' ? '#3B82F6' : '#facc15' }}>{p.status}</span></div>
+                  </div>
+                  {p.status === 'draft' && <button onClick={() => sendProposal(p.id)} style={{ background: '#3B82F6', border: 'none', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>SEND</button>}
+                  {p.status === 'approved' && <span style={{ fontSize: '16px' }}>✅</span>}
+                </div>
+              ))}
+              {proposals.length === 0 && !showPropForm && <p style={{ color: '#555', fontSize: '13px' }}>No proposals created yet.</p>}
+            </div>
+
+            {showPropForm && (
+              <div style={{ marginTop: '20px', borderTop: '1px solid #222', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <input placeholder="Proposal Title" value={propTitle} onChange={e => setPropTitle(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '8px', fontSize: '14px' }} />
+                <textarea placeholder="Executive Summary" value={propSummary} onChange={e => setPropSummary(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '8px', fontSize: '13px', minHeight: '60px' }} />
+                <input type="number" placeholder="Total Price" value={propPrice} onChange={e => setPropPrice(Number(e.target.value))} style={{ background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px', padding: '8px', fontSize: '14px' }} />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                   <button onClick={createProposal} style={{ background: '#4ade80', border: 'none', color: '#000', fontWeight: 700, padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Save Draft</button>
+                   <button onClick={() => setShowPropForm(false)} style={{ background: 'transparent', border: '1px solid #333', color: '#fff', padding: '8px 16px', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Conversation & Transcript */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Conversation</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }}>
+              {(assessment.conversation || []).map((msg, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                  <div style={{ maxWidth: '85%', padding: '12px 14px', borderRadius: '12px', fontSize: '13.5px', background: msg.role === 'user' ? '#333' : '#1a1a1a', color: msg.role === 'user' ? '#fff' : '#aaa', lineHeight: 1.5, borderBottomRightRadius: msg.role === 'user' ? '2px' : '12px', borderBottomLeftRadius: msg.role === 'user' ? '12px' : '2px' }}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Breakdown, Notes, Messages */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          {/* Status Tracker */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', margin: '0 0 16px 0' }}>Engagement Score</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {Object.entries(breakdown).map(([key, value]) => (
+                <div key={key}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#aaa', marginBottom: '4px' }}>
+                    <span>{DIMENSION_LABELS[key] || key.toUpperCase()}</span>
+                    <span>{value}%</span>
+                  </div>
+                  <div style={{ background: '#1a1a1a', borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', background: '#FF6B35', width: `${value}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+             <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '20px' }}>
+                <h4 style={{ fontSize: '12px', color: '#4ade80', margin: '0 0 6px 0' }}>TOP OPPORTUNITY</h4>
+                <p style={{ color: '#fff', fontSize: '13px', margin: 0 }}>{assessment.biggest_opportunity}</p>
+             </div>
+             <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '20px' }}>
+                <h4 style={{ fontSize: '12px', color: '#f87171', margin: '0 0 6px 0' }}>TOP RISK</h4>
+                <p style={{ color: '#fff', fontSize: '13px', margin: 0 }}>{assessment.biggest_risk}</p>
+             </div>
+          </div>
+
+          {/* CRM Notes */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '12px' }}>CRM Working Notes</h3>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              style={{ width: '100%', background: '#000', border: '1px solid #333', borderRadius: '6px', padding: '12px', color: '#fff', fontSize: '14px', minHeight: '80px', fontFamily: "'Outfit', sans-serif" }}
+              placeholder="Private notes for the team..."
+            />
+            <button onClick={saveNotes} disabled={saving} style={{ marginTop: '12px', background: '#333', color: '#fff', border: 'none', borderRadius: '4px', padding: '8px 16px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'SAVING...' : 'UPDATE NOTES'}</button>
+          </div>
+
+          {/* Portal Messages Chat */}
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '8px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '16px' }}>Portal Chat</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '250px', overflowY: 'auto' }}>
+              {messages.map((msg) => (
+                <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'prospect' ? 'flex-end' : 'flex-start' }}>
+                  <div style={{ maxWidth: '85%', padding: '8px 12px', borderRadius: '8px', fontSize: '13px', background: msg.sender === 'team' ? '#1a1a1a' : '#333', color: '#aaa', border: '1px solid #222' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '4px', color: msg.sender === 'team' ? '#FF6B35' : '#fff' }}>{msg.sender === 'team' ? 'BAAWA' : 'CLIENT'}</div>
+                    {msg.body}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <textarea value={messageBody} onChange={e => setMessageBody(e.target.value)} placeholder="Message the client..." rows={2} style={{ flex: 1, background: '#000', border: '1px solid #333', borderRadius: '6px', padding: '10px', color: '#fff', fontSize: '13px', resize: 'none' }} />
+              <button
+                onClick={async () => {
+                   if (!messageBody.trim()) return; setSendingMsg(true);
+                   const res = await authFetch(`${API_URL}/api/assessments/${id}/message`, token, on401, { method: 'POST', body: JSON.stringify({ body: messageBody.trim() }) });
+                   if (res?.ok) { setMessages(p => [...p, { id: Date.now(), sender: 'team', body: messageBody.trim(), created_at: new Date().toISOString() }]); setMessageBody('') }
+                   setSendingMsg(false)
                 }}
-              >
-                {msg.content}
-              </div>
+                disabled={sendingMsg}
+                style={{ background: '#fff', color: '#000', border: 'none', borderRadius: '6px', padding: '8px 12px', fontSize: '12px', fontWeight: 700, alignSelf: 'flex-end', cursor: 'pointer' }}
+              >{sendingMsg ? '..' : 'SEND'}</button>
             </div>
-          ))}
-          {(!assessment.conversation || assessment.conversation.length === 0) && (
-            <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>No conversation data.</p>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Portal Messages */}
-      <div style={{ background: '#111111', border: '1px solid #333333', borderRadius: '8px', padding: '24px', marginTop: '24px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', margin: '0 0 16px 0' }}>Portal Messages</h3>
-
-        {/* Thread */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '300px', overflowY: 'auto', paddingRight: '4px' }}>
-          {messages.length === 0 && (
-            <p style={{ color: '#aaaaaa', fontSize: '14px', margin: 0 }}>No messages yet.</p>
-          )}
-          {messages.map((msg) => (
-            <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'prospect' ? 'flex-end' : 'flex-start' }}>
-              <div style={{ maxWidth: '75%', padding: '8px 12px', borderRadius: '12px', fontSize: '14px', background: msg.sender === 'team' ? '#1a1a1a' : '#333333', color: '#aaaaaa' }}>
-                <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '4px' }}>{msg.sender === 'team' ? 'You' : 'Prospect'}</div>
-                {msg.body}
-              </div>
-            </div>
-          ))}
         </div>
-
-        {/* Send form */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <textarea
-            value={messageBody}
-            onChange={(e) => setMessageBody(e.target.value)}
-            placeholder="Write a message to this prospect…"
-            rows={2}
-            style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333333', borderRadius: '6px', padding: '8px 12px', color: '#ffffff', fontSize: '14px', outline: 'none', resize: 'none', fontFamily: "'Outfit', sans-serif" }}
-          />
-          <button
-            onClick={async () => {
-              if (!messageBody.trim()) return
-              setSendingMsg(true)
-              setMsgError('')
-              try {
-                const res = await authFetch(`${API_URL}/api/assessments/${id}/message`, token, on401, {
-                  method: 'POST',
-                  body: JSON.stringify({ body: messageBody.trim() }),
-                })
-                if (res?.ok) {
-                  setMessages((prev) => [...prev, { id: Date.now(), sender: 'team', body: messageBody.trim(), created_at: new Date().toISOString() }])
-                  setMessageBody('')
-                } else {
-                  setMsgError('Failed to send. Try again.')
-                }
-              } catch { setMsgError('Network error.') }
-              finally { setSendingMsg(false) }
-            }}
-            disabled={sendingMsg || !messageBody.trim()}
-            style={{ background: '#ffffff', color: '#000000', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: (sendingMsg || !messageBody.trim()) ? 'default' : 'pointer', opacity: (sendingMsg || !messageBody.trim()) ? 0.5 : 1, alignSelf: 'flex-end', fontFamily: "'Outfit', sans-serif" }}
-          >
-            {sendingMsg ? '…' : 'Send'}
-          </button>
-        </div>
-        {msgError && <p style={{ color: '#f87171', fontSize: '12px', marginTop: '8px' }}>{msgError}</p>}
       </div>
     </div>
   )
 }
+

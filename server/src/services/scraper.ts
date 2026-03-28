@@ -204,11 +204,15 @@ export async function scrapeAllSources(): Promise<ScrapedArticle[]> {
   for (const source of SOURCES) {
     try {
       const articles = await scrapeSource(source)
+      if (articles.length === 0) {
+        console.log(`[scraper] Warning: No articles collected from ${source.name}`)
+      }
       all.push(...articles)
     } catch (err) {
       console.error(`[scraper] Source failed entirely (${source.name}):`, err)
     }
   }
+  console.log(`[scraper] ── Scraping Complete ──`)
   console.log(`[scraper] Total articles scraped across all sources: ${all.length}`)
   return all
 }

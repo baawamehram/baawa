@@ -34,9 +34,10 @@ const allowedOrigins = CLIENT_URL
       CLIENT_URL.replace(/^https:\/\/www\./, 'https://'),
       CLIENT_URL.replace(/^https:\/\/(?!www\.)/, 'https://www.'),
     ]))
-  : null
+  : ['http://localhost:5173', 'http://localhost:4173']  // dev fallback — wildcard blocks credentialed requests
+
 const corsOptions = {
-  origin: allowedOrigins ?? '*',
+  origin: allowedOrigins,
   credentials: true,
 }
 app.use(cors(corsOptions))

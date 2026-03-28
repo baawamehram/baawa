@@ -1,17 +1,27 @@
 import { db } from '../db/client'
 
-async function getEmbedding(text: string): Promise<number[]> {
-  const apiKey = process.env.GOOGLE_AI_API_KEY ?? ''
+export async function getEmbedding(text: string): Promise<number[]> {
+  const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY || ''
+  if (!apiKey) throw new Error('Embedding API key (GOOGLE_AI_API_KEY or GEMINI_API_KEY) not set')
+
+  // Cap to 8000 chars to stay within API limits
+  const safeText = text.slice(0, 8000)
+
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: { parts: [{ text }] } }),
+      body: JSON.stringify({ content: { parts: [{ text: safeText }] } }),
     }
   )
-  if (!res.ok) throw new Error(`Google AI embedding failed: ${res.status} ${res.statusText}`)
-  const data = await res.json() as { embedding: { values: number[] } }
+
+  if (!res.ok) {
+    const errorBody = await res.text()
+    throw new Error(`Google AI embedding failed: ${res.status} ${res.statusText} — ${errorBody}`)
+  }
+
+  const data = (await res.json()) as { embedding: { values: number[] } }
   return data.embedding.values
 }
 
