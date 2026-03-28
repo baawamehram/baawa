@@ -62,21 +62,35 @@ describe('POST /api/portal/verify', () => {
     expect(res.status).toBe(400)
   })
 
+  it('handles mixed-case email during verify', async () => {
+    mockDb.query.mockResolvedValueOnce({ rows: [{ id: 1, assessment_id: 42 }] } as any)
+    mockDb.query.mockResolvedValueOnce({ rows: [{ email: 'user@test.com' }] } as any)
+    mockDb.query.mockResolvedValueOnce({ rows: [] } as any)
+
+    const res = await request(app).post('/api/portal/verify').send({ 
+      email: 'User@Test.Com', 
+      token: '123456' 
+    })
+    expect(res.status).toBe(200)
+    expect(res.body.ok).toBe(true)
+    // Verify that the query was called with lowercase email
+    expect(mockDb.query).toHaveBeenCalledWith(expect.stringContaining('a.email = $1'), expect.arrayContaining(['user@test.com', '123456']))
+  })
+
   it('returns 400 if token not found or expired', async () => {
     mockDb.query.mockResolvedValueOnce({ rows: [] } as any)
-    const validToken = 'a'.repeat(64)
-    const res = await request(app).post('/api/portal/verify').send({ token: validToken })
+    const res = await request(app).post('/api/portal/verify').send({ email: 'a@b.com', token: '111111' })
     expect(res.status).toBe(400)
   })
 
   it('sets portal_token cookie and returns ok:true on valid token', async () => {
-    const validToken = 'a'.repeat(64)
+    const validToken = '123456'
     mockDb.query
       .mockResolvedValueOnce({ rows: [{ id: 1, assessment_id: 42 }] } as any)
       .mockResolvedValueOnce({ rows: [{ email: 'user@test.com' }] } as any)
       .mockResolvedValueOnce({ rows: [] } as any)
 
-    const res = await request(app).post('/api/portal/verify').send({ token: validToken })
+    const res = await request(app).post('/api/portal/verify').send({ email: 'user@test.com', token: validToken })
     expect(res.status).toBe(200)
     expect(res.body.ok).toBe(true)
     expect(res.headers['set-cookie']).toBeDefined()

@@ -196,7 +196,8 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
     }).safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: 'Invalid email' })
 
-    const { email, phone } = parsed.data
+    const { email: rawEmail, phone } = parsed.data
+    const email = rawEmail.toLowerCase().trim()
 
     const sessionResult = await db.query<{
       conversation: ConversationTurn[]

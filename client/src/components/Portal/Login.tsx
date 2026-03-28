@@ -31,7 +31,7 @@ export function PortalLogin() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.toLowerCase().trim() }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -55,7 +55,7 @@ export function PortalLogin() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email, token: code }),
+        body: JSON.stringify({ email: email.toLowerCase().trim(), token: code }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

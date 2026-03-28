@@ -17,7 +17,8 @@ router.post('/login', async (req: Request, res: Response) => {
     const parsed = z.object({ email: z.string().email() }).safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: 'Invalid email' })
 
-    const { email } = parsed.data
+    const { email: rawEmail } = parsed.data
+    const email = rawEmail.toLowerCase().trim()
 
     const assessmentResult = await db.query<{ id: number }>(
       `SELECT id FROM assessments WHERE email = $1 ORDER BY created_at DESC LIMIT 1`,
@@ -60,7 +61,8 @@ router.post('/verify', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid or incorrect code format' })
     }
 
-    const { email, token } = parsed.data
+    const { email: rawEmail, token } = parsed.data
+    const email = rawEmail.toLowerCase().trim()
 
     const result = await db.query<{ id: number; assessment_id: number }>(
       `SELECT bt.id, bt.assessment_id 

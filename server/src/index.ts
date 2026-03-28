@@ -145,9 +145,19 @@ async function startServer() {
         created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `)
+    // Relax portal token uniqueness (6-digit codes can collide)
+    await db.query(`ALTER TABLE portal_tokens DROP CONSTRAINT IF EXISTS portal_tokens_token_key`)
     await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_tokens_token ON portal_tokens (token)`)
     await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_tokens_expires ON portal_tokens (expires_at)`)
     await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_tokens_assessment ON portal_tokens (assessment_id)`)
+
+    // Relax assessment email uniqueness to support multi-submissions as per AGENTS.md
+    await db.query(`ALTER TABLE assessments DROP CONSTRAINT IF EXISTS assessments_email_key`)
+    
+    // Normalize existing emails to lowercase
+    await db.query(`UPDATE assessments SET email = LOWER(TRIM(email))`)
+    await db.query(`UPDATE clients SET email = LOWER(TRIM(email))`)
+    await db.query(`UPDATE sessions SET email = LOWER(TRIM(email)) WHERE email IS NOT NULL`)
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS portal_messages (
