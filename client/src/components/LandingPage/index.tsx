@@ -8,6 +8,67 @@ const SERVICES = [
   "Positioning", "Growth", "Operations", "Scale",
 ]
 
+const WHO_WE_ARE = [
+  "Entrepreneurs",
+  "Filmmakers",
+  "Investment Bankers",
+  "Consultants",
+  "Agency Owners",
+  "AI Engineers",
+  "Brand Strategists",
+  "Geeks who obsess over business",
+]
+
+function IdentityTypewriter() {
+  const [text, setText] = useState('')
+  const [index, setIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [speed, setSpeed] = useState(70)
+
+  useEffect(() => {
+    let timer: number
+    const word = WHO_WE_ARE[index % WHO_WE_ARE.length]
+    if (!isDeleting && text === word) {
+      timer = window.setTimeout(() => setIsDeleting(true), 1800)
+    } else if (isDeleting && text === '') {
+      setIsDeleting(false)
+      setIndex(prev => prev + 1)
+      setSpeed(70)
+    } else {
+      timer = window.setTimeout(() => {
+        setText(word.substring(0, text.length + (isDeleting ? -1 : 1)))
+        setSpeed(isDeleting ? 30 : 70)
+      }, speed)
+    }
+    return () => clearTimeout(timer)
+  }, [text, isDeleting, index, speed])
+
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
+      <span style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: 'clamp(28px, 5vw, 52px)',
+        fontWeight: 700,
+        fontStyle: 'italic',
+        color: '#FF6B35',
+        minWidth: 4,
+        lineHeight: 1.1,
+      }}>{text}</span>
+      <span style={{
+        display: 'inline-block',
+        width: 3,
+        height: 'clamp(28px, 5vw, 50px)',
+        background: '#FF6B35',
+        marginLeft: 4,
+        borderRadius: 1,
+        animation: 'cursor-blink 0.9s step-end infinite',
+        verticalAlign: 'middle',
+        flexShrink: 0,
+      }} />
+    </div>
+  )
+}
+
 function TypewriterText() {
   const [text, setText] = useState('')
   const [index, setIndex] = useState(0)
@@ -347,7 +408,7 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* ── SECTION 2: PROOF BAR ── */}
-      <section style={{ background: '#1C1E26', padding: '56px 24px' }}>
+      <section style={{ background: '#1C1E26', padding: '40px 24px' }}>
         <motion.div
           initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ maxWidth: 900, margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 'clamp(24px, 6vw, 80px)', flexWrap: 'wrap' }}
@@ -366,8 +427,34 @@ export function LandingPage({ onStart }: Props) {
         </motion.div>
       </section>
 
+      {/* ── SECTION 2b: WHO WE ARE ── */}
+      <section style={{ background: '#111318', padding: 'clamp(40px, 6vw, 64px) clamp(20px, 5vw, 80px)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
+          style={{ maxWidth: 900, margin: '0 auto' }}
+        >
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,107,53,0.7)', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who We Are</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 300, color: 'rgba(253,252,250,0.5)', lineHeight: 1.1, whiteSpace: 'nowrap' }}>We are:</span>
+            <IdentityTypewriter />
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
+            {[
+              '250 years of collective experience',
+              'Every industry on the planet',
+              'Ahead of the AI game',
+              'Obsessed with business'
+            ].map(tag => (
+              <span key={tag} style={{ fontSize: 13, color: 'rgba(253,252,250,0.35)', fontFamily: 'Outfit, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: '#FF6B35', opacity: 0.5 }}>◆</span> {tag}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
       {/* ── SECTION 3: THE GAP (Merged carousel: Problem + Solution + Capabilities) ── */}
-      <section style={{ background: '#0A0A0A', padding: 'clamp(56px, 8vw, 96px) clamp(20px, 5vw, 80px)' }}>
+      <section style={{ background: '#0A0A0A', padding: 'clamp(44px, 6vw, 72px) clamp(20px, 5vw, 80px)' }}>
         <motion.div
           initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ maxWidth: 1000, margin: '0 auto' }}
@@ -381,7 +468,7 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* ── SECTION 4: HOW IT WORKS + WHO IT'S FOR (merged) ── */}
-      <section style={{ background: '#F5F0EE', padding: 'clamp(56px, 8vw, 96px) clamp(20px, 5vw, 80px)', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ background: '#F5F0EE', padding: 'clamp(44px, 6vw, 72px) clamp(20px, 5vw, 80px)', position: 'relative', overflow: 'hidden' }}>
         {/* Subtle grid BG */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.04 }}>
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -449,7 +536,7 @@ export function LandingPage({ onStart }: Props) {
       </section>
 
       {/* ── SECTION 5: FINAL CTA ── */}
-      <section style={{ background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)', padding: 'clamp(64px, 10vw, 112px) 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)', padding: 'clamp(56px, 8vw, 88px) 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.03, backgroundImage: 'radial-gradient(#FFF 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
         <motion.div
           initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
