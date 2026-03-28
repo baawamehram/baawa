@@ -1,23 +1,13 @@
 import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import multer from 'multer'
-import path from 'path'
 import { db } from '../db/client'
 import { requireAuth } from '../middleware/auth'
 
 const router = Router()
 
-// Setup multer for local disk storage
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, 'uploads/')
-  },
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
-  },
-})
-const upload = multer({ storage })
+// Setup multer for memory storage (for DB persistence)
+const upload = multer({ storage: multer.memoryStorage() })
 
 router.use(requireAuth)
 
@@ -79,16 +69,34 @@ router.post('/:id/upload', upload.single('file'), async (req: Request, res: Resp
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
 
-    const fileUrl = `/uploads/${req.file.filename}`
     await db.query(
-      'UPDATE deliverables SET file_url = $1 WHERE id = $2',
-      [fileUrl, req.params.id]
+      'UPDATE deliverables SET file_data = $1, file_name = $2, file_mime = $3 WHERE id = $4',
+      [req.file.buffer, req.file.originalname, req.file.mimetype, req.params.id]
     )
 
-    res.json({ ok: true, fileUrl })
+    res.json({ ok: true })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ error: 'Failed to upload file' })
+    res.status(500).json({ error: 'Failed to upload file to database' })
+  }
+})
+
+// GET /api/deliverables/:id/file — serve file from DB
+router.get('/:id/file', async (req: Request, res: Response) => {
+  try {
+    const result = await db.query(
+      'SELECT file_data, file_name, file_mime FROM deliverables WHERE id = $1',
+      [req.params.id]
+    )
+    const file = result.rows[0]
+    if (!file || !file.file_data) return res.status(404).json({ error: 'File not found' })
+
+    res.setHeader('Content-Type', file.file_mime)
+    res.setHeader('Content-Disposition', `attachment; filename="${file.file_name}"`)
+    res.send(file.file_data)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to fetch file' })
   }
 })
 

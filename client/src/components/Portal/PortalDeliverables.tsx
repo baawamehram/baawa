@@ -147,9 +147,9 @@ export function PortalDeliverables({ theme, on401 }: Props) {
                         </div>
                       )}
                       {d.file_url && (
-                        <a href={d.file_url} target="_blank" rel="noopener noreferrer"
+                        <a href={`/api/portal/deliverables/${d.id}/file`} target="_blank" rel="noopener noreferrer"
                           style={{ display: 'inline-block', background: tk.bg, border: `1px solid ${tk.border}`, borderRadius: 6, padding: '6px 12px', fontFamily: 'Outfit,sans-serif', fontSize: 12, color: tk.accent, textDecoration: 'none', marginBottom: 12 }}>
-                          📎 View Attachment
+                          📎 Download Attachment
                         </a>
                       )}
                       {!d.accepted_at && d.status === 'completed' && (

@@ -138,6 +138,35 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
                 <p style={{ color: '#888888', fontSize: '13px', whiteSpace: 'pre-wrap', lineHeight: '1.6', margin: '16px 0 0 0' }}>
                   {d.research_context || 'No strategy draft yet. Click "AI Draft" to generate one.'}
                 </p>
+                <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+                  <a 
+                    href={`${API_URL}/api/deliverables/${d.id}/file`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', color: '#ffffff', textDecoration: 'none', display: 'inline-block' }}
+                  >
+                    📎 Download
+                  </a>
+                  <label style={{ background: '#ffffff', color: '#000000', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                    ↑ Upload
+                    <input 
+                      type="file" 
+                      style={{ display: 'none' }} 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const formData = new FormData()
+                        formData.append('file', file)
+                        const res = await fetch(`${API_URL}/api/deliverables/${d.id}/upload`, {
+                          method: 'POST',
+                          headers: { 'Authorization': `Bearer ${token}` },
+                          body: formData
+                        })
+                        if (res.ok) onUpdate()
+                      }}
+                    />
+                  </label>
+                </div>
               </div>
             )}
           </div>

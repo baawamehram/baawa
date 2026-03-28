@@ -377,5 +377,28 @@ router.get('/insights', requirePortalAuth, async (req: Request, res: Response) =
     res.status(500).json({ error: 'Failed to fetch insights' })
   }
 })
+// GET /api/portal/deliverables/:id/file — serve file from DB for prospects
+router.get('/deliverables/:id/file', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    // Verify visibility + association
+    const result = await db.query(`
+      SELECT d.file_data, d.file_name, d.file_mime 
+      FROM deliverables d
+      JOIN clients c ON d.client_id = c.id
+      WHERE d.id = $1 AND c.assessment_id = $2 AND d.portal_visible = true
+    `, [req.params.id, assessmentId])
+
+    const file = result.rows[0]
+    if (!file || !file.file_data) return res.status(404).json({ error: 'File not found or not visible' })
+
+    res.setHeader('Content-Type', file.file_mime)
+    res.setHeader('Content-Disposition', `attachment; filename="${file.file_name}"`)
+    res.send(file.file_data)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to fetch file' })
+  }
+})
 
 export default router

@@ -234,6 +234,11 @@ async function startServer() {
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS accepted_by TEXT`)
     await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS milestone_order INT NOT NULL DEFAULT 1`)
 
+    // Gaps 5 & Railway Persistence — Persistent File Storage
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_data BYTEA`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_name TEXT`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_mime TEXT`)
+
     // Performance Indices
     await db.query(`CREATE INDEX IF NOT EXISTS idx_notes_client_id ON client_notes(client_id)`)
     await db.query(`CREATE INDEX IF NOT EXISTS idx_assessments_onboarding ON assessments(email, status)`)
