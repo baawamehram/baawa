@@ -6,6 +6,7 @@ import { generateNextQuestion, ConversationTurn } from '../services/questioning'
 import { scoreConversation } from '../services/scoring'
 import { sendProspectAck, sendFounderNotification } from '../services/email'
 import { getActiveConfig } from '../services/journeyConfig'
+import { classifyProblemDomains } from '../services/classification'
 
 const router = Router()
 
@@ -209,6 +210,21 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
     ).catch((e) => console.error('Founder notification failed:', e))
 
     res.json({ assessmentId: assessmentResult.rows[0].id })
+
+    // Classify problem domains — fire and forget, non-critical
+    void (async () => {
+      try {
+        const domains = await classifyProblemDomains(session.conversation)
+        if (domains.length > 0) {
+          await db.query(
+            `UPDATE assessments SET problem_domains = $1 WHERE id = $2`,
+            [JSON.stringify(domains), assessmentResult.rows[0].id]
+          )
+        }
+      } catch (e) {
+        console.warn('[classification] Failed:', (e as Error).message)
+      }
+    })()
 
     // Insert session_analytics row — non-blocking, non-critical
     void (async () => {

@@ -7,6 +7,7 @@ interface Assessment {
   score: number
   status: 'pending' | 'reviewing' | 'onboarded' | 'deferred'
   created_at: string
+  problem_domains: Array<{ domain: string; subCategory: string }> | null
 }
 
 interface Props {
@@ -92,6 +93,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
           <thead>
             <tr style={{ borderBottom: '1px solid #333333', textAlign: 'left' }}>
               <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Name</th>
+              <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Domain</th>
               <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Score</th>
               <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Status</th>
               <th style={{ padding: '12px 24px', color: '#aaaaaa', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Date</th>
@@ -107,11 +109,17 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
                 onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent' }}
               >
                 <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px' }}>{a.email}</td>
+                <td style={{ padding: '16px 24px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {(a.problem_domains ?? []).map(d => (
+                      <span key={d.domain} style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 4, background: 'rgba(255,107,53,0.12)', color: '#FF6B35', border: '1px solid rgba(255,107,53,0.25)', fontWeight: 600, whiteSpace: 'nowrap' }}>{d.domain}</span>
+                    ))}
+                    {!a.problem_domains?.length && <span style={{ fontSize: '11px', color: '#555' }}>—</span>}
+                  </div>
+                </td>
                 <td style={{ padding: '16px 24px', color: '#ffffff', fontSize: '14px', fontWeight: 600 }}>{a.score}</td>
                 <td style={{ padding: '16px 24px' }}>
-                  <span style={{ fontSize: '12px', color: STATUS_COLORS[a.status] || '#aaaaaa' }}>
-                    {a.status}
-                  </span>
+                  <span style={{ fontSize: '12px', color: STATUS_COLORS[a.status] || '#aaaaaa' }}>{a.status}</span>
                 </td>
                 <td style={{ padding: '16px 24px', color: '#aaaaaa', fontSize: '14px' }}>
                   {new Date(a.created_at).toLocaleDateString()}

@@ -28,7 +28,6 @@ router.post('/login', async (req: Request, res: Response) => {
     if (assessmentResult.rows[0]) {
       const assessmentId = assessmentResult.rows[0].id
 
-      // Delete any existing unexpired tokens for this assessment
       await db.query(
         `DELETE FROM portal_tokens WHERE assessment_id = $1 AND expires_at > NOW()`,
         [assessmentId]
@@ -44,7 +43,6 @@ router.post('/login', async (req: Request, res: Response) => {
       void sendMagicLink(email, magicLink).catch((e) => console.error('sendMagicLink failed:', e))
     }
 
-    // Always return ok — prevents email enumeration
     res.json({ ok: true })
   } catch (err) {
     console.error('POST /portal/login error:', err)
@@ -73,7 +71,6 @@ router.post('/verify', async (req: Request, res: Response) => {
 
     const { id: tokenId, assessment_id: assessmentId } = result.rows[0]
 
-    // Get email for JWT payload
     const assessmentResult = await db.query<{ email: string }>(
       `SELECT email FROM assessments WHERE id = $1`,
       [assessmentId]
@@ -82,7 +79,6 @@ router.post('/verify', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Assessment not found' })
     }
 
-    // Delete token (one-time use)
     await db.query(`DELETE FROM portal_tokens WHERE id = $1`, [tokenId])
 
     const jwtPayload = { assessmentId, email: assessmentResult.rows[0].email }
@@ -108,7 +104,7 @@ router.get('/me', requirePortalAuth, async (req: Request, res: Response) => {
     const { assessmentId } = req.portalUser!
 
     const result = await db.query(
-      `SELECT id, email, created_at, conversation, results_unlocked,
+      `SELECT id, email, created_at, conversation, results_unlocked, problem_domains,
               CASE WHEN results_unlocked THEN score ELSE NULL END AS score,
               CASE WHEN results_unlocked THEN score_breakdown ELSE NULL END AS score_breakdown,
               CASE WHEN results_unlocked THEN score_summary ELSE NULL END AS score_summary,
@@ -148,7 +144,6 @@ router.post('/messages', requirePortalAuth, async (req: Request, res: Response) 
       body: z.string().trim().min(1, 'Message cannot be empty').max(2000, 'Message too long'),
     }).safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0]?.message ?? 'Invalid message' })
-
     const { assessmentId } = req.portalUser!
     await db.query(
       `INSERT INTO portal_messages (assessment_id, sender, body) VALUES ($1, 'prospect', $2)`,
@@ -158,6 +153,178 @@ router.post('/messages', requirePortalAuth, async (req: Request, res: Response) 
   } catch (err) {
     console.error('POST /portal/messages error:', err)
     res.status(500).json({ error: 'Failed to send message' })
+  }
+})
+
+// GET /api/portal/call — proposed call slots for this founder
+router.get('/call', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    const result = await db.query(`SELECT * FROM call_slots WHERE assessment_id = $1`, [assessmentId])
+    res.json(result.rows[0] ?? null)
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch call' })
+  }
+})
+
+// PUT /api/portal/call/:id/select — founder picks a slot
+router.put('/call/:id/select', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const parsed = z.object({ datetime: z.string() }).safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ error: 'Invalid slot' })
+    const { assessmentId } = req.portalUser!
+    await db.query(
+      `UPDATE call_slots SET selected_slot = $1, status = 'confirmed' WHERE id = $2 AND assessment_id = $3`,
+      [parsed.data.datetime, req.params.id, assessmentId]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to book slot' })
+  }
+})
+
+// GET /api/portal/proposal — latest sent proposal
+router.get('/proposal', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    const result = await db.query(
+      `SELECT * FROM proposals WHERE assessment_id = $1 AND status IN ('sent','approved','rejected')
+       ORDER BY sent_at DESC LIMIT 1`,
+      [assessmentId]
+    )
+    res.json(result.rows[0] ?? null)
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch proposal' })
+  }
+})
+
+// PUT /api/portal/proposal/:id/approve — founder approves proposal
+router.put('/proposal/:id/approve', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    await db.query(
+      `UPDATE proposals SET status = 'approved', approved_at = NOW()
+       WHERE id = $1 AND assessment_id = $2 AND status = 'sent'`,
+      [req.params.id, assessmentId]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to approve proposal' })
+  }
+})
+
+// GET /api/portal/agreement/:proposalId
+router.get('/agreement/:proposalId', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    const result = await db.query(
+      `SELECT a.* FROM agreements a JOIN proposals p ON a.proposal_id = p.id
+       WHERE a.proposal_id = $1 AND p.assessment_id = $2`,
+      [req.params.proposalId, assessmentId]
+    )
+    res.json(result.rows[0] ?? null)
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch agreement' })
+  }
+})
+
+// POST /api/portal/agreement/:proposalId/sign — legally-binding web signature (IP + timestamp logged)
+router.post('/agreement/:proposalId/sign', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const parsed = z.object({ signed_name: z.string().min(2) }).safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ error: 'Full name required to sign' })
+    const { assessmentId } = req.portalUser!
+
+    const prop = await db.query(
+      `SELECT id FROM proposals WHERE id = $1 AND assessment_id = $2 AND status = 'approved'`,
+      [req.params.proposalId, assessmentId]
+    )
+    if (!prop.rows[0]) return res.status(403).json({ error: 'Proposal not approved yet' })
+
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ?? req.socket.remoteAddress ?? 'unknown'
+    await db.query(
+      `INSERT INTO agreements (proposal_id, assessment_id, signed_name, signed_at, signed_ip, signed_user_agent, status)
+       VALUES ($1, $2, $3, NOW(), $4, $5, 'signed')
+       ON CONFLICT (proposal_id) DO UPDATE
+         SET signed_name = EXCLUDED.signed_name, signed_at = NOW(),
+             signed_ip = EXCLUDED.signed_ip, signed_user_agent = EXCLUDED.signed_user_agent, status = 'signed'`,
+      [req.params.proposalId, assessmentId, parsed.data.signed_name, ip, req.headers['user-agent'] ?? '']
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to sign agreement' })
+  }
+})
+
+// GET /api/portal/deliverables — portal-visible deliverables with milestone grouping
+router.get('/deliverables', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    const client = await db.query<{ id: number }>(
+      `SELECT c.id FROM clients c JOIN assessments a ON c.assessment_id = a.id WHERE a.id = $1`,
+      [assessmentId]
+    )
+    if (!client.rows[0]) return res.json([])
+    const result = await db.query(
+      `SELECT id, title, description, content, file_url, status, milestone_order, accepted_at, due_date, created_at
+       FROM deliverables WHERE client_id = $1 AND portal_visible = true
+       ORDER BY milestone_order ASC, created_at ASC`,
+      [client.rows[0].id]
+    )
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch deliverables' })
+  }
+})
+
+// POST /api/portal/deliverables/:id/accept — founder formally accepts a deliverable
+router.post('/deliverables/:id/accept', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId, email } = req.portalUser!
+    const client = await db.query<{ id: number }>(
+      `SELECT c.id FROM clients c JOIN assessments a ON c.assessment_id = a.id WHERE a.id = $1`,
+      [assessmentId]
+    )
+    if (!client.rows[0]) return res.status(403).json({ error: 'No client record found' })
+    await db.query(
+      `UPDATE deliverables SET accepted_at = NOW(), accepted_by = $1 WHERE id = $2 AND client_id = $3`,
+      [email, req.params.id, client.rows[0].id]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to accept deliverable' })
+  }
+})
+
+// GET /api/portal/insights — curated research based on problem domain classification
+router.get('/insights', requirePortalAuth, async (req: Request, res: Response) => {
+  try {
+    const { assessmentId } = req.portalUser!
+    const assessment = await db.query<{ problem_domains: Array<{ domain: string }> | null }>(
+      `SELECT problem_domains FROM assessments WHERE id = $1`,
+      [assessmentId]
+    )
+    const domains: Array<{ domain: string }> = assessment.rows[0]?.problem_domains ?? []
+    const domainNames = domains.map(d => d.domain.toLowerCase())
+
+    let chunks
+    if (domainNames.length > 0) {
+      const conditions = domainNames.map((_d, i) => `LOWER(content) LIKE $${i + 1}`).join(' OR ')
+      chunks = await db.query(
+        `SELECT id, content, source_name, source_url, ingested_at FROM knowledge_chunks
+         WHERE is_active = true AND source_url IS NOT NULL AND (${conditions})
+         ORDER BY ingested_at DESC LIMIT 12`,
+        domainNames.map(d => `%${d}%`)
+      )
+    } else {
+      chunks = await db.query(
+        `SELECT id, content, source_name, source_url, ingested_at FROM knowledge_chunks
+         WHERE is_active = true AND source_url IS NOT NULL ORDER BY ingested_at DESC LIMIT 8`
+      )
+    }
+    res.json(chunks.rows)
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch insights' })
   }
 })
 

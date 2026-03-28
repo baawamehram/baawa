@@ -16,6 +16,8 @@ import journeyRouter from './routes/journey'
 import cookieParser from 'cookie-parser'
 import portalRouter from './routes/portal'
 import ingestionRouter from './routes/ingestion'
+import callsRouter from './routes/calls'
+import proposalsRouter from './routes/proposals'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -55,6 +57,8 @@ app.use('/api/market-data', marketRouter)
 app.use('/api/journey', journeyRouter)
 app.use('/api/portal', portalRouter)
 app.use('/api/admin/ingest', ingestionRouter)
+app.use('/api/calls', callsRouter)
+app.use('/api/proposals', proposalsRouter)
 
 // Health
 app.get('/health', async (_req, res) => {
@@ -150,6 +154,64 @@ async function startServer() {
       )
     `)
     await db.query(`CREATE INDEX IF NOT EXISTS idx_portal_messages_assessment ON portal_messages (assessment_id, created_at)`)
+
+    // Phase 1 — Problem classification
+    await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS problem_domains JSONB`)
+
+    // Phase 2 — Call scheduling
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS call_slots (
+        id             SERIAL PRIMARY KEY,
+        assessment_id  INT NOT NULL REFERENCES assessments(id) ON DELETE CASCADE UNIQUE,
+        proposed_slots JSONB NOT NULL DEFAULT '[]',
+        selected_slot  TIMESTAMPTZ,
+        meeting_link   TEXT,
+        status         VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_call_slots_assessment ON call_slots (assessment_id)`)
+
+    // Phase 3 — Proposals
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS proposals (
+        id            SERIAL PRIMARY KEY,
+        assessment_id INT NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+        title         TEXT NOT NULL,
+        summary       TEXT,
+        packages      JSONB NOT NULL DEFAULT '[]',
+        total_price   DECIMAL(10,2),
+        currency      VARCHAR(3) NOT NULL DEFAULT 'GBP',
+        status        VARCHAR(20) NOT NULL DEFAULT 'draft',
+        sent_at       TIMESTAMPTZ,
+        approved_at   TIMESTAMPTZ,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_proposals_assessment ON proposals (assessment_id)`)
+
+    // Phase 3 — Agreements (digital signatures)
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS agreements (
+        id                SERIAL PRIMARY KEY,
+        proposal_id       INT NOT NULL REFERENCES proposals(id) ON DELETE CASCADE UNIQUE,
+        assessment_id     INT NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+        signed_name       TEXT,
+        signed_at         TIMESTAMPTZ,
+        signed_ip         TEXT,
+        signed_user_agent TEXT,
+        status            VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+
+    // Phase 4 — Deliverables portal columns
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS portal_visible BOOLEAN NOT NULL DEFAULT false`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS content TEXT`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_url TEXT`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMPTZ`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS accepted_by TEXT`)
+    await db.query(`ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS milestone_order INT NOT NULL DEFAULT 1`)
 
     console.log('Startup migrations OK')
   } catch (err) {
