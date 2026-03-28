@@ -31,6 +31,12 @@ if (!CLIENT_URL && process.env.NODE_ENV === 'production') {
   console.error('FATAL: CLIENT_URL must be set in production')
   process.exit(1)
 }
+
+const PORTAL_JWT_SECRET = process.env.PORTAL_JWT_SECRET
+if (!PORTAL_JWT_SECRET && process.env.NODE_ENV === 'production') {
+  console.error('FATAL: PORTAL_JWT_SECRET must be set in production')
+  process.exit(1)
+}
 const allowedOrigins = CLIENT_URL
   ? Array.from(new Set([
       CLIENT_URL,

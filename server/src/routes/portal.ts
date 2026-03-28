@@ -29,7 +29,7 @@ router.post('/login', async (req: Request, res: Response) => {
       const assessmentId = assessmentResult.rows[0].id
 
       await db.query(
-        `DELETE FROM portal_tokens WHERE assessment_id = $1 AND expires_at > NOW()`,
+        `DELETE FROM portal_tokens WHERE assessment_id = $1`,
         [assessmentId]
       )
 
@@ -64,19 +64,26 @@ router.post('/verify', async (req: Request, res: Response) => {
     const { email: rawEmail, token } = parsed.data
     const email = rawEmail.toLowerCase().trim()
 
-    const result = await db.query<{ id: number; assessment_id: number }>(
-      `SELECT bt.id, bt.assessment_id 
+    // 1. Check if token exists for this email
+    const result = await db.query<{ id: number; assessment_id: number; is_expired: boolean }>(
+      `SELECT bt.id, bt.assessment_id, (bt.expires_at <= NOW()) as is_expired
        FROM portal_tokens bt
        JOIN assessments a ON bt.assessment_id = a.id
-       WHERE a.email = $1 AND bt.token = $2 AND bt.expires_at > NOW()`,
+       WHERE a.email = $1 AND bt.token = $2`,
       [email, token]
     )
 
     if (!result.rows[0]) {
-      return res.status(400).json({ error: 'Incorrect or expired code. Please try again.' })
+      return res.status(400).json({ error: 'Incorrect code. Please try again.' })
     }
 
-    const { id: tokenId, assessment_id: assessmentId } = result.rows[0]
+    const { id: tokenId, assessment_id: assessmentId, is_expired } = result.rows[0]
+
+    // 2. If it exists but is expired, delete it and tell the user
+    if (is_expired) {
+      await db.query(`DELETE FROM portal_tokens WHERE id = $1`, [tokenId])
+      return res.status(400).json({ error: 'This code has expired. Please request a new one.' })
+    }
 
     const assessmentResult = await db.query<{ email: string }>(
       `SELECT email FROM assessments WHERE id = $1`,
