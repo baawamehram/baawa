@@ -124,7 +124,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
                 <td style={{ padding: '16px 24px' }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                     {(a.problem_domains ?? []).map(d => (
-                      <span key={d.domain} style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 4, background: isDark ? 'rgba(255,107,53,0.12)' : 'rgba(255,107,53,0.08)', color: theme.accent, border: `1px solid ${isDark ? 'rgba(255,107,53,0.3)' : 'rgba(255,107,53,0.2)'}`, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.domain}</span>
+                      <span key={d.domain} style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 4, background: isDark ? 'rgba(52,211,153,0.12)' : 'rgba(52,211,153,0.08)', color: theme.accentMid, border: `1px solid ${isDark ? 'rgba(52,211,153,0.3)' : 'rgba(52,211,153,0.2)'}`, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.domain}</span>
                     ))}
                     {!a.problem_domains?.length && <span style={{ fontSize: '11px', color: theme.textMuted }}>—</span>}
                   </div>

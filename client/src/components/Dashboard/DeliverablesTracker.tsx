@@ -118,7 +118,7 @@ export function DeliverablesTracker({ clientId, deliverables, token, on401, onUp
                 <button
                   onClick={() => draftWithAI(d.id)}
                   disabled={draftingId !== null}
-                  style={{ background: 'none', border: 'none', color: '#FF6B35', fontSize: '12px', cursor: 'pointer', fontWeight: 600, opacity: draftingId === d.id ? 0.5 : 1 }}
+                  style={{ background: 'none', border: 'none', color: '#A78BFA', fontSize: '12px', cursor: 'pointer', fontWeight: 600, opacity: draftingId === d.id ? 0.5 : 1 }}
                 >
                   {draftingId === d.id ? 'Drafting...' : '🪄 AI Draft'}
                 </button>

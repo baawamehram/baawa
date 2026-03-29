@@ -71,8 +71,8 @@ const DIMENSION_LABELS: Record<string, string> = {
 }
 
 const DOMAIN_COLORS: Record<string, string> = {
-  Marketing: '#FF6B35',
-  Sales: '#E85520',
+  Marketing: '#A78BFA',
+  Sales: '#22D3EE',
   Engineering: '#3B82F6',
   Operations: '#8B5CF6',
   Strategy: '#F59E0B',
@@ -312,7 +312,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
           <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
             <span style={{ color: theme.primaryText, background: theme.primary, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{assessment.status}</span>
             {(assessment.problem_domains || []).map(d => (
-              <span key={d.domain} style={{ background: `${DOMAIN_COLORS[d.domain] || '#FF6B35'}20`, color: DOMAIN_COLORS[d.domain] || '#FF6B35', border: `1px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}40`, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{d.domain}</span>
+              <span key={d.domain} style={{ background: `${DOMAIN_COLORS[d.domain] || '#A78BFA'}20`, color: DOMAIN_COLORS[d.domain] || '#A78BFA', border: `1px solid ${DOMAIN_COLORS[d.domain] || '#A78BFA'}40`, padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>{d.domain}</span>
             ))}
           </div>
         </div>
@@ -353,7 +353,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
             {assessment.problem_domains && assessment.problem_domains.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {assessment.problem_domains.map((d, i) => (
-                  <div key={i} style={{ background: theme.input, padding: '12px', borderRadius: '8px', borderLeft: `3px solid ${DOMAIN_COLORS[d.domain] || '#FF6B35'}` }}>
+                  <div key={i} style={{ background: theme.input, padding: '12px', borderRadius: '8px', borderLeft: `3px solid ${DOMAIN_COLORS[d.domain] || '#A78BFA'}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontWeight: 700, color: theme.text, fontSize: '14px' }}>{d.domain} &middot; {d.subCategory}</span>
                       <span style={{ color: theme.accent, fontSize: '12px', fontWeight: 700 }}>{d.confidence}% match</span>
@@ -384,7 +384,7 @@ export function SubmissionDetail({ id, token, on401, onBack }: Props) {
               {sentinelProposals.map(p => (
                 <div key={p.id} style={{ background: theme.input, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '12px' }}>
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '9px', fontWeight: 800, padding: '2px 5px', borderRadius: '4px', background: p.type === 'friction' ? '#FF6B3520' : '#4ade8020', color: p.type === 'friction' ? '#FF6B35' : '#4ade80', textTransform: 'uppercase' }}>{p.type}</span>
+                    <span style={{ fontSize: '9px', fontWeight: 800, padding: '2px 5px', borderRadius: '4px', background: p.type === 'friction' ? '#A78BFA20' : '#4ade8020', color: p.type === 'friction' ? '#A78BFA' : '#4ade80', textTransform: 'uppercase' }}>{p.type}</span>
                     <span style={{ fontSize: '9px', border: `1px solid ${theme.border}`, color: theme.textMuted, padding: '2px 5px', borderRadius: '4px', fontWeight: 600 }}>{p.behavioral_frame}</span>
                   </div>
                   <p style={{ color: theme.text, fontSize: '13px', margin: '0 0 8px 0', lineHeight: 1.4 }}><b>Observation:</b> {p.observation}</p>

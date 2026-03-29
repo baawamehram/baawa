@@ -125,15 +125,15 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               style={{
                 width: 36, height: 36,
-                border: '2px solid rgba(255,107,53,0.2)',
-                borderTop: '2px solid #ff6b35',
+                border: '2px solid rgba(52,211,153,0.2)',
+                borderTop: '2px solid #064E3B',
                 borderRadius: '50%',
               }}
             />
             <motion.span
               animate={{ opacity: [0.4, 1, 0.4] }}
               transition={{ duration: 1.4, repeat: Infinity }}
-              style={{ fontSize: 12, color: '#ff6b35', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase' }}
+              style={{ fontSize: 12, color: '#064E3B', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase' }}
             >
               PROCESSING AUDIO...
             </motion.span>
@@ -157,14 +157,14 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
                     key={i}
                     animate={{ height: bar.heights }}
                     transition={{ duration: bar.duration, repeat: Infinity, ease: 'easeInOut', delay: bar.delay }}
-                    style={{ width: 5, background: 'linear-gradient(180deg, #ff6b35, #ff9a6c)', borderRadius: 3, minHeight: 6 }}
+                    style={{ width: 5, background: 'linear-gradient(180deg, #064E3B, #ff9a6c)', borderRadius: 3, minHeight: 6 }}
                   />
                 ))}
               </div>
               <motion.span
                 animate={{ opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 1.2, repeat: Infinity }}
-                style={{ fontSize: 11, color: '#ff6b35', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600 }}
+                style={{ fontSize: 11, color: '#064E3B', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600 }}
               >
                 ● NODE ACTIVELY LISTENING
               </motion.span>
@@ -177,7 +177,7 @@ export function VoiceInput({ onTranscript, onVoiceUnavailable, disabled = false,
               style={{
                 width: '100%',
                 padding: '22px 24px',
-                background: '#ff6b35',
+                background: '#064E3B',
                 border: 'none',
                 color: '#000',
                 fontFamily: 'Outfit, sans-serif',

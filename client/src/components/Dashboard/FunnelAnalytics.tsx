@@ -74,7 +74,7 @@ export function FunnelAnalytics({ data, totalStarted }: Props) {
         <div>
           <h4 style={{ fontSize: '11px', color: theme.textMuted, textTransform: 'uppercase', marginBottom: '8px' }}>Input Preference</h4>
           <div style={{ height: '8px', background: theme.border, borderRadius: '4px', display: 'flex', overflow: 'hidden' }}>
-            <div style={{ width: '65%', background: '#FF6B35' }} title="Voice" />
+            <div style={{ width: '65%', background: '#A78BFA' }} title="Voice" />
             <div style={{ width: '35%', background: theme.text }} title="Text" />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '10px', color: theme.textMuted }}>

@@ -265,7 +265,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
                <button
                 onClick={() => void handleUrlIngest()}
                 disabled={ingesting || !urlIngest.trim()}
-                style={{ background: '#FF6B35', color: '#000', border: 'none', borderRadius: '8px', padding: '0 20px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', opacity: (ingesting || !urlIngest.trim()) ? 0.5 : 1 }}
+                style={{ background: '#A78BFA', color: '#000', border: 'none', borderRadius: '8px', padding: '0 20px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', opacity: (ingesting || !urlIngest.trim()) ? 0.5 : 1 }}
               >
                 {ingesting ? 'Scanning...' : 'Ingest URL'}
               </button>
@@ -292,7 +292,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
                 style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                 id="vault-file-upload"
               />
-              <label htmlFor="vault-file-upload" style={{ ...inputStyle, flex: 0, minWidth: 120, cursor: 'pointer', textAlign: 'center', borderColor: uploadFile ? '#FF6B35' : theme.border, color: uploadFile ? '#FF6B35' : theme.text }}>
+              <label htmlFor="vault-file-upload" style={{ ...inputStyle, flex: 0, minWidth: 120, cursor: 'pointer', textAlign: 'center', borderColor: uploadFile ? '#A78BFA' : theme.border, color: uploadFile ? '#A78BFA' : theme.text }}>
                 {uploadFile ? 'File Selected' : 'Choose File'}
               </label>
             </div>

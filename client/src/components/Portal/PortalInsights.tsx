@@ -48,7 +48,7 @@ export function PortalInsights({ theme, on401, problemDomains = [] }: Props) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 20 }}>
           <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 11, color: tk.textMuted, alignSelf: 'center' }}>Your focus areas:</span>
           {problemDomains.map(d => (
-            <span key={d.domain} style={{ fontFamily: 'Outfit,sans-serif', fontSize: 11, background: 'rgba(255,107,53,0.12)', color: '#FF6B35', border: '1px solid rgba(255,107,53,0.3)', borderRadius: 4, padding: '2px 8px', fontWeight: 600 }}>
+            <span key={d.domain} style={{ fontFamily: 'Outfit,sans-serif', fontSize: 11, background: 'rgba(52,211,153,0.12)', color: '#A78BFA', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 4, padding: '2px 8px', fontWeight: 600 }}>
               {d.domain} · {d.subCategory}
             </span>
           ))}
@@ -65,7 +65,7 @@ export function PortalInsights({ theme, on401, problemDomains = [] }: Props) {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {insights.map(insight => {
-            const color = SOURCE_COLORS[insight.source_name] ?? '#FF6B35'
+            const color = SOURCE_COLORS[insight.source_name] ?? '#A78BFA'
             // Extract first 300 chars as a preview
             const preview = insight.content.replace(/^\[.*?\]\s*/u, '').slice(0, 280)
             return (

@@ -45,7 +45,7 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
   return (
     <div
       style={{
-        background: '#040404',
+        background: '#111827',
         minHeight: '100svh',
         display: 'flex',
         flexDirection: 'column',
@@ -104,7 +104,7 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
               fontFamily: 'Outfit, sans-serif', fontSize: 10, color: '#666',
               letterSpacing: '0.2em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6
             }}>
-              <span style={{ display: 'inline-block', width: 4, height: 4, background: state.loading ? '#FFFFFF' : '#4ade80', borderRadius: '50%' }} />
+              <span style={{ display: 'inline-block', width: 4, height: 4, background: state.loading ? '#FFFFFF' : '#064E3B', borderRadius: '50%' }} />
               {state.loading ? 'ANALYZING RESPONSE...' : 'DIAGNOSTIC ENGAGED'}
             </span>
             <span style={{
@@ -118,11 +118,11 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
           {/* Loading / Error / Question */}
           {state.error && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center' }}>
-              <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: '#ef4444' }}>{state.error}</p>
+              <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: '#4B5563' }}>{state.error}</p>
               <button 
                 onClick={() => void startSession()}
                 style={{
-                  marginTop: 16, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444',
+                  marginTop: 16, background: 'transparent', border: '1px solid #4B5563', color: '#4B5563',
                   padding: '6px 16px', fontSize: 12, fontFamily: 'Outfit, sans-serif', cursor: 'pointer', letterSpacing: '0.1em'
                 }}
               >REBOOT</button>
@@ -143,14 +143,14 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
                 { t: '[ 2.310s ]', msg: 'SYSTEMS READY. PREPARING FIRST QUERY.', d: 2.4 },
               ].map(({ t, msg, d }, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: d, duration: 0.2 }} style={{ display: 'flex', gap: 12 }}>
-                  <span style={{ color: '#ff6b35', flexShrink: 0 }}>{t}</span>
+                  <span style={{ color: '#064E3B', flexShrink: 0 }}>{t}</span>
                   <span style={{ color: '#888' }}>{msg}</span>
                 </motion.div>
               ))}
               <motion.div
                 animate={{ opacity: [0, 1, 0] }}
                 transition={{ duration: 0.7, repeat: Infinity }}
-                style={{ width: 9, height: 16, background: '#ff6b35', marginTop: 4, borderRadius: 1 }}
+                style={{ width: 9, height: 16, background: '#064E3B', marginTop: 4, borderRadius: 1 }}
               />
             </motion.div>
           )}

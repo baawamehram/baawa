@@ -22,7 +22,7 @@ interface Props {
 
 const STATUS_COLOR = {
   pending: '#555',
-  in_progress: '#FF6B35',
+  in_progress: '#A78BFA',
   completed: '#4ade80',
 }
 

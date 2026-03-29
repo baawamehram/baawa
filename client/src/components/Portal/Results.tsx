@@ -33,14 +33,14 @@ const DIMENSION_LABELS: Record<string, string> = {
 }
 
 const DOMAIN_COLORS: Record<string, string> = {
-  Marketing: '#FF6B35',
-  Sales: '#E85520',
-  Engineering: '#3B82F6',
-  Operations: '#8B5CF6',
-  Strategy: '#F59E0B',
-  Finance: '#10B981',
-  Research: '#EC4899',
-  Product: '#06B6D4',
+  Marketing: '#064E3B',
+  Sales: '#0A5F48',
+  Engineering: '#374151',
+  Operations: '#4B5563',
+  Strategy: '#0A3B24',
+  Finance: '#022C22',
+  Research: '#111827',
+  Product: '#064E3B',
 }
 
 type Tab = 'results' | 'call' | 'proposal' | 'work' | 'insights' | 'messages'
@@ -262,9 +262,9 @@ export function PortalResults() {
               {domains.map(d => (
                 <span key={d.domain} style={{
                   fontFamily: 'Outfit, sans-serif', fontSize: 11, borderRadius: 4, padding: '3px 8px', fontWeight: 600, letterSpacing: '0.04em',
-                  background: `${DOMAIN_COLORS[d.domain] ?? '#FF6B35'}18`,
-                  color: DOMAIN_COLORS[d.domain] ?? '#FF6B35',
-                  border: `1px solid ${DOMAIN_COLORS[d.domain] ?? '#FF6B35'}40`,
+                  background: `${DOMAIN_COLORS[d.domain] ?? '#A78BFA'}18`,
+                  color: DOMAIN_COLORS[d.domain] ?? '#A78BFA',
+                  border: `1px solid ${DOMAIN_COLORS[d.domain] ?? '#A78BFA'}40`,
                 }}>
                   {d.domain} · {d.subCategory}
                 </span>
@@ -334,7 +334,7 @@ export function PortalResults() {
                             <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted, width: 140, flexShrink: 0 }}>{DIMENSION_LABELS[key] ?? key}</span>
                               <div style={{ flex: 1, height: 4, background: tk.border, borderRadius: 2, overflow: 'hidden' }}>
-                                <div style={{ width: `${value}%`, height: '100%', background: `linear-gradient(90deg, #FF6B35, #E85520)`, borderRadius: 2 }} />
+                                <div style={{ width: `${value}%`, height: '100%', background: `linear-gradient(90deg, #064E3B, #0A5F48)`, borderRadius: 2 }} />
                               </div>
                               <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.accent, minWidth: 24, textAlign: 'right' }}>{value}</span>
                             </div>

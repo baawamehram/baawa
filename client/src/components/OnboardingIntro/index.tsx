@@ -69,7 +69,7 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
       <motion.div
         animate={{ top: ['0%', '100%'] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-        style={{ position: 'absolute', left: 0, right: 0, height: '4px', background: 'rgba(255,107,53,0.1)', zIndex: 5, pointerEvents: 'none' }}
+        style={{ position: 'absolute', left: 0, right: 0, height: '4px', background: 'rgba(52,211,153,0.1)', zIndex: 5, pointerEvents: 'none' }}
       />
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 10, position: 'relative' }}>
@@ -80,7 +80,7 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
           
           let color = '#ccc';
           if (isOK) color = '#fff';
-          if (isReady) color = '#ff6b35';
+          if (isReady) color = '#34D399';
           if (isSynced) color = '#0f0';
 
           return (
@@ -91,13 +91,13 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
               transition={{ duration: 0.1 }}
               style={{ color }}
             >
-              <span style={{ color: '#ff6b35', marginRight: '8px' }}>&gt;</span>
+              <span style={{ color: '#34D399', marginRight: '8px' }}>&gt;</span>
               {line.text}
             </motion.div>
           );
         })}
         {visibleLines < bootLines.length && (
-          <motion.div animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} style={{ width: '10px', height: '16px', background: '#ff6b35', marginTop: '4px' }} />
+          <motion.div animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} style={{ width: '10px', height: '16px', background: '#34D399', marginTop: '4px' }} />
         )}
       </div>
     </div>
@@ -163,7 +163,7 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
         onClick={() => setStep('voice')}
         disabled={!intake.name || !intake.region}
         style={{
-          marginTop: '32px', width: '100%', padding: '14px', background: '#ff6b35', color: '#000',
+          marginTop: '32px', width: '100%', padding: '14px', background: '#064E3B', color: '#F9FAFB',
           border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer',
           opacity: (!intake.name || !intake.region) ? 0.5 : 1
         }}
@@ -175,8 +175,8 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
 
   const renderVoiceBanner = () => (
     <div style={{ padding: '60px 24px', textAlign: 'center', color: '#fff', maxWidth: '600px', margin: '0 auto' }}>
-      <div style={{ margin: '0 auto 24px', width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,107,53,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ff6b35' }}>
-        <svg fill="#ff6b35" width="24" height="24" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      <div style={{ margin: '0 auto 24px', width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(52,211,153,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #34D399' }}>
+        <svg fill="#34D399" width="24" height="24" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
       </div>
       <h3 style={{ fontSize: '20px', marginBottom: '16px', fontFamily: 'Cormorant Garamond, serif' }}>Optimization: Enable Voice Interface</h3>
       <p style={{ color: '#999', lineHeight: '1.6', marginBottom: '32px', fontFamily: 'Outfit, sans-serif' }}>
@@ -204,13 +204,13 @@ export function OnboardingIntro({ country, onComplete }: OnboardingIntroProps) {
     <div style={{ background: '#040404', minHeight: '100vh', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       {step === 'dashboard' && (
         <div style={{ padding: '20px' }}>
-          <h1 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '32px', fontFamily: 'Cormorant Garamond, serif', fontWeight: '300' }}>Diagnostic Interface <span style={{ color: '#ff6b35' }}>v1.4</span></h1>
+          <h1 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '32px', fontFamily: 'Cormorant Garamond, serif', fontWeight: '300' }}>Diagnostic Interface <span style={{ color: '#34D399' }}>v1.4</span></h1>
           {renderDashboard()}
           {visibleLines === bootLines.length && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginTop: '48px' }}>
               <button
                 onClick={() => setStep('intake')}
-                style={{ padding: '14px 40px', background: '#ff6b35', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.05em' }}
+                style={{ padding: '14px 40px', background: '#064E3B', color: '#F9FAFB', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', letterSpacing: '0.05em' }}
               >
                 INITIALIZE INTAKE
               </button>

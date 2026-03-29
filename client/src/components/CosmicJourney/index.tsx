@@ -61,7 +61,7 @@ const MSGS = [
 ]
 
 function fmtPct(p: number) { return (p >= 0 ? '+' : '') + p.toFixed(2) + '%' }
-function colFor(p: number) { return p >= 0 ? '#4ADE80' : '#F87171' }
+function colFor(p: number) { return p >= 0 ? '#4ADE80' : '#4B5563' }
 
 // Polyfill for roundRect on older browsers
 function roundRect(
@@ -200,8 +200,8 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
 
       // Background radial glow
       const bg = ctx.createRadialGradient(CX, CY, 0, CX, CY, minD * 0.5)
-      bg.addColorStop(0, 'rgba(255,107,53,0.04)')
-      bg.addColorStop(1, 'rgba(4,4,14,0)')
+      bg.addColorStop(0, 'rgba(6,78,59,0.06)')
+      bg.addColorStop(1, 'rgba(17,24,39,0)')
       ctx.fillStyle = bg
       ctx.fillRect(0, 0, W, H)
 
@@ -227,7 +227,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           ctx.beginPath()
           ctx.moveTo(p.x, p.y)
           ctx.lineTo(CX, CY)
-          ctx.strokeStyle = `rgba(255,107,53,${0.025 * (1 - dc / (minD * 0.55)) * globalA})`
+          ctx.strokeStyle = `rgba(6,78,59,${0.03 * (1 - dc / (minD * 0.55)) * globalA})`
           ctx.lineWidth = 0.4
           ctx.stroke()
         }
@@ -253,7 +253,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
         ctx.beginPath()
         ctx.moveTo(CX, CY)
         ctx.lineTo(x, y)
-        ctx.strokeStyle = `rgba(255,107,53,${0.06 * a})`
+        ctx.strokeStyle = `rgba(6,78,59,${0.08 * a})`
         ctx.lineWidth = 0.7
         ctx.stroke()
 
@@ -498,7 +498,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
 
   if (reducedMotion) return null
 
-  const btcCls = btcUp === null ? '#FBBF24' : btcUp ? '#4ADE80' : '#F87171'
+  const btcCls = btcUp === null ? '#9CA3AF' : btcUp ? '#4ADE80' : '#4B5563'
 
   const tickerSpans = (
     <>
@@ -524,16 +524,16 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
   })
 
   return (
-    <div style={{ background: '#04040E', width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ background: '#111827', width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <style>{`
         @keyframes scr      { from{transform:translateX(0)} to{transform:translateX(-50%)} }
         @keyframes opulse   {
-          0%,100%{box-shadow:0 0 0 2px rgba(255,107,53,0.2),0 0 60px rgba(255,107,53,0.7),0 0 120px rgba(255,107,53,0.3),0 0 240px rgba(255,107,53,0.12);transform:scale(1);}
-          50%    {box-shadow:0 0 0 3px rgba(255,107,53,0.35),0 0 90px rgba(255,107,53,1),  0 0 180px rgba(255,107,53,0.5),0 0 360px rgba(255,107,53,0.18);transform:scale(1.06);}
+          0%,100%{box-shadow:0 0 0 2px rgba(6,78,59,0.2),0 0 60px rgba(6,78,59,0.7),0 0 120px rgba(6,78,59,0.3),0 0 240px rgba(6,78,59,0.12);transform:scale(1);}
+          50%    {box-shadow:0 0 0 3px rgba(6,78,59,0.35),0 0 90px rgba(6,78,59,1),  0 0 180px rgba(6,78,59,0.5),0 0 360px rgba(6,78,59,0.18);transform:scale(1.06);}
         }
         @keyframes opulse2  {
-          0%,100%{box-shadow:0 0 60px rgba(255,107,53,0.7),0 0 140px rgba(255,107,53,0.3);}
-          50%    {box-shadow:0 0 90px rgba(255,107,53,0.9),0 0 200px rgba(255,107,53,0.45);}
+          0%,100%{box-shadow:0 0 60px rgba(6,78,59,0.7),0 0 140px rgba(6,78,59,0.3);}
+          50%    {box-shadow:0 0 90px rgba(6,78,59,0.9),0 0 200px rgba(6,78,59,0.45);}
         }
         @keyframes orbRadiate {
           0%   {transform:scale(1);   opacity:0.55;}
@@ -550,8 +550,8 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           50%    {opacity:0.5;transform:scale(0.88);}
         }
         @keyframes textGlow {
-          0%,100%{text-shadow:0 0 40px rgba(255,107,53,0.04);}
-          50%    {text-shadow:0 0 70px rgba(255,107,53,0.13),0 0 30px rgba(255,150,60,0.07);}
+          0%,100%{text-shadow:0 0 40px rgba(6,78,59,0.06);}
+          50%    {text-shadow:0 0 70px rgba(6,78,59,0.18),0 0 30px rgba(10,59,36,0.1);}
         }
       `}</style>
 
@@ -560,7 +560,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
         ...fadeStyle(showOrbital),
         height: 30, zIndex: 20, position: 'relative',
         background: 'rgba(4,4,14,0.95)',
-        borderBottom: '1px solid rgba(255,107,53,0.2)',
+        borderBottom: '1px solid rgba(6,78,59,0.3)',
         overflow: 'hidden', whiteSpace: 'nowrap',
         display: 'flex', alignItems: 'center',
       }}>
@@ -604,7 +604,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
             {[0, 1, 2].map(i => (
               <div key={i} style={{
                 position: 'absolute', inset: 0, borderRadius: '50%',
-                border: '2px solid rgba(255,107,53,0.45)',
+                border: '2px solid rgba(6,78,59,0.45)',
                 animation: `orbRadiate 2.4s ease-out ${i * 0.8}s infinite`,
                 pointerEvents: 'none',
               }} />
@@ -616,7 +616,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
               onKeyDown={e => { if (e.key === 'Enter') handleOrbTap() }}
               style={{
                 width: 160, height: 160, borderRadius: '50%',
-                background: 'radial-gradient(circle at 36% 32%, #FFAA80, #FF6B35 45%, #B83010)',
+                background: 'radial-gradient(circle at 36% 32%, #0A5F48, #064E3B 45%, #022C22)',
                 animation: 'opulse 2.8s ease-in-out infinite',
                 cursor: 'pointer', position: 'relative',
                 display: 'flex', flexDirection: 'column',
@@ -657,7 +657,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
         }}>
           <div style={{
             fontFamily: 'Courier New, monospace', fontSize: 8.5, letterSpacing: '0.18em',
-            color: 'rgba(255,107,53,0.45)', textTransform: 'uppercase', marginBottom: 7,
+            color: 'rgba(6,78,59,0.6)', textTransform: 'uppercase', marginBottom: 7,
           }}>
             Startup &amp; Tech — Now
           </div>
@@ -667,7 +667,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
               color: 'rgba(253,252,250,0.4)', lineHeight: 1.6,
               marginBottom: 5, display: 'flex', gap: 6,
             }}>
-              <span style={{ color: 'rgba(255,107,53,0.5)', flexShrink: 0 }}>›</span>
+              <span style={{ color: 'rgba(6,78,59,0.7)', flexShrink: 0 }}>›</span>
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {title}
               </span>
@@ -701,13 +701,13 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
       {/* ── TYPEWRITER SCREEN ── */}
       <div style={{
         ...fadeStyle(showTypewriter),
-        position: 'fixed', inset: 0, background: '#04040E', zIndex: 100,
+        position: 'fixed', inset: 0, background: '#111827', zIndex: 100,
         display: 'flex', flexDirection: 'column', alignItems: 'center',
       }}>
         {/* Orb — pinned at top */}
         <div style={{
           width: 100, height: 100, borderRadius: '50%', flexShrink: 0,
-          background: 'radial-gradient(circle at 36% 32%, #FFAA80, #FF6B35 45%, #B83010)',
+          background: 'radial-gradient(circle at 36% 32%, #0A5F48, #064E3B 45%, #022C22)',
           animation: 'opulse2 2.4s ease-in-out infinite',
           marginTop: 40, marginBottom: 28,
         }} />
@@ -716,7 +716,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
         <div ref={textScrollRef} style={{
           flex: 1, overflowY: 'auto', width: '100%', maxWidth: 560,
           padding: '0 32px',
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(255,107,53,0.05) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(6,78,59,0.08) 0%, transparent 65%)',
         }}>
           <div style={{
             fontFamily: 'Georgia, serif',
@@ -728,7 +728,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
             {twText}
             <span style={{
               display: 'inline-block', width: 2, height: '1em',
-              background: '#FF6B35', verticalAlign: 'middle',
+              background: '#064E3B', verticalAlign: 'middle',
               animation: 'blink 0.75s step-end infinite', marginLeft: 3,
             }} />
           </div>
@@ -745,7 +745,7 @@ export function CosmicJourney({ onComplete }: CosmicJourneyProps) {
           <button
             onClick={handleMicTap}
             style={{
-              background: micTapped ? 'rgba(255,107,53,0.6)' : '#FF6B35',
+              background: micTapped ? 'rgba(6,78,59,0.6)' : '#064E3B',
               color: '#FDFCFA', border: 'none', cursor: 'pointer',
               padding: '14px 44px', borderRadius: '8px',
               fontFamily: 'Outfit, sans-serif', fontSize: 16, fontWeight: 600,

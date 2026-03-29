@@ -3,12 +3,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        'deep-navy':    '#0C1220',
-        'antique-gold': '#C9A962',
-        'warm-white':   '#F5F3EF',
-        'stone':        '#8B8680',
-        'brand-orange': '#FF6B35',
-        'brand-orange-dark': '#E85520',
+        'saturn-charcoal': '#111827',
+        'saturn-gray':     '#1F2937',
+        'saturn-emerald':  '#064E3B',
+        'saturn-emerald-mid': '#059669',
+        'saturn-emerald-light': '#34D399',
+        'saturn-white':    '#F9FAFB',
+        'saturn-muted':    '#4B5563',
+        'saturn-rose':     '#FB7185',
+        'deep-navy':       '#111827', // Legacy fallback for deep-navy
+        'warm-white':      '#F9FAFB', // Legacy fallback for warm-white
       },
       fontFamily: {
         display: ["'Cormorant Garamond'", 'serif'],

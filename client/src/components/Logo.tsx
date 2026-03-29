@@ -14,7 +14,7 @@ export function LogoLight({ height = 36, color = "#0A0A0A" }: LogoProps) {
       <text x="10" y="55" fontFamily="'Manrope', sans-serif">
         <tspan fill={color} fontSize="48" fontWeight="700">baa</tspan>
         <tspan fill={color} fontSize="48" fontWeight="300">wa</tspan>
-        <tspan fill="#FF6B35" fontSize="48" fontWeight="300">{'>'}</tspan>
+        <tspan fill="#064E3B" fontSize="48" fontWeight="300">{'>'}</tspan>
       </text>
     </svg>
   )
@@ -28,7 +28,7 @@ export function LogoDark({ height = 36, color = "#FFFFFF" }: LogoProps) {
       <text x="10" y="55" fontFamily="'Manrope', sans-serif">
         <tspan fill={color} fontSize="48" fontWeight="700">baa</tspan>
         <tspan fill={color} fontSize="48" fontWeight="300">wa</tspan>
-        <tspan fill="#FF6B35" fontSize="48" fontWeight="300">{'>'}</tspan>
+        <tspan fill="#064E3B" fontSize="48" fontWeight="300">{'>'}</tspan>
       </text>
     </svg>
   )
@@ -42,7 +42,7 @@ export function LogoIcon({ height = 36, color = "#FFFFFF" }: LogoProps) {
       <text x="12" y="55" fontFamily="'Manrope', sans-serif">
         <tspan fill={color} fontSize="36" fontWeight="700">b</tspan>
         <tspan fill={color} fontSize="36" fontWeight="300">w</tspan>
-        <tspan fill="#FF6B35" fontSize="36" fontWeight="300">{'>'}</tspan>
+        <tspan fill="#064E3B" fontSize="36" fontWeight="300">{'>'}</tspan>
       </text>
     </svg>
   )
@@ -52,7 +52,7 @@ export function LogoIcon({ height = 36, color = "#FFFFFF" }: LogoProps) {
 export function LogoSymbol({ size = 40, color = "#0A0A0A" }: { size?: number, color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="8" fill="#FF6B35" />
+      <rect width="80" height="80" rx="8" fill="#064E3B" />
       <text x="22" y="58" fill={color} fontFamily="'Manrope', sans-serif" fontSize="48" fontWeight="300">{'>'}</text>
     </svg>
   )

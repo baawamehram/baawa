@@ -13,7 +13,7 @@ export function ThankYou() {
       particleCount: 120,
       spread: 80,
       origin: { y: 0.55 },
-      colors: ['#FF6B35', '#E85520', '#FFB09A', '#c4b5fd', '#FDFCFA', '#ffffff'],
+      colors: ['#064E3B', '#059669', '#FFB09A', '#c4b5fd', '#FDFCFA', '#ffffff'],
       ticks: 200,
       gravity: 0.9,
       scalar: 1.1,
@@ -25,7 +25,7 @@ export function ThankYou() {
         particleCount: 60,
         spread: 50,
         origin: { x: 0.25, y: 0.6 },
-        colors: ['#FF6B35', '#E85520', '#FFB09A'],
+        colors: ['#064E3B', '#059669', '#FFB09A'],
         ticks: 160,
         gravity: 1,
       })
@@ -33,7 +33,7 @@ export function ThankYou() {
         particleCount: 60,
         spread: 50,
         origin: { x: 0.75, y: 0.6 },
-        colors: ['#FF6B35', '#E85520', '#FFB09A'],
+        colors: ['#064E3B', '#059669', '#FFB09A'],
         ticks: 160,
         gravity: 1,
       })
@@ -68,7 +68,7 @@ export function ThankYou() {
           width: '55vw',
           height: '55vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,107,53,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(52,211,153,0.1) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -80,7 +80,7 @@ export function ThankYou() {
           width: '45vw',
           height: '45vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(232,85,32,0.09) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(5,150,105,0.09) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -94,7 +94,7 @@ export function ThankYou() {
           width: '60vw',
           height: '60vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,107,53,0.04) 0%, transparent 65%)',
+          background: 'radial-gradient(circle, rgba(52,211,153,0.04) 0%, transparent 65%)',
           pointerEvents: 'none',
         }}
       />
@@ -123,8 +123,8 @@ export function ThankYou() {
             width: 64,
             height: 64,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(255,107,53,0.2), rgba(232,85,32,0.25))',
-            border: '1.5px solid rgba(255,107,53,0.35)',
+            background: 'linear-gradient(135deg, rgba(52,211,153,0.2), rgba(5,150,105,0.25))',
+            border: '1.5px solid rgba(52,211,153,0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -174,7 +174,7 @@ export function ThankYou() {
           style={{
             width: 48,
             height: 1,
-            background: 'linear-gradient(90deg, transparent, rgba(255,107,53,0.45), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.45), transparent)',
             margin: '8px 0',
           }}
         />
@@ -193,7 +193,7 @@ export function ThankYou() {
             lineHeight: 1.6,
             maxWidth: 420,
             padding: '16px 20px',
-            borderLeft: '2px solid rgba(255,107,53,0.3)',
+            borderLeft: '2px solid rgba(52,211,153,0.3)',
             textAlign: 'left',
           }}
         >

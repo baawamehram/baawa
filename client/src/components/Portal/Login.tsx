@@ -147,7 +147,7 @@ export function PortalLogin() {
                 disabled={loading}
                 whileHover={loading ? undefined : { scale: 1.02 }}
                 whileTap={loading ? undefined : { scale: 0.98 }}
-                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #FF6B35, #E85520)`, color: loading ? tk.accent : '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #A78BFA, #22D3EE)`, color: loading ? tk.accent : '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
               >
                 {loading ? 'Sending…' : 'Get access code →'}
               </motion.button>
@@ -198,7 +198,7 @@ export function PortalLogin() {
                 disabled={loading}
                 whileHover={loading ? undefined : { scale: 1.02 }}
                 whileTap={loading ? undefined : { scale: 0.98 }}
-                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #FF6B35, #E85520)`, color: loading ? tk.accent : '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #A78BFA, #22D3EE)`, color: loading ? tk.accent : '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
               >
                 {loading ? 'Verifying…' : 'Verify & Enter Portal →'}
               </motion.button>

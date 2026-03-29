@@ -11,7 +11,7 @@ const SERVICES = [
 ]
 
 const NAV_SEQUENCES = [
-  ...SERVICES.map(s => ({ text: s, prefix: "We do: ", color: "#FF6B35" })),
+  ...SERVICES.map(s => ({ text: s, prefix: "We do: ", color: "#059669" })),
   { text: "Jack of all trades,", prefix: "we are : ", color: "#6B6460" },
   { text: "masters of none.", prefix: "we are : ", color: "#6B6460" },
   { text: "oftentimes better than....", prefix: "we are : ", color: "#6B6460" },
@@ -19,15 +19,15 @@ const NAV_SEQUENCES = [
 ]
 
 const IDENTITY_ITEMS = [
-  { text: "Entrepreneurs", color: "#FF6B35" },
-  { text: "Filmmakers", color: "#FF6B35" },
-  { text: "Investment Bankers", color: "#FF6B35" },
-  { text: "Consultants", color: "#FF6B35" },
-  { text: "Agency Owners", color: "#FF6B35" },
-  { text: "AI Engineers", color: "#FF6B35" },
-  { text: "Brand Strategists", color: "#FF6B35" },
-  { text: "Behavioral Architects", color: "#FF6B35" },
-  { text: "Geeks who obsess over business", color: "#FF6B35" },
+  { text: "Entrepreneurs", color: "#059669" },
+  { text: "Filmmakers", color: "#059669" },
+  { text: "Investment Bankers", color: "#059669" },
+  { text: "Consultants", color: "#059669" },
+  { text: "Agency Owners", color: "#059669" },
+  { text: "AI Engineers", color: "#059669" },
+  { text: "Brand Strategists", color: "#059669" },
+  { text: "Behavioral Architects", color: "#059669" },
+  { text: "Geeks who obsess over business", color: "#059669" },
 ]
 
 function IdentityTypewriter() {
@@ -226,10 +226,10 @@ function DynamicHeroText() {
     <div style={{ position: 'relative', minHeight: '280px', display: 'flex', flexDirection: 'column', justifyContent: 'center', marginBottom: '40px' }}>
       <AnimatePresence mode="wait">
         <motion.div key={slide} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.6, ease: 'easeInOut' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: '20px' }}>{HERO_SLIDES[slide].kicker}</div>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#059669', fontFamily: 'Outfit, sans-serif', marginBottom: '20px' }}>{HERO_SLIDES[slide].kicker}</div>
           <h1 style={{ margin: '0 0 20px', lineHeight: 1.1 }}>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(36px, 6.5vw, 80px)', fontWeight: 400, color: '#0A0A0A', display: 'block' }}>{HERO_SLIDES[slide].title1}</div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(36px, 6.5vw, 80px)', fontWeight: 700, fontStyle: 'italic', color: '#FF6B35', display: 'block' }}>{HERO_SLIDES[slide].title2}</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(36px, 6.5vw, 80px)', fontWeight: 700, fontStyle: 'italic', color: '#059669', display: 'block' }}>{HERO_SLIDES[slide].title2}</div>
           </h1>
           <p style={{ fontSize: '17px', color: '#6B6460', lineHeight: 1.7, maxWidth: '560px', margin: '0 auto' }}>{HERO_SLIDES[slide].subtitle}</p>
         </motion.div>
@@ -237,7 +237,7 @@ function DynamicHeroText() {
       {/* Slide dots */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
         {HERO_SLIDES.map((_, i) => (
-          <button key={i} onClick={() => setSlide(i)} style={{ width: i === slide ? 20 : 6, height: 6, borderRadius: 3, background: i === slide ? '#FF6B35' : 'rgba(107,100,96,0.3)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s' }} />
+          <button key={i} onClick={() => setSlide(i)} style={{ width: i === slide ? 20 : 6, height: 6, borderRadius: 3, background: i === slide ? '#059669' : 'rgba(107,100,96,0.3)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s' }} />
         ))}
       </div>
     </div>
@@ -305,9 +305,9 @@ function GapCarousel() {
             style={{
               padding: '10px 20px',
               borderRadius: 100,
-              border: i === activeTab ? '1px solid #FF6B35' : '1px solid rgba(255,255,255,0.12)',
-              background: i === activeTab ? 'rgba(255,107,53,0.12)' : 'transparent',
-              color: i === activeTab ? '#FF6B35' : 'rgba(255,255,255,0.5)',
+              border: i === activeTab ? '1px solid #059669' : '1px solid rgba(255,255,255,0.12)',
+              background: i === activeTab ? 'rgba(52,211,153,0.12)' : 'transparent',
+              color: i === activeTab ? '#059669' : 'rgba(255,255,255,0.5)',
               fontFamily: 'Outfit, sans-serif',
               fontSize: 13,
               fontWeight: i === activeTab ? 600 : 400,
@@ -339,7 +339,7 @@ function GapCarousel() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 16 }}>
             {tab.items.map(({ num, title, body }) => (
               <div key={title} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '24px 20px' }}>
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 900, color: '#FF6B35', lineHeight: 1, marginBottom: 12 }}>{num}</div>
+                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 900, color: '#059669', lineHeight: 1, marginBottom: 12 }}>{num}</div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#FDFCFA', marginBottom: 8, fontFamily: 'Outfit, sans-serif' }}>{title}</div>
                 <div style={{ fontSize: 14, color: 'rgba(253,252,250,0.5)', lineHeight: 1.7 }}>{body}</div>
               </div>
@@ -399,7 +399,7 @@ function LoginMenu() {
                 padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
                 display: 'flex', flexDirection: 'column', gap: 2,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,107,53,0.05)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(52,211,153,0.05)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
             >
               <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Client Access</span>
@@ -449,7 +449,7 @@ export function LandingPage({ onStart }: Props) {
               </button>
             </div>
             <div style={{ maxWidth: '680px', margin: '0 auto', padding: '56px 24px 80px', width: '100%' }}>
-              <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: '20px' }}>About Baawa</div>
+              <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#059669', fontFamily: 'Outfit, sans-serif', marginBottom: '20px' }}>About Baawa</div>
               {[
                 { title: 'Mission', body: 'To be the first call clients make when they need things to move — delivering truth, clarity, and momentum through psychology-driven strategy.' },
                 { title: 'Vision', body: 'A world where every client has access to an advisor who tells them what they need to hear, not what they want to hear — and gets them unstuck.' },
@@ -459,8 +459,8 @@ export function LandingPage({ onStart }: Props) {
                   <p style={{ fontSize: '16px', color: 'rgba(253,252,250,0.65)', lineHeight: 1.75, margin: 0 }}>{body}</p>
                 </div>
               ))}
-              <div style={{ marginBottom: '44px', background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.15)', borderRadius: '10px', padding: '28px 24px' }}>
-                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 700, color: '#FF6B35', margin: '0 0 12px' }}>Core Belief</h2>
+              <div style={{ marginBottom: '44px', background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)', borderRadius: '10px', padding: '28px 24px' }}>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 700, color: '#059669', margin: '0 0 12px' }}>Core Belief</h2>
                 <p style={{ fontSize: '15px', color: 'rgba(253,252,250,0.7)', lineHeight: 1.75, margin: 0 }}>Clients deserve truth, not reassurance. The agency model is broken. Psychology beats tactics. We diagnose before we prescribe.</p>
               </div>
               <div>
@@ -473,7 +473,7 @@ export function LandingPage({ onStart }: Props) {
                     { title: 'Selectivity over volume', body: "We can't help everyone, and we don't pretend to." },
                   ].map(({ title, body }) => (
                     <div key={title} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                      <span style={{ color: '#FF6B35', fontWeight: 700, flexShrink: 0 }}>—</span>
+                      <span style={{ color: '#059669', fontWeight: 700, flexShrink: 0 }}>—</span>
                       <div>
                         <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '14px', fontWeight: 700, color: '#FDFCFA', marginBottom: '3px' }}>{title}</div>
                         <div style={{ fontSize: '13px', color: 'rgba(253,252,250,0.45)', lineHeight: 1.6 }}>{body}</div>
@@ -495,7 +495,7 @@ export function LandingPage({ onStart }: Props) {
         </div>
         <div className="flex items-center gap-1.5 md:gap-3">
           <LoginMenu />
-          <button onClick={onStart} className="px-3 py-1.5 md:px-5 md:py-2.5 rounded-md bg-[#FF6B35] text-[#FAFAFA] font-['Outfit'] font-semibold text-[11px] md:text-[14px] whitespace-nowrap" style={{ touchAction: 'manipulation' }}>
+          <button onClick={onStart} className="px-3 py-1.5 md:px-5 md:py-2.5 rounded-md bg-[#059669] text-[#FAFAFA] font-['Outfit'] font-semibold text-[11px] md:text-[14px] whitespace-nowrap" style={{ touchAction: 'manipulation' }}>
             <span className="sm:hidden">Start →</span>
             <span className="hidden sm:inline">Start Assessment</span>
           </button>
@@ -510,7 +510,7 @@ export function LandingPage({ onStart }: Props) {
           <DynamicHeroText />
           <button
             onClick={onStart}
-            style={{ background: '#FF6B35', color: '#FAFAFA', border: 'none', cursor: 'pointer', padding: '16px 36px', borderRadius: 10, fontSize: 15, fontFamily: 'Outfit, sans-serif', fontWeight: 600, marginBottom: 12, touchAction: 'manipulation', display: 'block', margin: '0 auto 12px' }}
+            style={{ background: '#059669', color: '#FAFAFA', border: 'none', cursor: 'pointer', padding: '16px 36px', borderRadius: 10, fontSize: 15, fontFamily: 'Outfit, sans-serif', fontWeight: 600, marginBottom: 12, touchAction: 'manipulation', display: 'block', margin: '0 auto 12px' }}
           >
             Start Assessment →
           </button>
@@ -546,7 +546,7 @@ export function LandingPage({ onStart }: Props) {
           initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ maxWidth: 900, margin: '0 auto' }}
         >
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,107,53,0.7)', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who We Are</div>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(52,211,153,0.7)', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who We Are</div>
           <IdentityTypewriter />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
             {[
@@ -556,7 +556,7 @@ export function LandingPage({ onStart }: Props) {
               'Obsessed with business'
             ].map(tag => (
               <span key={tag} style={{ fontSize: 13, color: 'rgba(253,252,250,0.35)', fontFamily: 'Outfit, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ color: '#FF6B35', opacity: 0.5 }}>◆</span> {tag}
+                <span style={{ color: '#059669', opacity: 0.5 }}>◆</span> {tag}
               </span>
             ))}
           </div>
@@ -569,9 +569,9 @@ export function LandingPage({ onStart }: Props) {
           initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ maxWidth: 1000, margin: '0 auto' }}
         >
-          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Our Intelligence</div>
+          <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#059669', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Our Intelligence</div>
           <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 400, color: 'rgba(253,252,250,0.6)', margin: '0 0 48px', lineHeight: 1.3, maxWidth: 520 }}>
-            The gap between where you are and where you should be<span style={{ color: '#FF6B35', fontStyle: 'italic' }}> is our operating space.</span>
+            The gap between where you are and where you should be<span style={{ color: '#059669', fontStyle: 'italic' }}> is our operating space.</span>
           </p>
           <GapCarousel />
         </motion.div>
@@ -582,7 +582,7 @@ export function LandingPage({ onStart }: Props) {
         {/* Subtle grid BG */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.04 }}>
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs><pattern id="gridbg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="#FF6B35" strokeWidth="1" /></pattern></defs>
+            <defs><pattern id="gridbg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="#059669" strokeWidth="1" /></pattern></defs>
             <rect width="100%" height="100%" fill="url(#gridbg)" />
           </svg>
         </div>
@@ -592,7 +592,7 @@ export function LandingPage({ onStart }: Props) {
           style={{ maxWidth: 1000, margin: '0 auto', position: 'relative' }}
         >
           <motion.div variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }} style={{ marginBottom: 48 }}>
-            <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>How It Works</div>
+            <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#059669', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>How It Works</div>
             <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(28px, 4.5vw, 48px)', fontWeight: 700, color: '#0A0A0A', margin: 0, lineHeight: 1.15 }}>
               Three steps to momentum.
             </h2>
@@ -607,7 +607,7 @@ export function LandingPage({ onStart }: Props) {
               <motion.div key={num} variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                 style={{ background: 'white', border: '1px solid #EEDDD8', borderRadius: 12, padding: '28px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
               >
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 52, fontWeight: 900, color: '#FF6B35', lineHeight: 1, marginBottom: 16 }}>{num}</div>
+                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 52, fontWeight: 900, color: '#059669', lineHeight: 1, marginBottom: 16 }}>{num}</div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: '#0A0A0A', marginBottom: 8, fontFamily: 'Outfit, sans-serif' }}>{title}</div>
                 <div style={{ fontSize: 14, color: '#6B6460', lineHeight: 1.7 }}>{body}</div>
               </motion.div>
@@ -618,7 +618,7 @@ export function LandingPage({ onStart }: Props) {
           <motion.div variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: 32, alignItems: 'start' }}>
               <div>
-                <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who This Is For</div>
+                <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#059669', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who This Is For</div>
                 <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 700, color: '#0A0A0A', margin: '0 0 20px', lineHeight: 1.2 }}>Clients ready to bypass the consulting bloat.</h3>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
@@ -628,7 +628,7 @@ export function LandingPage({ onStart }: Props) {
                     "Ready to hear the absolute truth about your business",
                   ].map((item) => (
                     <li key={item} style={{ display: 'flex', gap: 12, fontSize: 15, color: '#3A3530', lineHeight: 1.5 }}>
-                      <span style={{ color: '#FF6B35', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                      <span style={{ color: '#059669', fontWeight: 700, flexShrink: 0 }}>✓</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -654,14 +654,14 @@ export function LandingPage({ onStart }: Props) {
         >
           <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 6vw, 64px)', fontWeight: 700, color: '#FDFCFA', lineHeight: 1.1, margin: '0 0 16px' }}>
             Ready to let our intelligence<br />
-            <span style={{ fontStyle: 'italic', color: '#FF6B35' }}>diagnose your business?</span>
+            <span style={{ fontStyle: 'italic', color: '#059669' }}>diagnose your business?</span>
           </h2>
           <p style={{ fontSize: 16, color: 'rgba(253,252,250,0.55)', lineHeight: 1.7, margin: '0 auto 32px', maxWidth: 460 }}>
             Take the assessment. Zero cost. Zero sales pressure. Pure, actionable insight.
           </p>
           <button
             onClick={onStart}
-            style={{ background: '#FF6B35', color: 'white', border: 'none', cursor: 'pointer', padding: '18px 44px', borderRadius: 10, fontSize: 16, fontFamily: 'Outfit, sans-serif', fontWeight: 700, marginBottom: 16, display: 'block', margin: '0 auto 16px', touchAction: 'manipulation', boxShadow: '0 8px 32px rgba(255,107,53,0.25)' }}
+            style={{ background: '#059669', color: 'white', border: 'none', cursor: 'pointer', padding: '18px 44px', borderRadius: 10, fontSize: 16, fontFamily: 'Outfit, sans-serif', fontWeight: 700, marginBottom: 16, display: 'block', margin: '0 auto 16px', touchAction: 'manipulation', boxShadow: '0 8px 32px rgba(52,211,153,0.25)' }}
           >
             Begin the Assessment →
           </button>

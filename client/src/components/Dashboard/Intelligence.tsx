@@ -300,7 +300,7 @@ export function Intelligence({ token, on401 }: Props) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <div>
-                    <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: p.type === 'friction' ? '#FF6B3520' : '#4ade8020', color: p.type === 'friction' ? '#FF6B35' : '#4ade80', textTransform: 'uppercase', marginRight: '8px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: p.type === 'friction' ? '#A78BFA20' : '#4ade8020', color: p.type === 'friction' ? '#A78BFA' : '#4ade80', textTransform: 'uppercase', marginRight: '8px' }}>
                       {p.type}
                     </span>
                     <span style={{ fontSize: '10px', border: `1px solid ${theme.border}`, color: theme.textMuted, padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
@@ -311,7 +311,7 @@ export function Intelligence({ token, on401 }: Props) {
                 </div>
                 <p style={{ color: theme.text, fontSize: '14px', margin: '0 0 8px 0', lineHeight: 1.5 }}>{p.observation}</p>
                 <div style={{ background: theme.input, borderRadius: '6px', padding: '10px', marginBottom: '12px' }}>
-                  <p style={{ color: '#FF6B35', fontSize: '12px', fontWeight: 700, margin: '0 0 4px 0', textTransform: 'uppercase' }}>Proposal</p>
+                  <p style={{ color: '#A78BFA', fontSize: '12px', fontWeight: 700, margin: '0 0 4px 0', textTransform: 'uppercase' }}>Proposal</p>
                   <p style={{ color: theme.text, fontSize: '13px', margin: 0 }}>{p.proposal}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>

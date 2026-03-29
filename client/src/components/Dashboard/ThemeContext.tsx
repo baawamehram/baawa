@@ -12,20 +12,42 @@ export interface ThemeColors {
   primary: string
   primaryText: string
   accent: string
+  accentHover: string
+  accentMid: string
+  accentTintBg: string
+  accentTintBorder: string
+  accentGlow: string
+  gradient: string
+  statusPending: string
+  statusReviewing: string
+  statusSuccess: string
+  statusDeferred: string
+  statusError: string
 }
 
 export const DARK_THEME: ThemeColors = {
-  bg: '#000000',
-  bgMain: '#000000',
-  sidebar: '#111111',
-  card: '#111111',
-  input: '#1a1a1a',
-  border: '#333333',
-  text: '#ffffff',
-  textMuted: '#aaaaaa',
-  primary: '#ffffff',
-  primaryText: '#000000',
-  accent: '#FF6B35'
+  bg: '#111827', // Saturn Charcoal
+  bgMain: '#111827',
+  sidebar: '#0F1419',
+  card: '#1F2937', // Saturn Gray
+  input: '#374151',
+  border: '#4B5563',
+  text: '#F9FAFB', // Saturn White
+  textMuted: '#9CA3AF',
+  primary: '#F9FAFB',
+  primaryText: '#111827',
+  accent: '#064E3B', // Saturn Emerald (Deep Forest Green)
+  accentHover: '#065F46',
+  accentMid: '#059669', // Mid-emerald for gradients
+  accentTintBg: 'rgba(52,211,153,0.08)',
+  accentTintBorder: 'rgba(52,211,153,0.25)',
+  accentGlow: 'rgba(52,211,153,0.4)',
+  gradient: 'linear-gradient(135deg,#059669,#064E3B)',
+  statusPending: '#FBBF24', // Amber-400
+  statusReviewing: '#60A5FA', // Blue-400
+  statusSuccess: '#34D399', // Emerald-400
+  statusDeferred: '#4B5563', // Muted Saturn Gray
+  statusError: '#FB7185' // Rose-400
 }
 
 export const LIGHT_THEME: ThemeColors = {
@@ -39,7 +61,18 @@ export const LIGHT_THEME: ThemeColors = {
   textMuted: '#6b7280', // gray-500
   primary: '#111827',
   primaryText: '#ffffff',
-  accent: '#FF6B35'
+  accent: '#064E3B', // Saturn Emerald
+  accentHover: '#065F46',
+  accentMid: '#059669',
+  accentTintBg: 'rgba(6,78,59,0.08)',
+  accentTintBorder: 'rgba(6,78,59,0.25)',
+  accentGlow: 'rgba(6,78,59,0.4)',
+  gradient: 'linear-gradient(135deg,#059669,#064E3B)',
+  statusPending: '#FBBF24',
+  statusReviewing: '#60A5FA',
+  statusSuccess: '#34D399',
+  statusDeferred: '#9CA3AF',
+  statusError: '#DC2626' // Red-600 for light mode (darker for contrast)
 }
 
 interface ThemeContextType {

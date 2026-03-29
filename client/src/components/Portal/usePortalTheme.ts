@@ -29,37 +29,47 @@ export function usePortalTheme() {
 }
 
 export const LIGHT: Record<string, string> = {
-  bg: '#F8F6F3',
+  bg: '#F9FAFB', // Saturn White
   bg2: '#FFFFFF',
-  border: 'rgba(0,0,0,0.09)',
-  text: '#1A1A1A',
-  textMuted: 'rgba(0,0,0,0.45)',
-  accent: '#E85520',
-  accentLight: 'rgba(232,85,32,0.1)',
-  accentBorder: 'rgba(232,85,32,0.25)',
-  riskBg: 'rgba(239,68,68,0.05)',
-  riskBorder: 'rgba(239,68,68,0.2)',
-  riskText: '#dc2626',
-  msgTeamBg: 'rgba(232,85,32,0.08)',
-  msgProspectBg: '#F0EDE8',
-  inputBg: '#F0EDE8',
+  border: 'rgba(0,0,0,0.08)',
+  text: '#111827', // Saturn Charcoal
+  textMuted: 'rgba(17,24,39,0.5)',
+  accent: '#064E3B', // Saturn Emerald
+  accentLight: 'rgba(52,211,153,0.08)', // Emerald-400 tint
+  accentBorder: 'rgba(52,211,153,0.25)',
+  riskBg: 'rgba(75,85,99,0.05)',
+  riskBorder: 'rgba(75,85,99,0.2)',
+  riskText: '#4B5563', // Muted Saturn Gray
+  msgTeamBg: 'rgba(6,78,59,0.08)',
+  msgProspectBg: '#F3F4F6',
+  inputBg: '#F3F4F6',
+  statusPending: '#FBBF24',
+  statusReviewing: '#60A5FA',
+  statusSuccess: '#34D399',
+  statusDeferred: '#9CA3AF',
+  statusError: '#DC2626',
 }
 
 export const DARK: Record<string, string> = {
-  bg: '#0A0A0A',
-  bg2: 'rgba(255,255,255,0.03)',
-  border: 'rgba(255,255,255,0.08)',
-  text: '#FDFCFA',
-  textMuted: 'rgba(255,176,154,0.55)',
-  accent: '#FF6B35',
-  accentLight: 'rgba(255,107,53,0.12)',
-  accentBorder: 'rgba(255,107,53,0.3)',
-  riskBg: 'rgba(239,68,68,0.06)',
-  riskBorder: 'rgba(239,68,68,0.18)',
-  riskText: '#ef4444',
-  msgTeamBg: 'rgba(255,107,53,0.1)',
-  msgProspectBg: 'rgba(255,255,255,0.06)',
-  inputBg: 'rgba(255,107,53,0.07)',
+  bg: '#111827', // Saturn Charcoal
+  bg2: '#1F2937', // Saturn Gray
+  border: 'rgba(255,255,255,0.06)',
+  text: '#F9FAFB', // Saturn White
+  textMuted: 'rgba(249,250,251,0.45)',
+  accent: '#064E3B', // Saturn Emerald
+  accentLight: 'rgba(52,211,153,0.08)', // Emerald-400 tint (visible on dark)
+  accentBorder: 'rgba(52,211,153,0.25)', // Emerald-400 border
+  riskBg: 'rgba(75,85,99,0.08)',
+  riskBorder: 'rgba(75,85,99,0.25)',
+  riskText: '#9CA3AF', // Muted Light Saturn Gray
+  msgTeamBg: 'rgba(6,78,59,0.12)',
+  msgProspectBg: 'rgba(255,255,255,0.04)',
+  inputBg: 'rgba(255,255,255,0.02)',
+  statusPending: '#FBBF24',
+  statusReviewing: '#60A5FA',
+  statusSuccess: '#34D399',
+  statusDeferred: '#4B5563',
+  statusError: '#FB7185',
 }
 
 export function t(theme: Theme): Record<string, string> {

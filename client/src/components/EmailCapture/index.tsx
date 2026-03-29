@@ -89,7 +89,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
           width: '50vw',
           height: '50vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -101,7 +101,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
           width: '40vw',
           height: '40vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(232,85,32,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(5,150,105,0.07) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -131,9 +131,9 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                border: '3px solid rgba(255,107,53,0.15)',
-                borderTopColor: '#FF6B35',
-                borderRightColor: '#E85520',
+                border: '3px solid rgba(52,211,153,0.15)',
+                borderTopColor: '#064E3B',
+                borderRightColor: '#059669',
               }}
             />
 
@@ -169,7 +169,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                     width: 7,
                     height: 7,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FF6B35, #E85520)',
+                    background: 'linear-gradient(135deg, #064E3B, #059669)',
                   }}
                 />
               ))}
@@ -261,12 +261,12 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   autoComplete="email"
                   disabled={submitting}
                   style={{
-                    background: 'rgba(255,107,53,0.07)',
+                    background: 'rgba(52,211,153,0.07)',
                     border: emailError
                       ? '1.5px solid #ef4444'
                       : focused === 'email'
-                      ? '1.5px solid #FF6B35'
-                      : '1.5px solid rgba(255,107,53,0.3)',
+                      ? '1.5px solid #064E3B'
+                      : '1.5px solid rgba(52,211,153,0.3)',
                     borderRadius: 10,
                     padding: '13px 16px',
                     fontFamily: 'Outfit, sans-serif',
@@ -320,10 +320,10 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   autoComplete="tel"
                   disabled={submitting}
                   style={{
-                    background: 'rgba(255,107,53,0.07)',
+                    background: 'rgba(52,211,153,0.07)',
                     border: focused === 'phone'
-                      ? '1.5px solid #FF6B35'
-                      : '1.5px solid rgba(255,107,53,0.3)',
+                      ? '1.5px solid #064E3B'
+                      : '1.5px solid rgba(52,211,153,0.3)',
                     borderRadius: 10,
                     padding: '13px 16px',
                     fontFamily: 'Outfit, sans-serif',
@@ -366,8 +366,8 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   borderRadius: 10,
                   border: 'none',
                   background: submitting
-                    ? 'rgba(255,107,53,0.4)'
-                    : 'linear-gradient(135deg, #FF6B35, #E85520)',
+                    ? 'rgba(52,211,153,0.4)'
+                    : 'linear-gradient(135deg, #064E3B, #059669)',
                   color: '#fff',
                   fontFamily: 'Outfit, sans-serif',
                   fontSize: 16,

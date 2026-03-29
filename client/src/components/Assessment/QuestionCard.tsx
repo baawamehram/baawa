@@ -123,7 +123,7 @@ export function QuestionCard({ question, questionKey, loading, onSubmit, onRecor
                       display: 'block',
                       fontFamily: 'monospace',
                       fontSize: 12,
-                      color: '#ff6b35',
+                      color: '#064E3B',
                       letterSpacing: '0.05em',
                     }}
                   >

@@ -37,7 +37,7 @@ export function GoldenOrb({ state }: Props) {
 
     // Main sphere
     const material = new THREE.MeshStandardMaterial({
-      color: '#FF6B35',
+      color: '#064E3B',
       metalness: 0.9,
       roughness: 0.12,
       emissive: '#8B2500',
@@ -52,7 +52,7 @@ export function GoldenOrb({ state }: Props) {
 
     // Outer glow
     const glowGeo = new THREE.SphereGeometry(4.8, 32, 32)
-    const glowMat = new THREE.MeshBasicMaterial({ color: '#FF6B35', transparent: true, opacity: 0.08, side: THREE.BackSide })
+    const glowMat = new THREE.MeshBasicMaterial({ color: '#064E3B', transparent: true, opacity: 0.08, side: THREE.BackSide })
     const glowMesh = new THREE.Mesh(glowGeo, glowMat)
     scene.add(glowMesh)
 
