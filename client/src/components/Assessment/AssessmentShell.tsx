@@ -46,10 +46,10 @@ export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps
   }, [intakeData, setIntakeData])
 
   useEffect(() => {
-    if (!state.sessionId && !state.loading && !state.error && intakeData) {
+    if (!state.sessionId && !state.loading && !state.error) {
       void startSession()
     }
-  }, [state.sessionId, state.loading, state.error, startSession, intakeData])
+  }, [state.sessionId, state.loading, state.error, startSession])
 
   useEffect(() => {
     if (state.done && state.sessionId) {
