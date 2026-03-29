@@ -43,7 +43,7 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
     <button
       onClick={onExit}
       style={{
-        position: 'fixed', top: '20px', left: '20px', zIndex: 1000,
+        position: 'fixed', top: 'calc(20px + env(safe-area-inset-top))', left: 'calc(20px + env(safe-area-inset-left))', zIndex: 1000,
         background: 'rgba(52,211,153,0.12)', backdropFilter: 'blur(8px)',
         border: '1px solid rgba(52,211,153,0.35)', color: '#fff',
         padding: '8px 16px', borderRadius: '6px', cursor: 'pointer',

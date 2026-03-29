@@ -64,7 +64,7 @@ export function RevenueOverview({ token, on401 }: Props) {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
         <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', padding: '24px' }}>
           <p style={{ color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Total Phase 1 Revenue</p>
           <p style={{ fontSize: '28px', fontWeight: 700, color: theme.text, margin: 0 }}>{fmt(totalPhase1)}</p>
@@ -80,7 +80,8 @@ export function RevenueOverview({ token, on401 }: Props) {
       </div>
 
       <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', minWidth: '500px', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${theme.border}`, textAlign: 'left', background: 'rgba(0,0,0,0.02)' }}>
               <th style={{ padding: '12px 24px', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Client</th>
@@ -110,6 +111,7 @@ export function RevenueOverview({ token, on401 }: Props) {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

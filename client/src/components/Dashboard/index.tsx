@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { LogoDark, LogoLight, LogoIcon } from '../Logo'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SubmissionList } from './SubmissionList'
@@ -86,6 +86,13 @@ function DashboardContent() {
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null)
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handle401 = useCallback(() => {
     setToken(null)
@@ -201,9 +208,9 @@ function DashboardContent() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: theme.bg, fontFamily: "'Outfit', sans-serif", color: theme.text }}>
+    <div style={{ display: 'flex', minHeight: '100dvh', background: theme.bg, fontFamily: "'Outfit', sans-serif", color: theme.text }}>
       {/* Mobile header bar */}
-      <div style={{ display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: theme.sidebar, borderBottom: `1px solid ${theme.border}` }}
+      <div style={{ display: isMobile ? 'flex' : 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: theme.sidebar, borderBottom: `1px solid ${theme.border}` }}
         className="mobile-header">
         <LogoIcon height={28} color={theme.text} />
         <button
@@ -225,7 +232,7 @@ function DashboardContent() {
               onClick={() => handleNavSelect(item.key)}
               style={{
                 textAlign: 'left',
-                padding: '10px 16px',
+                padding: '13px 16px',
                 borderRadius: '6px',
                 fontSize: '14px',
                 border: 'none',
@@ -249,7 +256,7 @@ function DashboardContent() {
       )}
 
       {/* Sidebar — desktop only */}
-      <aside style={{ width: '256px', background: theme.sidebar, borderRight: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', padding: '24px 16px', flexShrink: 0 }}>
+      <aside style={{ width: '256px', background: theme.sidebar, borderRight: `1px solid ${theme.border}`, display: isMobile ? 'none' : 'flex', flexDirection: 'column', padding: '24px 16px', flexShrink: 0 }}>
         <div style={{ marginBottom: '32px', padding: '0 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {isDark ? <LogoDark height={32} /> : <LogoLight height={32} />}
           <button
@@ -290,7 +297,7 @@ function DashboardContent() {
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, overflowY: 'auto', padding: '32px', background: theme.bgMain }}>
+      <main style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '72px 16px 16px' : '32px', background: theme.bgMain }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={`${section}-${selectedAssessmentId}-${selectedClientId}-${isDark}`}

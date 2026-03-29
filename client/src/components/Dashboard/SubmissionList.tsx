@@ -93,7 +93,8 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
       </div>
 
       <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '8px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${theme.border}`, textAlign: 'left', background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
               <th style={{ padding: '12px 24px', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Identity</th>
@@ -147,6 +148,7 @@ export function SubmissionList({ token, on401, onSelect }: Props) {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

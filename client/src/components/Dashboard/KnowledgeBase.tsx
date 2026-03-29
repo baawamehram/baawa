@@ -308,7 +308,8 @@ export function KnowledgeBase({ token, on401 }: Props) {
       </div>
 
       <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '12px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', minWidth: '580px', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: 'rgba(0,0,0,0.02)', borderBottom: `1px solid ${theme.border}` }}>
               <th style={{ padding: '16px 24px', textAlign: 'left', color: theme.textMuted, fontSize: '11px', textTransform: 'uppercase' }}>Source Name</th>
@@ -348,6 +349,7 @@ export function KnowledgeBase({ token, on401 }: Props) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

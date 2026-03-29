@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import confetti from 'canvas-confetti'
 
 export function ThankYou() {
   const reducedMotion = useReducedMotion()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (reducedMotion) return
@@ -199,6 +201,39 @@ export function ThankYou() {
         >
           "The most important question isn't who you are. It's what you're ready to become."
         </motion.blockquote>
+
+        {/* Back to homepage button — delayed fade in */}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+          onClick={() => navigate('/')}
+          style={{
+            marginTop: '40px',
+            padding: '12px 24px',
+            borderRadius: '6px',
+            border: '1px solid rgba(52,211,153,0.3)',
+            background: 'transparent',
+            color: '#9CA3AF',
+            fontSize: '13px',
+            fontFamily: 'Outfit, sans-serif',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+            cursor: 'pointer',
+            textTransform: 'uppercase',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(52,211,153,0.6)';
+            e.currentTarget.style.color = '#C4B5FD';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(52,211,153,0.3)';
+            e.currentTarget.style.color = '#9CA3AF';
+          }}
+        >
+          ← Back to homepage
+        </motion.button>
       </motion.div>
     </div>
   )
