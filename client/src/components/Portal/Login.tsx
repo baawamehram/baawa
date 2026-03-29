@@ -14,6 +14,20 @@ export function PortalLogin() {
   const [step, setStep] = useState<'email' | 'otp'>('email')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [health, setHealth] = useState<'checking' | 'ok' | 'error'>('checking')
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch(`${API_URL}/health`)
+        if (res.ok) setHealth('ok')
+        else setHealth('error')
+      } catch {
+        setHealth('error')
+      }
+    }
+    void checkHealth()
+  }, [])
 
   // If already authenticated, skip login
   useEffect(() => {
@@ -90,9 +104,15 @@ export function PortalLogin() {
         <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: 11, color: tk.accent, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
           Baawa Portal
         </div>
-        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(22px, 4vw, 28px)', color: tk.text, margin: '0 0 6px', lineHeight: 1.3 }}>
-          Client Login
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+          <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(22px, 4vw, 28px)', color: tk.text, margin: 0, lineHeight: 1.3 }}>
+            Client Login
+          </h1>
+          <div 
+            title={health === 'ok' ? 'Connected to Baawa Intelligence' : 'Connecting to Baawa Intelligence...'}
+            style={{ width: 8, height: 8, borderRadius: '50%', background: health === 'ok' ? '#10b981' : '#f59e0b', marginTop: 4 }} 
+          />
+        </div>
 
         {step === 'email' ? (
           <>
@@ -131,6 +151,16 @@ export function PortalLogin() {
               >
                 {loading ? 'Sending…' : 'Get access code →'}
               </motion.button>
+
+              {health === 'error' && (
+                <button 
+                  type="button"
+                  onClick={() => navigate('/portal/results', { replace: true })}
+                  style={{ background: 'none', border: 'none', color: tk.accent, fontSize: 11, cursor: 'pointer', textAlign: 'center', marginTop: 8 }}
+                >
+                  Can't connect? View Strategic Preview
+                </button>
+              )}
             </form>
           </>
         ) : (

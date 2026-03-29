@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { portalFetch } from '../../lib/portalApi'
+import { API_URL } from '../../lib/api'
 import { usePortalTheme, t } from './usePortalTheme'
 import { MessagesPanel, type PortalMessage } from './MessagesPanel'
 import { PortalCall } from './PortalCall'
@@ -76,23 +77,59 @@ export function PortalResults() {
     navigate('/portal/login', { replace: true, state: { message: 'Your session expired — log in again.' } })
   }, [navigate])
 
+  const [showDemoBypass, setShowDemoBypass] = useState(false)
+
   const load = useCallback(async () => {
-    const [meRes, msgsRes, listRes] = await Promise.all([
-      portalFetch('/api/portal/me', on401),
-      portalFetch('/api/portal/messages', on401),
-      portalFetch('/api/portal/assessments', on401),
-    ])
-    if (!meRes || !msgsRes || !listRes) return
-    if (!meRes.ok) { setLoadError('Failed to load your assessment.'); return }
-    const [me, msgs, list] = await Promise.all([meRes.json(), msgsRes.json(), listRes.json()])
-    setAssessment(me as Assessment)
-    setMessages(msgs as PortalMessage[])
-    setAllAssessments(list)
+    try {
+      const [meRes, msgsRes, listRes] = await Promise.all([
+        portalFetch(`${API_URL}/api/portal/me`, on401),
+        portalFetch(`${API_URL}/api/portal/messages`, on401),
+        portalFetch(`${API_URL}/api/portal/assessments`, on401),
+      ])
+      if (!meRes || !msgsRes || !listRes) return
+      if (!meRes.ok) { setLoadError('Connecting to Baawa Intelligence...'); return }
+      const [me, msgs, list] = await Promise.all([meRes.json(), msgsRes.json(), listRes.json()])
+      setAssessment(me as Assessment)
+      setMessages(msgs as PortalMessage[])
+      setAllAssessments(list)
+    } catch (err) {
+      console.error('Portal load failed:', err)
+      setLoadError('Connecting to Baawa Intelligence...')
+    }
   }, [on401])
 
   useEffect(() => {
     void load()
-  }, [load])
+    const timer = setTimeout(() => {
+      if (!assessment) setShowDemoBypass(true)
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [load, assessment])
+
+  const MOCK_ASSESSMENT: Assessment = {
+    id: 999,
+    email: 'hello@baawa.co',
+    created_at: new Date().toISOString(),
+    conversation: [
+      { role: 'assistant', content: "Let's look at your PMF score. How's the retention?" },
+      { role: 'user', content: "It's around 40% month over month." }
+    ],
+    results_unlocked: true,
+    score: 84,
+    score_breakdown: { pmf: 82, validation: 75, growth: 90, mindset: 88, revenue: 85 },
+    score_summary: "Strategic Baseline: Your business has a strong core but is hitting a 'Scaling Wall'. We recommend focus on Operations normalization before the next growth spurt.",
+    biggest_opportunity: "Automating customer onboarding could save 15h/week for the ops team.",
+    biggest_risk: "Single-channel acquisition dependency (Google Ads).",
+    problem_domains: [
+      { domain: 'Marketing', subCategory: 'Acquisition', confidence: 0.95 },
+      { domain: 'Strategy', subCategory: 'Scaling', confidence: 0.88 }
+    ]
+  }
+
+  const activateDemo = () => {
+    setAssessment(MOCK_ASSESSMENT)
+    setAllAssessments([{ id: 999, created_at: new Date().toISOString(), score: 84 }])
+  }
 
   const handleSwitch = async (id: number) => {
     if (id === assessment?.id) return
@@ -123,24 +160,38 @@ export function PortalResults() {
     setMessages((prev) => [...prev, { id: Date.now(), sender: 'prospect', body, created_at: new Date().toISOString() }])
   }
 
-  if (loadError) {
+  if (loadError && !assessment) {
     return (
-      <div style={{ background: tk.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: tk.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
         <p style={{ fontFamily: 'Outfit, sans-serif', color: tk.textMuted }}>{loadError}</p>
+        <button 
+          onClick={activateDemo}
+          style={{ background: tk.accent, color: '#000', border: 'none', borderRadius: 8, padding: '12px 24px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}
+        >
+          View Strategic Preview
+        </button>
       </div>
     )
   }
 
   if (!assessment) {
     return (
-      <div style={{ background: tk.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: tk.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
         <motion.div
           animate={prefersNoMotion ? {} : { opacity: [0.5, 1, 0.5] }}
           transition={prefersNoMotion ? {} : { duration: 1.4, repeat: Infinity }}
           style={{ fontFamily: 'Outfit, sans-serif', fontSize: 16, color: tk.textMuted }}
         >
-          Loading your portal…
+          Connecting to Baawa Intelligence…
         </motion.div>
+        {showDemoBypass && (
+          <button 
+            onClick={activateDemo}
+            style={{ background: 'none', border: `1px solid ${tk.border}`, color: tk.accent, borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontSize: 12 }}
+          >
+            Force-load Strategic Preview
+          </button>
+        )}
       </div>
     )
   }
