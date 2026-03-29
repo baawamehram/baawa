@@ -20,9 +20,11 @@ const IDENTITY_ITEMS = [
   { text: "Brand Strategists", color: "#FF6B35" },
   { text: "Behavioral Architects", color: "#FF6B35" },
   { text: "Geeks who obsess over business", color: "#FF6B35" },
-  { text: "a jack of all trades,", color: "#6B6460" },
-  { text: "is a master of none,", color: "#6B6460" },
-  { text: "but oftentimes better than a master of one.", color: "#6B6460" },
+  // The dark grey sequence (4 parts)
+  { text: "a jack of all trades,", color: "#6B6460", hidePrefix: true },
+  { text: "is a master of none,", color: "#6B6460", hidePrefix: true },
+  { text: "but oftentimes better", color: "#6B6460", hidePrefix: true },
+  { text: "than a master of one.", color: "#6B6460", hidePrefix: true },
 ]
 
 function IdentityTypewriter() {
@@ -52,29 +54,41 @@ function IdentityTypewriter() {
   }, [text, isDeleting, index, speed, currentItem.text])
 
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
-      <span style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: 'clamp(28px, 5vw, 52px)',
-        fontWeight: 700,
-        fontStyle: 'italic',
-        color: currentItem.color,
-        minWidth: 4,
-        lineHeight: 1.1,
-        transition: 'color 0.4s ease-in-out',
-      }}>{text}</span>
-      <span style={{
-        display: 'inline-block',
-        width: 3,
-        height: 'clamp(28px, 5vw, 50px)',
-        background: currentItem.color,
-        marginLeft: 4,
-        borderRadius: 1,
-        animation: 'cursor-blink 0.9s step-end infinite',
-        verticalAlign: 'middle',
-        flexShrink: 0,
-        transition: 'background 0.4s ease-in-out',
-      }} />
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+      {!currentItem.hidePrefix && (
+        <span style={{ 
+          fontFamily: "'Cormorant Garamond', serif", 
+          fontSize: 'clamp(28px, 5vw, 52px)', 
+          fontWeight: 300, 
+          color: 'rgba(253,252,250,0.5)', 
+          lineHeight: 1.1, 
+          whiteSpace: 'nowrap' 
+        }}>We are:</span>
+      )}
+      <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
+        <span style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: 'clamp(28px, 5vw, 52px)',
+          fontWeight: 700,
+          fontStyle: 'italic',
+          color: currentItem.color,
+          minWidth: 4,
+          lineHeight: 1.1,
+          transition: 'color 0.4s ease-in-out',
+        }}>{text}</span>
+        <span style={{
+          display: 'inline-block',
+          width: 3,
+          height: 'clamp(28px, 5vw, 50px)',
+          background: currentItem.color,
+          marginLeft: 4,
+          borderRadius: 1,
+          animation: 'cursor-blink 0.9s step-end infinite',
+          verticalAlign: 'middle',
+          flexShrink: 0,
+          transition: 'background 0.4s ease-in-out',
+        }} />
+      </div>
     </div>
   )
 }
@@ -530,10 +544,7 @@ export function LandingPage({ onStart }: Props) {
           style={{ maxWidth: 900, margin: '0 auto' }}
         >
           <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,107,53,0.7)', fontFamily: 'Outfit, sans-serif', marginBottom: 12 }}>Who We Are</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 300, color: 'rgba(253,252,250,0.5)', lineHeight: 1.1, whiteSpace: 'nowrap' }}>We are:</span>
-            <IdentityTypewriter />
-          </div>
+          <IdentityTypewriter />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
             {[
               '250 years of collective experience',
