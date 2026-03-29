@@ -271,6 +271,13 @@ async function startServer() {
     // Triple Intelligence Upgrade: Phase 1 Migrations
     await db.query(`ALTER TABLE knowledge_chunks ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'general'`)
     await db.query(`ALTER TABLE knowledge_chunks ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb`)
+    
+    // Ensure all session_analytics columns exist for real-time heartbeat
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS question_count INT DEFAULT 0`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS avg_answer_words FLOAT`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS min_answer_words INT`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS max_answer_words INT`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS drop_off_at_question INT`)
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS events JSONB DEFAULT '[]'::jsonb`)
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS health_score INT DEFAULT 100`)
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS last_input_method VARCHAR(20)`)

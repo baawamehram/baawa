@@ -37,10 +37,12 @@ function isFallbackableError(err: unknown): boolean {
   if (err instanceof Anthropic.APIConnectionTimeoutError) return true
   if (err instanceof Anthropic.AuthenticationError) return true
   if (err instanceof GoogleGenerativeAIFetchError) {
-    return err.status === 429 || err.status === 500 || err.status === 503
+    // 404 is included here because sometimes model names are slightly off between versions/regions
+    return !!err.status && [401, 403, 404, 429, 500, 503].includes(err.status)
   }
   if (err instanceof Error) {
-    return /econnrefused|fetch failed|enotfound/i.test(err.message)
+    const msg = err.message.toLowerCase()
+    return /econnrefused|fetch failed|enotfound|rate limit|timeout|401|404/i.test(msg)
   }
   return false
 }
@@ -107,9 +109,9 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
     name: 'claude' | 'gemini' | 'groq'
     fn: () => Promise<string>
   }> = [
-    { name: 'claude', fn: () => callClaude(req, claudeModel) },
-    { name: 'gemini', fn: () => callGemini(req, geminiModel) },
     { name: 'groq', fn: () => callGroq(req, groqModel) },
+    { name: 'gemini', fn: () => callGemini(req, geminiModel) },
+    { name: 'claude', fn: () => callClaude(req, claudeModel) },
   ]
 
   const failures: Array<{ provider: string; error: string }> = []

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import multer from 'multer'
 import Groq, { toFile } from 'groq-sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const router = Router()
 
@@ -41,19 +42,53 @@ router.post(
         return res.status(400).json({ error: 'No audio file provided.' })
       }
 
-      const file = await toFile(req.file.buffer, req.file.originalname, {
-        type: req.file.mimetype,
-      })
+      console.log(`[voice] Attempting transcription for ${req.file.originalname} (${req.file.size} bytes)...`)
 
-      const groq = getGroqClient()
-      const transcription = await groq.audio.transcriptions.create({
-        file,
-        model: 'whisper-large-v3-turbo',
-      })
+      // Attempt Groq (Whisper) first — Fast and OSS
+      try {
+        const file = await toFile(req.file.buffer, req.file.originalname, {
+          type: req.file.mimetype,
+        })
+        const groq = getGroqClient()
+        const transcription = await groq.audio.transcriptions.create({
+          file,
+          model: 'whisper-large-v3-turbo',
+        })
+        console.log('[voice] Groq transcription successful.')
+        return res.json({ transcript: transcription.text })
+      } catch (groqErr) {
+        console.warn('[voice] Groq transcription failed, falling back to Gemini:', groqErr instanceof Error ? groqErr.message : String(groqErr))
+      }
 
-      return res.json({ transcript: transcription.text })
+      // Fallback: Gemini 1.5 Flash (Supports audio input directly)
+      try {
+        if (!process.env.GOOGLE_AI_API_KEY) {
+          throw new Error('GOOGLE_AI_API_KEY not configured for voice fallback.')
+        }
+
+        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY)
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+        const result = await model.generateContent([
+          {
+            inlineData: {
+              data: req.file.buffer.toString('base64'),
+              mimeType: req.file.mimetype
+            }
+          },
+          'Transcribe this audio exactly as heard. Do not add anything else.'
+        ])
+
+        const transcript = result.response.text()
+        console.log('[voice] Gemini transcription successful.')
+        return res.json({ transcript })
+      } catch (geminiErr) {
+        console.error('[voice] Gemini transcription also failed:', geminiErr instanceof Error ? geminiErr.message : String(geminiErr))
+      }
+
+      return res.status(500).json({ error: 'All transcription providers failed.' })
     } catch (err) {
-      console.error('POST /voice/transcribe error:', err)
+      console.error('POST /voice/transcribe critical error:', err)
       return res.status(500).json({ error: 'Failed to transcribe audio.' })
     }
   }
