@@ -88,13 +88,19 @@ YOUR INTERVIEW STYLE:
 - Stay under 120 words total per response. Wit over length.
 `.trim()
 
-  // 3. Prepare history (SPEC: Last 8 turns / 16 messages)
-  const history = conversation.slice(-16) 
-  const messages: LLMMessage[] = history.length > 0
-    ? history.map((turn) => ({ role: turn.role, content: turn.content }))
-    : [{ role: 'user', content: 'Begin the diagnostic interview.' }]
+  // 3. First question — hardcoded opener (no LLM call needed)
+  if (conversation.length === 0) {
+    return {
+      question: 'Tell us everything about yourself and your business — what you\'re building, who you\'re serving, and what problem you\'re solving. Paint the full picture.',
+      done: false
+    }
+  }
 
-  // 4. Call LLM
+  // 4. Prepare history (SPEC: Last 8 turns / 16 messages)
+  const history = conversation.slice(-16)
+  const messages: LLMMessage[] = history.map((turn) => ({ role: turn.role, content: turn.content }))
+
+  // 5. Call LLM
   const { text: rawResponse } = await callLLM({ 
     messages, 
     systemPrompt, 
@@ -102,12 +108,12 @@ YOUR INTERVIEW STYLE:
     maxTokens: 256 
   })
 
-  // 5. Hardened Termination Check
+  // 6. Hardened Termination Check
   if (extractDoneFlag(rawResponse)) {
     return { question: '', done: true }
   }
 
-  // 6. Clean and return the question
+  // 7. Clean and return the question
   // Strip markdown fences if present
   const text = rawResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
 
