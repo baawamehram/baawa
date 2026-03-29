@@ -20,10 +20,9 @@ const IDENTITY_ITEMS = [
   { text: "Brand Strategists", color: "#FF6B35" },
   { text: "Behavioral Architects", color: "#FF6B35" },
   { text: "Geeks who obsess over business", color: "#FF6B35" },
-  // The dark grey sequence
-  { text: "the jack of all trades...", color: "#6B6460" },
-  { text: "then master of none,", color: "#6B6460" },
-  { text: "but oftentimes better than one.", color: "#6B6460" },
+  { text: "a jack of all trades,", color: "#6B6460" },
+  { text: "is a master of none,", color: "#6B6460" },
+  { text: "but oftentimes better than a master of one.", color: "#6B6460" },
 ]
 
 function IdentityTypewriter() {
