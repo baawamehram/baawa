@@ -1,43 +1,18 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { OnboardingIntro, IntakeData } from './components/OnboardingIntro'
 import { AssessmentShell } from './components/Assessment/AssessmentShell'
 import { EmailCapture } from './components/EmailCapture'
 import { ThankYou } from './components/ThankYou'
 import Dashboard from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
-import { API_URL } from './lib/api'
 import { PortalLogin } from './components/Portal/Login'
 import { PortalResults } from './components/Portal/Results'
 
-type FunnelPhase = 'intake' | 'assessment' | 'email' | 'thankyou'
-
-interface GeoData {
-  city: string | null
-  country: string | null
-  lat: number | null
-  lon: number | null
-}
+type FunnelPhase = 'assessment' | 'email' | 'thankyou'
 
 function FunnelPage({ onExit }: { onExit: () => void }) {
-  const [phase, setPhase] = useState<FunnelPhase>('intake')
+  const [phase, setPhase] = useState<FunnelPhase>('assessment')
   const [sessionId, setSessionId] = useState<string>('')
-  const [intakeData, setIntakeData] = useState<IntakeData | null>(null)
-  const [geo, setGeo] = useState<GeoData>({ city: null, country: null, lat: null, lon: null })
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/geo`)
-      .then((res) => res.json())
-      .then((data: GeoData) => setGeo(data))
-      .catch(() => {
-        // geo is non-critical, fall back to nulls
-      })
-  }, [])
-
-  const handleJourneyComplete = useCallback((data: IntakeData) => {
-    setIntakeData(data)
-    setPhase('assessment')
-  }, [])
 
   const exitButton = phase !== 'thankyou' && (
     <button
@@ -55,24 +30,12 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
     </button>
   )
 
-  if (phase === 'intake') {
-    return (
-      <>
-        {exitButton}
-        <OnboardingIntro
-          country={geo.country}
-          onComplete={handleJourneyComplete}
-        />
-      </>
-    )
-  }
-
   if (phase === 'assessment') {
     return (
       <>
         {exitButton}
         <AssessmentShell
-          intakeData={intakeData}
+          intakeData={null}
           onComplete={(id: string) => {
             setSessionId(id)
             setPhase('email')

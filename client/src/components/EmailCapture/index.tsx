@@ -13,12 +13,14 @@ type Phase = 'analyzing' | 'form'
 export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
   const reducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<Phase>('analyzing')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [nameError, setNameError] = useState('')
   const [emailError, setEmailError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [apiError, setApiError] = useState('')
-  const [focused, setFocused] = useState<'email' | 'phone' | null>(null)
+  const [focused, setFocused] = useState<'name' | 'email' | 'phone' | null>(null)
 
   // Advance from loader to form after 3 seconds
   useEffect(() => {
@@ -34,8 +36,14 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setNameError('')
     setEmailError('')
     setApiError('')
+
+    if (!name.trim()) {
+      setNameError('Please enter your name.')
+      return
+    }
 
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address.')
@@ -47,7 +55,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
       const res = await fetch(`${API_URL}/api/sessions/${sessionId}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, phone: phone.trim() || undefined }),
+        body: JSON.stringify({ name: name.trim(), email, phone: phone.trim() || undefined }),
       })
 
 
@@ -235,6 +243,69 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 gap: 12,
               }}
             >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label
+                  htmlFor="name-input"
+                  style={{
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: 13,
+                    color: 'rgba(255,176,154,0.6)',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Your name
+                </label>
+                <input
+                  id="name-input"
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    if (nameError) setNameError('')
+                    if (apiError) setApiError('')
+                  }}
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  disabled={submitting}
+                  style={{
+                    background: 'rgba(52,211,153,0.07)',
+                    border: nameError
+                      ? '1.5px solid #ef4444'
+                      : focused === 'name'
+                      ? '1.5px solid #064E3B'
+                      : '1.5px solid rgba(52,211,153,0.3)',
+                    borderRadius: 10,
+                    padding: '13px 16px',
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: 16,
+                    color: '#FDFCFA',
+                    outline: 'none',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={() => setFocused('name')}
+                  onBlur={() => setFocused(null)}
+                />
+                {nameError && (
+                  <motion.p
+                    id="name-error"
+                    role="alert"
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{
+                      fontFamily: 'Outfit, sans-serif',
+                      fontSize: 13,
+                      color: '#f87171',
+                      margin: 0,
+                    }}
+                  >
+                    {nameError}
+                  </motion.p>
+                )}
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label
                   htmlFor="email-input"
