@@ -1,4 +1,3 @@
-import { getFullKnowledgeText } from './knowledge'
 import { retrieveRelevantChunks } from './rag'
 import { getActiveConfig } from './journeyConfig'
 import { callLLM, LLMMessage } from './llm-provider'
@@ -18,9 +17,8 @@ export async function generateNextQuestion(
   latestAnswer: string
 ): Promise<QuestionResult> {
   // Get knowledge base content
-  const [config, fullKnowledge, relevantChunks] = await Promise.all([
+  const [config, relevantChunks] = await Promise.all([
     getActiveConfig(),
-    getFullKnowledgeText(),
     retrieveRelevantChunks(latestAnswer),
   ])
 
@@ -29,7 +27,7 @@ export async function generateNextQuestion(
     : ''
 
   const systemPrompt = config.system_prompt
-    .replace('{{KNOWLEDGE_BASE}}', fullKnowledge)
+    .replace('{{KNOWLEDGE_BASE}}', '') // Full base is too large, rely on RAG
     .replace('{{RAG_CONTEXT}}', ragContext)
 
   const messages: LLMMessage[] = conversation.length > 0
