@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { GoogleGenerativeAI, GoogleGenerativeAIFetchError } from '@google/generative-ai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import Groq from 'groq-sdk'
 
 export type ModelChain = 'assessment' | 'optimizer'
@@ -30,22 +30,6 @@ export class AllProvidersFailedError extends Error {
   }
 }
 
-function isFallbackableError(err: unknown): boolean {
-  if (err instanceof Anthropic.RateLimitError) return true
-  if (err instanceof Anthropic.InternalServerError) return true
-  if (err instanceof Anthropic.APIConnectionError) return true
-  if (err instanceof Anthropic.APIConnectionTimeoutError) return true
-  if (err instanceof Anthropic.AuthenticationError) return true
-  if (err instanceof GoogleGenerativeAIFetchError) {
-    // 404 is included here because sometimes model names are slightly off between versions/regions
-    return !!err.status && [401, 403, 404, 429, 500, 503].includes(err.status)
-  }
-  if (err instanceof Error) {
-    const msg = err.message.toLowerCase()
-    return /econnrefused|fetch failed|enotfound|rate limit|timeout|401|404/i.test(msg)
-  }
-  return false
-}
 
 async function callClaude(req: LLMRequest, model: string): Promise<string> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -127,11 +111,9 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err)
       console.warn(`[llm-provider] ${provider.name} failed: ${errorMsg}`)
-      if (isFallbackableError(err)) {
-        failures.push({ provider: provider.name, error: errorMsg })
-        continue
-      }
-      throw err
+      failures.push({ provider: provider.name, error: errorMsg })
+      // Continue to next provider regardless of error type in the fallback chain
+      continue
     }
   }
 
