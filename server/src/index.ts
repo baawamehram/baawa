@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import cron from 'node-cron'
 import { runOptimizer } from './services/journeyOptimizer'
-import { V1_INTRO_MESSAGES } from './db/seeds/journeyConfigV1'
+import { V1_INTRO_MESSAGES, V1_SYSTEM_PROMPT } from './db/seeds/journeyConfigV1'
 import express from 'express'
 import cors from 'cors'
 import { rateLimit } from 'express-rate-limit'
@@ -134,10 +134,10 @@ async function startServer() {
     `)
     await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS session_analytics_session_id ON session_analytics (session_id)`)
     await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS journey_config_one_active ON journey_config ((1)) WHERE status = 'active'`)
-    // Keep v1 intro messages current with the codebase
+    // Keep v1 intro messages and system prompt current with the codebase
     await db.query(
-      `UPDATE journey_config SET intro_messages = $1 WHERE version = 1`,
-      [JSON.stringify(V1_INTRO_MESSAGES)]
+      `UPDATE journey_config SET intro_messages = $1, system_prompt = $2 WHERE version = 1`,
+      [JSON.stringify(V1_INTRO_MESSAGES), V1_SYSTEM_PROMPT]
     )
 
     await db.query(`ALTER TABLE assessments ADD COLUMN IF NOT EXISTS results_unlocked BOOLEAN NOT NULL DEFAULT false`)

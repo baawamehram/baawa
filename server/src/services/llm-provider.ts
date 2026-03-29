@@ -82,12 +82,12 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
   const geminiModel =
     req.chain === 'optimizer'
       ? (process.env.GEMINI_OPTIMIZER_MODEL ?? 'gemini-1.5-pro')
-      : (process.env.GEMINI_ASSESSMENT_MODEL ?? 'gemini-1.5-flash')
+      : (process.env.GEMINI_ASSESSMENT_MODEL ?? 'gemini-1.5-pro')
 
   const groqModel =
     req.chain === 'optimizer'
       ? (process.env.GROQ_OPTIMIZER_MODEL ?? 'llama-3.3-70b-versatile')
-      : (process.env.GROQ_ASSESSMENT_MODEL ?? 'llama-3.1-8b-instant')
+      : (process.env.GROQ_ASSESSMENT_MODEL ?? 'llama-3.3-70b-versatile')
 
   const providers: Array<{
     name: 'claude' | 'gemini' | 'groq'

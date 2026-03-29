@@ -207,3 +207,12 @@ export async function getFullKnowledgeText(): Promise<string> {
   knowledgeTextCache = result.rows.map((r) => r.content).join('\n\n')
   return knowledgeTextCache
 }
+
+/**
+ * Returns a high-signal "core" of the knowledge base for persona stability.
+ * Used to stay within token limits while maintaining behavioral economics expertise.
+ */
+export async function getStrategicCore(length: number = 3000): Promise<string> {
+  const full = await getFullKnowledgeText()
+  return full.slice(0, length)
+}

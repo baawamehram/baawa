@@ -1,4 +1,4 @@
-import { getFullKnowledgeText } from './knowledge'
+import { getStrategicCore } from './knowledge'
 import { getActiveConfig } from './journeyConfig'
 import { ConversationTurn } from './questioning'
 import { callLLM } from './llm-provider'
@@ -25,12 +25,13 @@ export interface ScoringResult {
 export async function scoreConversation(
   conversation: ConversationTurn[]
 ): Promise<ScoringResult> {
-  const [config, fullKnowledge] = await Promise.all([
+  const [config, coreKnowledge] = await Promise.all([
     getActiveConfig(),
-    getFullKnowledgeText(),
+    getStrategicCore(5000), // Slightly more for final scoring than questioning
   ])
 
   const transcript = conversation
+    .slice(-30) // Only analyze the last 15 turns (30 entries) to prevent overflow
     .map((t) => `${t.role === 'user' ? 'Founder' : 'Interviewer'}: ${t.content}`)
     .join('\n\n')
 
@@ -52,8 +53,8 @@ Score on 5 dimensions:
 Maximum total score: ${totalCap}. High score = most ready for fast, measurable results.
 Low score = needs more groundwork before moving fast.
 
-[KNOWLEDGE BASE]
-${fullKnowledge}
+[STRATEGIC PRINCIPLES]
+${coreKnowledge}
 
 Output ONLY valid JSON in this exact format:
 {
