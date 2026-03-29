@@ -6,17 +6,24 @@ import { LogoLight, LogoDark } from '../Logo'
 const SERVICES = [
   "Strategy", "Execution", "Marketing", "Development",
   "Positioning", "Growth", "Operations", "Scale",
+  "Reframing", "Psychological Arbitrage", "Behavioral Design", "Leverage Management",
+  "Value Perception", "Pricing Power", "Customer Psychology", "Assumption Challenging"
 ]
 
-const WHO_WE_ARE = [
-  "Entrepreneurs",
-  "Filmmakers",
-  "Investment Bankers",
-  "Consultants",
-  "Agency Owners",
-  "AI Engineers",
-  "Brand Strategists",
-  "Geeks who obsess over business",
+const IDENTITY_ITEMS = [
+  { text: "Entrepreneurs", color: "#FF6B35" },
+  { text: "Filmmakers", color: "#FF6B35" },
+  { text: "Investment Bankers", color: "#FF6B35" },
+  { text: "Consultants", color: "#FF6B35" },
+  { text: "Agency Owners", color: "#FF6B35" },
+  { text: "AI Engineers", color: "#FF6B35" },
+  { text: "Brand Strategists", color: "#FF6B35" },
+  { text: "Behavioral Architects", color: "#FF6B35" },
+  { text: "Geeks who obsess over business", color: "#FF6B35" },
+  // The dark grey sequence
+  { text: "the jack of all trades...", color: "#6B6460" },
+  { text: "then master of none,", color: "#6B6460" },
+  { text: "but oftentimes better than one.", color: "#6B6460" },
 ]
 
 function IdentityTypewriter() {
@@ -25,9 +32,11 @@ function IdentityTypewriter() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [speed, setSpeed] = useState(70)
 
+  const currentItem = IDENTITY_ITEMS[index % IDENTITY_ITEMS.length]
+
   useEffect(() => {
     let timer: number
-    const word = WHO_WE_ARE[index % WHO_WE_ARE.length]
+    const word = currentItem.text
     if (!isDeleting && text === word) {
       timer = window.setTimeout(() => setIsDeleting(true), 1800)
     } else if (isDeleting && text === '') {
@@ -41,7 +50,7 @@ function IdentityTypewriter() {
       }, speed)
     }
     return () => clearTimeout(timer)
-  }, [text, isDeleting, index, speed])
+  }, [text, isDeleting, index, speed, currentItem.text])
 
   return (
     <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
@@ -50,20 +59,22 @@ function IdentityTypewriter() {
         fontSize: 'clamp(28px, 5vw, 52px)',
         fontWeight: 700,
         fontStyle: 'italic',
-        color: '#FF6B35',
+        color: currentItem.color,
         minWidth: 4,
         lineHeight: 1.1,
+        transition: 'color 0.4s ease-in-out',
       }}>{text}</span>
       <span style={{
         display: 'inline-block',
         width: 3,
         height: 'clamp(28px, 5vw, 50px)',
-        background: '#FF6B35',
+        background: currentItem.color,
         marginLeft: 4,
         borderRadius: 1,
         animation: 'cursor-blink 0.9s step-end infinite',
         verticalAlign: 'middle',
         flexShrink: 0,
+        transition: 'background 0.4s ease-in-out',
       }} />
     </div>
   )
@@ -116,10 +127,28 @@ const HERO_SLIDES = [
     subtitle: "If you can't outspend them, outsmart them. We help clients reposition their entire offering without changing the product.",
   },
   {
+    kicker: "Logic's Limit",
+    title1: "The cost of being reasonable",
+    title2: "is a reduction in value.",
+    subtitle: "When you only do what's logical, you do what everyone else does. Real breakthroughs live in the territory logic is afraid of.",
+  },
+  {
     kicker: "Behavioral Design",
     title1: "Don't change the person.",
     title2: "Change the environment.",
     subtitle: "Stop fighting your customers' psychology. We rebuild your strategy around how humans actually make decisions.",
+  },
+  {
+    kicker: "Efficiency is a Trap",
+    title1: "The most efficient way",
+    title2: "to win is to be different.",
+    subtitle: "If everyone is chasing the same metrics, the real prize is the one nobody's measuring. We find the invisible gaps.",
+  },
+  {
+    kicker: "Contextual Alchemy",
+    title1: "A £5 bottle of water",
+    title2: "is a bargain in a desert.",
+    subtitle: "Contextual value outweighs product features. We help you change the context of your business to unlock premium pricing.",
   },
 ]
 
