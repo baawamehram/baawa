@@ -10,6 +10,14 @@ const SERVICES = [
   "Value Perception", "Pricing Power", "Customer Psychology", "Assumption Challenging"
 ]
 
+const NAV_SEQUENCES = [
+  ...SERVICES.map(s => ({ text: s, prefix: "We do: ", color: "#FF6B35" })),
+  { text: "a jack of all trades,", prefix: "WE ARE: ", color: "#6B6460" },
+  { text: "is a master of none,", prefix: "WE ARE: ", color: "#6B6460" },
+  { text: "but oftentimes better", prefix: "WE ARE: ", color: "#6B6460" },
+  { text: "than a master of one.", prefix: "WE ARE: ", color: "#6B6460" }
+]
+
 const IDENTITY_ITEMS = [
   { text: "Entrepreneurs", color: "#FF6B35" },
   { text: "Filmmakers", color: "#FF6B35" },
@@ -99,10 +107,12 @@ function TypewriterText() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [typingSpeed, setTypingSpeed] = useState(100)
 
+  const currentItem = NAV_SEQUENCES[index % NAV_SEQUENCES.length]
+
   useEffect(() => {
     let timer: number
-    const currentWord = SERVICES[index % SERVICES.length]
-    if (!isDeleting && text === currentWord) {
+    const word = currentItem.text
+    if (!isDeleting && text === word) {
       timer = window.setTimeout(() => setIsDeleting(true), 1500)
     } else if (isDeleting && text === '') {
       setIsDeleting(false)
@@ -110,17 +120,17 @@ function TypewriterText() {
       setTypingSpeed(100)
     } else {
       timer = window.setTimeout(() => {
-        setText(currentWord.substring(0, text.length + (isDeleting ? -1 : 1)))
+        setText(word.substring(0, text.length + (isDeleting ? -1 : 1)))
         setTypingSpeed(isDeleting ? 40 : 100)
       }, typingSpeed)
     }
     return () => clearTimeout(timer)
-  }, [text, isDeleting, index, typingSpeed])
+  }, [text, isDeleting, index, typingSpeed, currentItem.text])
 
   return (
-    <div style={{ fontSize: '12px', color: '#FF6B35', fontWeight: 600, letterSpacing: '0.02em', height: '14px', marginTop: '2px', display: 'flex', alignItems: 'center' }}>
-      <span>We do: {text}</span>
-      <span style={{ display: 'inline-block', width: '2px', height: '12px', backgroundColor: '#FF6B35', marginLeft: '2px', animation: 'cursor-blink 1s step-end infinite' }} />
+    <div style={{ fontSize: '12px', color: currentItem.color, fontWeight: 600, letterSpacing: '0.02em', height: '14px', marginTop: '2px', display: 'flex', alignItems: 'center', transition: 'color 0.4s ease-in-out' }}>
+      <span>{currentItem.prefix}{text}</span>
+      <span style={{ display: 'inline-block', width: '2px', height: '12px', backgroundColor: currentItem.color, marginLeft: '2px', animation: 'cursor-blink 1s step-end infinite', transition: 'background-color 0.4s ease-in-out' }} />
       <style>{`@keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
     </div>
   )
