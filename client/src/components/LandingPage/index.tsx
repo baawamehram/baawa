@@ -12,10 +12,10 @@ const SERVICES = [
 
 const NAV_SEQUENCES = [
   ...SERVICES.map(s => ({ text: s, prefix: "We do: ", color: "#FF6B35" })),
-  { text: "a jack of all trades,", prefix: "WE ARE: ", color: "#6B6460" },
-  { text: "is a master of none,", prefix: "WE ARE: ", color: "#6B6460" },
-  { text: "but oftentimes better", prefix: "WE ARE: ", color: "#6B6460" },
-  { text: "than a master of one.", prefix: "WE ARE: ", color: "#6B6460" }
+  { text: "Jack of all trades,", prefix: "we are : ", color: "#6B6460" },
+  { text: "masters of none.", prefix: "we are : ", color: "#6B6460" },
+  { text: "oftentimes better than....", prefix: "we are : ", color: "#6B6460" },
+  { text: "a master of one.", prefix: "we are : ", color: "#6B6460" }
 ]
 
 const IDENTITY_ITEMS = [
@@ -28,11 +28,6 @@ const IDENTITY_ITEMS = [
   { text: "Brand Strategists", color: "#FF6B35" },
   { text: "Behavioral Architects", color: "#FF6B35" },
   { text: "Geeks who obsess over business", color: "#FF6B35" },
-  // The dark grey sequence (4 parts)
-  { text: "a jack of all trades,", color: "#6B6460", hidePrefix: true },
-  { text: "is a master of none,", color: "#6B6460", hidePrefix: true },
-  { text: "but oftentimes better", color: "#6B6460", hidePrefix: true },
-  { text: "than a master of one.", color: "#6B6460", hidePrefix: true },
 ]
 
 function IdentityTypewriter() {
@@ -63,16 +58,14 @@ function IdentityTypewriter() {
 
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-      {!currentItem.hidePrefix && (
-        <span style={{ 
-          fontFamily: "'Cormorant Garamond', serif", 
-          fontSize: 'clamp(28px, 5vw, 52px)', 
-          fontWeight: 300, 
-          color: 'rgba(253,252,250,0.5)', 
-          lineHeight: 1.1, 
-          whiteSpace: 'nowrap' 
-        }}>We are:</span>
-      )}
+      <span style={{ 
+        fontFamily: "'Cormorant Garamond', serif", 
+        fontSize: 'clamp(28px, 5vw, 52px)', 
+        fontWeight: 300, 
+        color: 'rgba(253,252,250,0.5)', 
+        lineHeight: 1.1, 
+        whiteSpace: 'nowrap' 
+      }}>We are:</span>
       <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
         <span style={{
           fontFamily: "'Cormorant Garamond', serif",
