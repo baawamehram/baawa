@@ -79,8 +79,8 @@ router.post('/verify', async (req: Request, res: Response) => {
         
         res.cookie('portal_token', signedToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          secure: true,
+          sameSite: 'none',
           maxAge: 7 * 24 * 60 * 60 * 1000,
           path: '/',
         })
@@ -125,8 +125,8 @@ router.post('/verify', async (req: Request, res: Response) => {
 
     res.cookie('portal_token', signedToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
@@ -209,8 +209,8 @@ router.post('/switch', requirePortalAuth, async (req: Request, res: Response) =>
 
     res.cookie('portal_token', signedToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
