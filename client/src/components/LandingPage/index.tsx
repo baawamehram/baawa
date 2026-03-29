@@ -323,29 +323,35 @@ function GapCarousel() {
   return (
     <div style={{ width: '100%' }}>
       {/* Tab Pills */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', position: 'sticky', top: 64, zIndex: 20, background: '#0A0A0A', padding: '12px 0', marginBottom: 28 }}>
-        {GAP_TABS.map((t, i) => (
-          <button
-            key={t.id}
-            onClick={() => switchTab(i)}
-            style={{
-              padding: '10px 20px',
-              borderRadius: 100,
-              border: i === activeTab ? '1px solid #059669' : '1px solid rgba(255,255,255,0.12)',
-              background: i === activeTab ? 'rgba(52,211,153,0.12)' : 'transparent',
-              color: i === activeTab ? '#059669' : 'rgba(255,255,255,0.5)',
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: 13,
-              fontWeight: i === activeTab ? 600 : 400,
-              cursor: 'pointer',
-              letterSpacing: '0.04em',
-              transition: 'all 0.25s',
-              touchAction: 'manipulation',
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', position: 'sticky', top: 64, zIndex: 20, background: '#0A0A0A', padding: '12px 0', marginBottom: 12, alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {GAP_TABS.map((t, i) => (
+            <button
+              key={t.id}
+              onClick={() => switchTab(i)}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 100,
+                border: i === activeTab ? '1px solid #059669' : '1px solid rgba(255,255,255,0.12)',
+                background: i === activeTab ? 'rgba(52,211,153,0.12)' : 'transparent',
+                color: i === activeTab ? '#059669' : 'rgba(255,255,255,0.5)',
+                fontFamily: 'Outfit, sans-serif',
+                fontSize: 13,
+                fontWeight: i === activeTab ? 600 : 400,
+                cursor: 'pointer',
+                letterSpacing: '0.04em',
+                transition: 'all 0.25s',
+                touchAction: 'manipulation',
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Swipe hint */}
+      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Outfit, sans-serif', marginBottom: 28, textAlign: 'center', letterSpacing: '0.05em' }}>
+        ← Swipe left/right to explore →
       </div>
 
       {/* Content */}
