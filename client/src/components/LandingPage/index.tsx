@@ -244,6 +244,32 @@ function DynamicHeroText() {
   )
 }
 
+// ─── Wake Lock Hook ──────────────────────────────────────────────────────────
+
+function useWakeLock() {
+  useEffect(() => {
+    let lock: any = null
+    const acquire = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          lock = await (navigator as any).wakeLock.request('screen')
+        }
+      } catch {
+        // not granted — silent
+      }
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') void acquire()
+    }
+    void acquire()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      lock?.release().catch(() => {})
+    }
+  }, [])
+}
+
 // ─── The Gap Carousel ────────────────────────────────────────────────────────
 
 const GAP_TABS = [
@@ -297,7 +323,7 @@ function GapCarousel() {
   return (
     <div style={{ width: '100%' }}>
       {/* Tab Pills */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 40, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', position: 'sticky', top: 64, zIndex: 20, background: '#0A0A0A', padding: '12px 0', marginBottom: 28 }}>
         {GAP_TABS.map((t, i) => (
           <button
             key={t.id}
@@ -331,6 +357,13 @@ function GapCarousel() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direction * -40 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.1}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -60) switchTab(Math.min(activeTab + 1, GAP_TABS.length - 1))
+            else if (info.offset.x > 60) switchTab(Math.max(activeTab - 1, 0))
+          }}
         >
           <div style={{ marginBottom: 32 }}>
             <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 700, color: '#FDFCFA', margin: '0 0 12px', lineHeight: 1.15 }}>{tab.heading}</h2>
@@ -428,6 +461,7 @@ function LoginMenu() {
 
 export function LandingPage({ onStart }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
+  useWakeLock()
 
   return (
     <div style={{ fontFamily: 'Outfit, sans-serif', background: '#FDFCFA', color: '#0A0A0A' }}>

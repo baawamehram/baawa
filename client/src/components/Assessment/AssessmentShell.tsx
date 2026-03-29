@@ -11,8 +11,33 @@ interface AssessmentShellProps {
 
 const MAX_QUESTIONS = 25
 
+function useWakeLock() {
+  useEffect(() => {
+    let lock: any = null
+    const acquire = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          lock = await (navigator as any).wakeLock.request('screen')
+        }
+      } catch {
+        // not granted — silent
+      }
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') void acquire()
+    }
+    void acquire()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      lock?.release().catch(() => {})
+    }
+  }, [])
+}
+
 export function AssessmentShell({ intakeData, onComplete }: AssessmentShellProps) {
   const { state, startSession, submitAnswer, setIntakeData } = useSession()
+  useWakeLock()
 
   useEffect(() => {
     if (intakeData) {
