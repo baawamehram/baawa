@@ -13,10 +13,9 @@ export function MCQQuestion({ question, options, onSubmit, loading = false }: MC
   const [submitted, setSubmitted] = useState(false)
 
   const handleSelect = (option: string) => {
-    if (submitted) return // Prevent double-submit
     setSelected(option)
     setSubmitted(true)
-    onSubmit(option) // Call immediately, don't wait
+    onSubmit(option)
   }
 
   return (

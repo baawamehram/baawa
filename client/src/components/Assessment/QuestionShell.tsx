@@ -69,6 +69,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
       case 'mcq':
         return (
           <MCQQuestion
+            key={`mcq-${session.questionIndex}`}
             question={question}
             options={options || []}
             onSubmit={(val) => handleSubmit(val, 'click')}
@@ -78,6 +79,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
       case 'slider':
         return (
           <SliderQuestion
+            key={`slider-${session.questionIndex}`}
             question={question}
             min={sliderConfig?.min || 0}
             max={sliderConfig?.max || 10}
@@ -89,6 +91,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
       case 'ranking':
         return (
           <RankingQuestion
+            key={`ranking-${session.questionIndex}`}
             question={question}
             options={options || []}
             onSubmit={(val) => handleSubmit(val, 'click')}
@@ -98,6 +101,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
       default:
         return (
           <OpenTextQuestion
+            key={`text-${session.questionIndex}`}
             question={question}
             onSubmit={(val, inputType) => handleSubmit(val, inputType)}
             loading={session.loading}
