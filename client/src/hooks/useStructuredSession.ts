@@ -43,13 +43,18 @@ export function useStructuredSession() {
     setLoading(true)
     setError(null)
     try {
+      console.log('Starting session with intake data:', intakeData)
       const response = await fetch(`${API_URL}/api/sessions/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(intakeData || {})
       })
-      if (!response.ok) throw new Error('Failed to start session')
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({ error: 'Failed to start session' }))
+        throw new Error(errData.error || 'Failed to start session')
+      }
       const data = await response.json()
+      console.log('Session started:', data)
       setSessionId(data.sessionId)
       setCurrentQuestion({
         question: data.question,
@@ -58,7 +63,9 @@ export function useStructuredSession() {
       setQuestionIndex(0)
       setPartialScore(0)
     } catch (err) {
-      setError((err as Error).message)
+      const msg = (err as Error).message
+      console.error('Session start error:', msg)
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -78,20 +85,27 @@ export function useStructuredSession() {
 
       try {
         const payload = { type, value }
+        const body = {
+          questionIndex,
+          payload,
+          displayText,
+          inputType: inputType || 'text',
+          clientLatency: 0
+        }
+        console.log('Submitting answer:', body)
         const response = await fetch(`${API_URL}/api/sessions/${sessionId}/answer`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            questionIndex,
-            payload,
-            displayText,
-            inputType: inputType || 'text',
-            clientLatency: 0
-          })
+          body: JSON.stringify(body)
         })
 
-        if (!response.ok) throw new Error('Failed to submit answer')
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          console.error('Answer submission failed:', errData)
+          throw new Error(errData.error || 'Failed to submit answer')
+        }
         const data = await response.json()
+        console.log('Answer accepted:', data)
 
         // Increment partial score by 12.5 (8 questions = 100 points)
         setPartialScore(prev => prev + 12.5)
