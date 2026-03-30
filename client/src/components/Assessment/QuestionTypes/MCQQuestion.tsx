@@ -57,7 +57,10 @@ export function MCQQuestion({ question, options, onSubmit, loading = false }: MC
           {options.map((option, idx) => (
             <motion.button
               key={option}
-              onClick={() => handleSelect(option)}
+              onClick={() => {
+                console.log('MCQ button clicked:', option, 'submitted:', submitted)
+                handleSelect(option)
+              }}
               disabled={loading}
               whileTap={{ scale: 0.97 }}
               whileHover={{ scale: 1.02 }}
