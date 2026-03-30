@@ -201,11 +201,21 @@ export function PortalResults() {
 
   return (
     <div style={{ background: tk.bg, minHeight: '100vh', boxSizing: 'border-box' }}>
-      {/* Theme toggle */}
-      <button onClick={toggleTheme} aria-label="Toggle theme"
-        style={{ position: 'fixed', top: 16, right: 16, zIndex: 100, background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: tk.textMuted, fontSize: 16 }}>
-        {theme === 'light' ? '🌙' : '☀️'}
-      </button>
+      {/* Top-right controls */}
+      <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 100, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button onClick={() => window.location.href = '/'} aria-label="Back to home" title="Back to home"
+          style={{ background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: tk.textMuted, fontSize: 14, fontFamily: 'Outfit, sans-serif' }}>
+          ← Home
+        </button>
+        <button onClick={toggleTheme} aria-label="Toggle theme"
+          style={{ background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: tk.textMuted, fontSize: 16 }}>
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+        <button onClick={() => navigate('/portal/login')} aria-label="Logout" title="Logout"
+          style={{ background: 'none', border: `1px solid #ef4444`, borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: '#ef4444', fontSize: 13, fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}>
+          Logout
+        </button>
+      </div>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 16px' }}>
         {/* Header */}

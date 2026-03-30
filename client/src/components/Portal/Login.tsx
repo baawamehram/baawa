@@ -86,14 +86,24 @@ export function PortalLogin() {
 
   return (
     <div style={{ background: tk.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 20px', position: 'relative' }}>
-      {/* Theme toggle */}
-      <button
-        onClick={toggleTheme}
-        aria-label="Toggle theme"
-        style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: tk.textMuted, fontSize: 16 }}
-      >
-        {theme === 'light' ? '🌙' : '☀️'}
-      </button>
+      {/* Top-right controls */}
+      <div style={{ position: 'absolute', top: 20, right: 20, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button
+          onClick={() => window.location.href = '/'}
+          aria-label="Back to home"
+          title="Back to home"
+          style={{ background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: tk.textMuted, fontSize: 14, fontFamily: 'Outfit, sans-serif' }}
+        >
+          ← Home
+        </button>
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          style={{ background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: tk.textMuted, fontSize: 16 }}
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

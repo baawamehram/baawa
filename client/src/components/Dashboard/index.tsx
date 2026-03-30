@@ -213,14 +213,24 @@ function DashboardContent() {
       <div style={{ display: isMobile ? 'flex' : 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: theme.sidebar, borderBottom: `1px solid ${theme.border}` }}
         className="mobile-header">
         <LogoIcon height={28} color={theme.text} />
-        <button
-          onClick={() => setMobileNavOpen((o) => !o)}
-          style={{ color: theme.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}
-          aria-label="Toggle navigation"
-          aria-expanded={mobileNavOpen}
-        >
-          ☰
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => window.location.href = '/'}
+            title="Back to home"
+            style={{ color: theme.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: 4 }}
+            aria-label="Back to home"
+          >
+            ←
+          </button>
+          <button
+            onClick={() => setMobileNavOpen((o) => !o)}
+            style={{ color: theme.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}
+            aria-label="Toggle navigation"
+            aria-expanded={mobileNavOpen}
+          >
+            ☰
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown nav */}
@@ -251,6 +261,18 @@ function DashboardContent() {
             style={{ textAlign: 'left', padding: '10px 16px', borderRadius: '6px', fontSize: '14px', border: 'none', cursor: 'pointer', background: 'transparent', color: theme.textMuted, fontFamily: "'Outfit', sans-serif", marginTop: '8px', borderTop: `1px solid ${theme.border}` }}
           >
             {isDark ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </button>
+          <button
+            onClick={() => window.location.href = '/'}
+            style={{ textAlign: 'left', padding: '10px 16px', borderRadius: '6px', fontSize: '14px', border: 'none', cursor: 'pointer', background: 'transparent', color: theme.textMuted, fontFamily: "'Outfit', sans-serif" }}
+          >
+            ← Back to Home
+          </button>
+          <button
+            onClick={() => setToken(null)}
+            style={{ textAlign: 'left', padding: '10px 16px', borderRadius: '6px', fontSize: '14px', border: 'none', cursor: 'pointer', background: 'transparent', color: '#ef4444', fontFamily: "'Outfit', sans-serif" }}
+          >
+            🚪 Logout
           </button>
         </div>
       )}
@@ -290,9 +312,23 @@ function DashboardContent() {
             </button>
           ))}
         </nav>
-        
-        <div style={{ paddingTop: '16px', borderTop: `1px solid ${theme.border}`, color: theme.textMuted, fontSize: '12px', textAlign: 'center' }}>
-          Baawa Consultancy CRM v1.1
+
+        <div style={{ paddingTop: '16px', borderTop: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button
+            onClick={() => window.location.href = '/'}
+            style={{ textAlign: 'left', padding: '8px 12px', borderRadius: '6px', fontSize: '13px', border: 'none', cursor: 'pointer', background: 'transparent', color: theme.textMuted, fontFamily: "'Outfit', sans-serif", transition: 'color 0.2s' }}
+          >
+            ← Home
+          </button>
+          <button
+            onClick={() => setToken(null)}
+            style={{ textAlign: 'left', padding: '8px 12px', borderRadius: '6px', fontSize: '13px', border: 'none', cursor: 'pointer', background: 'transparent', color: '#ef4444', fontFamily: "'Outfit', sans-serif", transition: 'color 0.2s' }}
+          >
+            🚪 Logout
+          </button>
+          <div style={{ color: theme.textMuted, fontSize: '11px', textAlign: 'center', marginTop: '8px' }}>
+            Baawa CRM v1.1
+          </div>
         </div>
       </aside>
 
