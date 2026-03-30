@@ -79,7 +79,7 @@ export function AssessmentSubmitted({ onContinue }: AssessmentSubmittedProps) {
               lineHeight: 1.6
             }}
           >
-            Your assessment has been received.
+            Your application has been received.
           </p>
           <p
             style={{
@@ -90,7 +90,7 @@ export function AssessmentSubmitted({ onContinue }: AssessmentSubmittedProps) {
               lineHeight: 1.6
             }}
           >
-            Our team is reviewing your insights. Expect our reach-out within 24 hours.
+            Our analysts are reviewing your answers. If we're a fit, we'll reach out within 24 hours to discuss your personalized $5,000 assessment.
           </p>
         </motion.div>
 

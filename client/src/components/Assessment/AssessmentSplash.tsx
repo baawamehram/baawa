@@ -5,33 +5,6 @@ interface AssessmentSplashProps {
   onStart: () => void
 }
 
-interface AnimatedNumberProps {
-  to: number
-  duration: number
-}
-
-function AnimatedNumber({ to, duration }: AnimatedNumberProps) {
-  return (
-    <motion.span
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      onAnimationComplete={() => {
-        // Could display final number here
-      }}
-      transition={{ duration }}
-    >
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: duration * 0.2 }}
-        style={{ display: 'inline-block' }}
-      >
-        £{Math.floor(to).toLocaleString()}+
-      </motion.span>
-    </motion.span>
-  )
-}
-
 export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
   const [showButton, setShowButton] = useState(false)
 
@@ -74,7 +47,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             textTransform: 'uppercase'
           }}
         >
-          Founder Assessment
+          Apply for Discovery
         </motion.div>
 
         {/* Value */}
@@ -92,10 +65,8 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
               lineHeight: 1.2
             }}
           >
-            This assessment is valued at{' '}
-            <span style={{ color: '#059669' }}>
-              <AnimatedNumber to={2000} duration={1.2} />
-            </span>
+            Selected founders get a{' '}
+            <span style={{ color: '#059669' }}>$5,000 expert assessment</span>
           </motion.h1>
         </div>
 
@@ -112,7 +83,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             lineHeight: 1.5
           }}
         >
-          Built by industry experts who understand brands, marketing, and how to build great products.
+          Complete this discovery. If we're a fit, our analysts will evaluate your business and schedule a consultation.
         </motion.p>
 
         {/* Call-to-action text */}
@@ -128,7 +99,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             lineHeight: 1.5
           }}
         >
-          We only work with founders who are ready. Let's find out if you are.
+          5-10 minutes. Answer honestly so we can properly evaluate you.
         </motion.p>
 
         {/* Button */}
@@ -163,7 +134,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
                 : 'none'
             } as any}
           >
-            Begin Assessment →
+            Apply Now →
           </motion.button>
 
           {/* Skip link */}
