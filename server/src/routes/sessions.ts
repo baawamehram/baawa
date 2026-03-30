@@ -5,6 +5,7 @@ import { geolocateIP } from '../services/geo'
 import { ConversationTurn, QUESTION_BANK, getQuestion, QuestionType } from '../services/questioning'
 import { scoreConversationHybrid } from '../services/scoring'
 import { sendProspectAck, sendFounderNotification } from '../services/email'
+import { sendConfirmationOnComplete } from '../services/emailScheduler'
 import { getActiveConfig } from '../services/journeyConfig'
 import { classifyProblemDomains } from '../services/classification'
 
@@ -307,6 +308,11 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
     ).catch((e) => console.error('Founder notification failed:', e))
 
     res.json({ assessmentId: assessmentResult.rows[0].id })
+
+    // Send confirmation email — fire and forget, non-critical
+    void sendConfirmationOnComplete(assessmentResult.rows[0].id).catch((e) =>
+      console.error('Confirmation email failed:', e)
+    )
 
     // Classify problem domains — fire and forget, non-critical
     void (async () => {

@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import cron from 'node-cron'
 import { runOptimizer } from './services/journeyOptimizer'
+import { initializeEmailQueue, startEmailScheduler } from './services/emailScheduler'
 import { V1_INTRO_MESSAGES, V1_SYSTEM_PROMPT } from './db/seeds/journeyConfigV1'
 import express from 'express'
 import cors from 'cors'
@@ -299,6 +300,10 @@ async function startServer() {
     `)
 
     console.log('Startup migrations + indices OK')
+
+    // Initialize email queue and start scheduler
+    await initializeEmailQueue()
+    startEmailScheduler()
   } catch (err) {
     console.error('Startup migration error:', err)
   }
