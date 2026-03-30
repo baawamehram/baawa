@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 interface AssessmentCompleteProps {
@@ -123,7 +123,6 @@ export function AssessmentComplete({ onContinue }: AssessmentCompleteProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 1 }}
-          onAnimationComplete={() => setCanSkip(true)}
           onClick={onContinue}
           style={{
             background: 'none',

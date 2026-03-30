@@ -94,7 +94,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
           >
             This assessment is valued at{' '}
             <span style={{ color: '#059669' }}>
-              <AnimatedNumber from={0} to={2000} duration={1.2} />
+              <AnimatedNumber to={2000} duration={1.2} />
             </span>
           </motion.h1>
         </div>
