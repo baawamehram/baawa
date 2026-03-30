@@ -13,7 +13,6 @@ interface SliderQuestionProps {
 export function SliderQuestion({ question, min, max, label, onSubmit, loading = false }: SliderQuestionProps) {
   const [value, setValue] = useState(min)
   const [moved, setMoved] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(Number(e.target.value))
@@ -21,7 +20,6 @@ export function SliderQuestion({ question, min, max, label, onSubmit, loading = 
   }
 
   const handleSubmit = () => {
-    setSubmitted(true)
     onSubmit(value)
   }
 
@@ -112,7 +110,7 @@ export function SliderQuestion({ question, min, max, label, onSubmit, loading = 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               onClick={handleSubmit}
-              disabled={submitted || loading}
+              disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{
@@ -125,8 +123,7 @@ export function SliderQuestion({ question, min, max, label, onSubmit, loading = 
                 fontFamily: "'Outfit', sans-serif",
                 fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                alignSelf: 'flex-start',
-                opacity: submitted ? 0.5 : 1
+                alignSelf: 'flex-start'
               }}
             >
               Next →

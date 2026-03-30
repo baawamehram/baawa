@@ -10,7 +10,6 @@ interface OpenTextQuestionProps {
 
 export function OpenTextQuestion({ question, onSubmit, loading = false }: OpenTextQuestionProps) {
   const [text, setText] = useState('')
-  const [submitted, setSubmitted] = useState(false)
   const [inputMethod, setInputMethod] = useState<'voice' | 'text'>('voice')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -20,8 +19,8 @@ export function OpenTextQuestion({ question, onSubmit, loading = false }: OpenTe
   }
 
   const handleSubmit = () => {
+    console.log('OpenText submit clicked, text:', text, 'length:', text.trim().length)
     if (text.trim().length >= 10) {
-      setSubmitted(true)
       onSubmit(text, inputMethod)
     }
   }
@@ -125,7 +124,7 @@ export function OpenTextQuestion({ question, onSubmit, loading = false }: OpenTe
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               onClick={handleSubmit}
-              disabled={submitted || loading}
+              disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{
@@ -138,8 +137,7 @@ export function OpenTextQuestion({ question, onSubmit, loading = false }: OpenTe
                 fontFamily: "'Outfit', sans-serif",
                 fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                alignSelf: 'flex-start',
-                opacity: submitted ? 0.5 : 1
+                alignSelf: 'flex-start'
               }}
             >
               Next →

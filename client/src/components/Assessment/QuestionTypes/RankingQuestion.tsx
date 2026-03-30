@@ -10,7 +10,6 @@ interface RankingQuestionProps {
 
 export function RankingQuestion({ question, options, onSubmit, loading = false }: RankingQuestionProps) {
   const [ranking, setRanking] = useState<string[]>([])
-  const [submitted, setSubmitted] = useState(false)
 
   const unranked = options.filter(opt => !ranking.includes(opt))
 
@@ -26,7 +25,6 @@ export function RankingQuestion({ question, options, onSubmit, loading = false }
 
   const handleSubmit = () => {
     if (ranking.length === options.length) {
-      setSubmitted(true)
       onSubmit(ranking)
     }
   }
@@ -193,7 +191,7 @@ export function RankingQuestion({ question, options, onSubmit, loading = false }
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               onClick={handleSubmit}
-              disabled={submitted || loading}
+              disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{
@@ -206,8 +204,7 @@ export function RankingQuestion({ question, options, onSubmit, loading = false }
                 fontFamily: "'Outfit', sans-serif",
                 fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                alignSelf: 'flex-start',
-                opacity: submitted ? 0.5 : 1
+                alignSelf: 'flex-start'
               }}
             >
               Next →
