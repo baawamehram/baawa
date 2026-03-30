@@ -222,7 +222,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
               style={{
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 15,
-                color: 'rgba(255,176,154,0.65)',
+                color: 'rgba(52,211,153,0.65)',
                 margin: '0 0 24px',
                 textAlign: 'center',
                 lineHeight: 1.6,
@@ -249,7 +249,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   style={{
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: 13,
-                    color: 'rgba(255,176,154,0.6)',
+                    color: 'rgba(52,211,153,0.6)',
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
                   }}
@@ -312,7 +312,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   style={{
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: 13,
-                    color: 'rgba(255,176,154,0.6)',
+                    color: 'rgba(52,211,153,0.6)',
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
                   }}
@@ -375,7 +375,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   style={{
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: 13,
-                    color: 'rgba(255,176,154,0.6)',
+                    color: 'rgba(52,211,153,0.6)',
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
                   }}

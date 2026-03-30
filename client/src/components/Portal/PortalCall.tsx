@@ -99,7 +99,7 @@ export function PortalCall({ theme, on401 }: Props) {
             onClick={() => void selectSlot(slot.datetime)}
             disabled={booking}
             style={{
-              background: '#A78BFA', color: '#000', border: 'none', borderRadius: 8, padding: '12px 16px',
+              background: tk.accent, color: '#000', border: 'none', borderRadius: 8, padding: '12px 16px',
               fontFamily: 'Outfit,sans-serif', fontSize: 14, fontWeight: 600, cursor: booking ? 'default' : 'pointer',
               opacity: booking ? 0.6 : 1, textAlign: 'left',
             }}

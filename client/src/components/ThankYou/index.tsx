@@ -15,7 +15,7 @@ export function ThankYou() {
       particleCount: 120,
       spread: 80,
       origin: { y: 0.55 },
-      colors: ['#064E3B', '#059669', '#FFB09A', '#c4b5fd', '#FDFCFA', '#ffffff'],
+      colors: ['#064E3B', '#059669', '#34D399', '#c4b5fd', '#FDFCFA', '#ffffff'],
       ticks: 200,
       gravity: 0.9,
       scalar: 1.1,
@@ -27,7 +27,7 @@ export function ThankYou() {
         particleCount: 60,
         spread: 50,
         origin: { x: 0.25, y: 0.6 },
-        colors: ['#064E3B', '#059669', '#FFB09A'],
+        colors: ['#064E3B', '#059669', '#34D399'],
         ticks: 160,
         gravity: 1,
       })
@@ -35,7 +35,7 @@ export function ThankYou() {
         particleCount: 60,
         spread: 50,
         origin: { x: 0.75, y: 0.6 },
-        colors: ['#064E3B', '#059669', '#FFB09A'],
+        colors: ['#064E3B', '#059669', '#34D399'],
         ticks: 160,
         gravity: 1,
       })
@@ -160,7 +160,7 @@ export function ThankYou() {
           style={{
             fontFamily: 'Outfit, sans-serif',
             fontSize: 'clamp(15px, 2.5vw, 18px)',
-            color: 'rgba(255,176,154,0.7)',
+            color: 'rgba(52,211,153,0.7)',
             margin: 0,
             lineHeight: 1.65,
           }}
@@ -189,7 +189,7 @@ export function ThankYou() {
           style={{
             fontFamily: 'Outfit, sans-serif',
             fontSize: 'clamp(14px, 2vw, 17px)',
-            color: 'rgba(255,176,154,0.5)',
+            color: 'rgba(52,211,153,0.5)',
             margin: 0,
             fontStyle: 'italic',
             lineHeight: 1.6,

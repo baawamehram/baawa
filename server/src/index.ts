@@ -279,7 +279,9 @@ async function startServer() {
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS max_answer_words INT`)
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS drop_off_at_question INT`)
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS events JSONB DEFAULT '[]'::jsonb`)
-    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS health_score INT DEFAULT 100`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS assessment_id INT REFERENCES assessments(id) ON DELETE CASCADE`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS score INT`)
+    await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS score_breakdown JSONB`)
     await db.query(`ALTER TABLE session_analytics ADD COLUMN IF NOT EXISTS last_input_method VARCHAR(20)`)
 
     // Sentinel Proposals Table (The Brain's Memory)

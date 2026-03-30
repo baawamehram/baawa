@@ -174,7 +174,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
           </div>
         </div>
 
-        {/* Real-time score display */}
+        {/* Progress indicator */}
         <motion.div
           animate={{ opacity: [0.6, 1] }}
           transition={{ repeat: Infinity, duration: 2 }}
@@ -187,14 +187,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
             textTransform: 'uppercase'
           }}
         >
-          Score building...{' '}
-          <motion.span
-            key={Math.floor(session.partialScore)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {Math.floor(session.partialScore)}/100
-          </motion.span>
+          Building your assessment...
         </motion.div>
 
         {/* Just 2 questions left message */}

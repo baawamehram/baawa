@@ -98,7 +98,7 @@ export function MessagesPanel({ messages, theme, onSend, sendError }: MessagesPa
         <button
           onClick={() => void handleSend()}
           disabled={sending || !body.trim()}
-          style={{ background: 'linear-gradient(135deg, #A78BFA, #22D3EE)', border: 'none', borderRadius: 8, padding: '8px 14px', color: '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 14, fontWeight: 600, cursor: sending || !body.trim() ? 'not-allowed' : 'pointer', opacity: sending || !body.trim() ? 0.5 : 1 }}
+          style={{ background: 'linear-gradient(135deg, #064E3B, #059669)', border: 'none', borderRadius: 8, padding: '8px 14px', color: '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 14, fontWeight: 600, cursor: sending || !body.trim() ? 'not-allowed' : 'pointer', opacity: sending || !body.trim() ? 0.5 : 1 }}
         >
           →
         </button>

@@ -81,8 +81,8 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
 
   const geminiModel =
     req.chain === 'optimizer'
-      ? (process.env.GEMINI_OPTIMIZER_MODEL ?? 'gemini-1.5-pro')
-      : (process.env.GEMINI_ASSESSMENT_MODEL ?? 'gemini-1.5-pro')
+      ? (process.env.GEMINI_OPTIMIZER_MODEL ?? 'gemini-3-flash')
+      : (process.env.GEMINI_ASSESSMENT_MODEL ?? 'gemini-3-flash')
 
   const groqModel =
     req.chain === 'optimizer'
@@ -93,9 +93,9 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
     name: 'claude' | 'gemini' | 'groq'
     fn: () => Promise<string>
   }> = [
-    { name: 'groq', fn: () => callGroq(req, groqModel) },
-    { name: 'gemini', fn: () => callGemini(req, geminiModel) },
     { name: 'claude', fn: () => callClaude(req, claudeModel) },
+    { name: 'gemini', fn: () => callGemini(req, geminiModel) },
+    { name: 'groq', fn: () => callGroq(req, groqModel) },
   ]
 
   const failures: Array<{ provider: string; error: string }> = []

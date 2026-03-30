@@ -13,9 +13,10 @@ export function MCQQuestion({ question, options, onSubmit, loading = false }: MC
   const [submitted, setSubmitted] = useState(false)
 
   const handleSelect = (option: string) => {
+    if (submitted) return // Prevent double-submit
     setSelected(option)
     setSubmitted(true)
-    setTimeout(() => onSubmit(option), 500)
+    onSubmit(option) // Call immediately, don't wait
   }
 
   return (
@@ -57,7 +58,7 @@ export function MCQQuestion({ question, options, onSubmit, loading = false }: MC
             <motion.button
               key={option}
               onClick={() => handleSelect(option)}
-              disabled={submitted || loading}
+              disabled={loading}
               whileTap={{ scale: 0.97 }}
               whileHover={{ scale: 1.02 }}
               initial={{ opacity: 0, y: 10 }}
