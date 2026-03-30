@@ -105,6 +105,7 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
             question={question}
             onSubmit={(val, inputType) => handleSubmit(val, inputType)}
             loading={session.loading}
+            isFirstQuestion={session.questionIndex === 0}
           />
         )
     }

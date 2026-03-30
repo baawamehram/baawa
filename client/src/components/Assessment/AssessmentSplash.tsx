@@ -102,6 +102,29 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
           5-10 minutes. Answer honestly so we can properly evaluate you.
         </motion.p>
 
+        {/* Social Proof Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 1.3 }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            padding: '16px 20px',
+            borderRadius: 8,
+            backgroundColor: 'rgba(5, 150, 105, 0.08)',
+            border: '1px solid rgba(5, 150, 105, 0.2)'
+          }}
+        >
+          <div style={{ fontSize: 12, color: '#8B8B8B', fontFamily: "'Outfit', sans-serif" }}>
+            <span style={{ color: '#059669', fontWeight: 600 }}>287</span> assessments completed
+          </div>
+          <div style={{ fontSize: 12, color: '#8B8B8B', fontFamily: "'Outfit', sans-serif" }}>
+            <span style={{ color: '#059669', fontWeight: 600 }}>16</span> founders discovered critical gaps
+          </div>
+        </motion.div>
+
         {/* Button */}
         <div
           style={{

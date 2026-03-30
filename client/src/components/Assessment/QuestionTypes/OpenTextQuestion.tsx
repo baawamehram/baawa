@@ -6,9 +6,10 @@ interface OpenTextQuestionProps {
   question: string
   onSubmit: (value: string, inputType: 'voice' | 'text') => void
   loading?: boolean
+  isFirstQuestion?: boolean
 }
 
-export function OpenTextQuestion({ question, onSubmit, loading = false }: OpenTextQuestionProps) {
+export function OpenTextQuestion({ question, onSubmit, loading = false, isFirstQuestion = false }: OpenTextQuestionProps) {
   const [text, setText] = useState('')
   const [inputMethod, setInputMethod] = useState<'voice' | 'text'>('voice')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -54,6 +55,24 @@ export function OpenTextQuestion({ question, onSubmit, loading = false }: OpenTe
         >
           {question}
         </h2>
+
+        {/* Voice encouragement for Q1 */}
+        {isFirstQuestion && (
+          <div
+            style={{
+              padding: '12px 16px',
+              borderRadius: 8,
+              backgroundColor: 'rgba(5, 150, 105, 0.1)',
+              border: '1px solid rgba(5, 150, 105, 0.2)',
+              fontSize: 13,
+              color: '#AAAAAA',
+              fontFamily: "'Outfit', sans-serif",
+              lineHeight: 1.5
+            }}
+          >
+            💡 <span style={{ color: '#FFFFFF', fontWeight: 500 }}>Speak freely.</span> Ramble if you want. The more detail you share, the better we can assess you.
+          </div>
+        )}
 
         {/* Voice Input */}
         <VoiceInput onTranscript={handleVoiceTranscript} />
