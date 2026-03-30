@@ -24,7 +24,8 @@ export function RankingQuestion({ question, options, onSubmit, loading = false }
   }
 
   const handleSubmit = () => {
-    if (ranking.length === options.length) {
+    if (ranking.length >= 2) {
+      console.log('Ranking submitted:', ranking)
       onSubmit(ranking)
     }
   }
@@ -58,6 +59,18 @@ export function RankingQuestion({ question, options, onSubmit, loading = false }
         </h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Progress indicator */}
+          <div
+            style={{
+              fontSize: 12,
+              color: ranking.length >= 2 ? '#059669' : '#8B8B8B',
+              fontFamily: "'Outfit', sans-serif",
+              transition: 'color 0.2s ease'
+            }}
+          >
+            {ranking.length < 2 ? `Add ${2 - ranking.length} more item${2 - ranking.length !== 1 ? 's' : ''} to continue` : '✓ Ready to continue'}
+          </div>
+
           {/* Your Ranking */}
           {ranking.length > 0 && (
             <div>
@@ -185,7 +198,7 @@ export function RankingQuestion({ question, options, onSubmit, loading = false }
         </div>
 
         <AnimatePresence>
-          {ranking.length === options.length && (
+          {ranking.length >= 2 && (
             <motion.button
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
