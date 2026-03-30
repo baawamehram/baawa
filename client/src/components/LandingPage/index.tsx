@@ -429,20 +429,6 @@ function LoginMenu() {
             }}
           >
             <button
-              onClick={() => { navigate('/portal/login'); setOpen(false) }}
-              style={{
-                width: '100%', textAlign: 'left', background: 'none', border: 'none',
-                padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
-                display: 'flex', flexDirection: 'column', gap: 2,
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(52,211,153,0.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-            >
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Client Access</span>
-              <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>View your diagnostics portal</span>
-            </button>
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.04)', margin: '4px 8px' }} />
-            <button
               onClick={() => { navigate('/dashboard'); setOpen(false) }}
               style={{
                 width: '100%', textAlign: 'left', background: 'none', border: 'none',

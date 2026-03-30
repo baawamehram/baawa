@@ -39,7 +39,7 @@ export const QUESTION_BANK: QuestionBankItem[] = [
   {
     id: 1,
     type: 'open_text',
-    question: 'Who are you, and what do you want?',
+    question: 'Hello there, tell us more about yourself and everything about your business or problem statement.',
     dimension: 'problem_clarity'
   },
   {
