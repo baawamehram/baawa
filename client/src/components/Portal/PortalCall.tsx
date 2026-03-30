@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { portalFetch } from '../../lib/portalApi'
+import { trackCallBooked } from '../../lib/analytics'
 import { t } from './usePortalTheme'
 
 interface CallSlot {
@@ -38,7 +39,12 @@ export function PortalCall({ theme, on401 }: Props) {
       method: 'PUT',
       body: JSON.stringify({ datetime }),
     })
-    if (res?.ok) { setBooked(true); void load() }
+    if (res?.ok) {
+      // Track call booked event (0 days since assessment for now — could be calculated from creation_at)
+      trackCallBooked(0)
+      setBooked(true)
+      void load()
+    }
     setBooking(false)
   }
 

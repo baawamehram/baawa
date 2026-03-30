@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { trackEmailCaptured } from '../../lib/analytics'
 
 import { API_URL } from '../../lib/api'
 
@@ -67,6 +68,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
       }
 
       // success
+      trackEmailCaptured(email)
       onComplete()
     } catch {
       setApiError('Network error. Please check your connection and try again.')

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { trackPortalAccessed } from '../../lib/analytics'
 import { portalFetch } from '../../lib/portalApi'
 import { API_URL } from '../../lib/api'
 import { usePortalTheme, t } from './usePortalTheme'
@@ -72,6 +73,11 @@ export function PortalResults() {
   const [switching, setSwitching] = useState(false)
 
   const prefersNoMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  useEffect(() => {
+    // Track portal access on mount
+    trackPortalAccessed('results')
+  }, [])
 
   const on401 = useCallback(() => {
     navigate('/portal/login', { replace: true, state: { message: 'Your session expired — log in again.' } })

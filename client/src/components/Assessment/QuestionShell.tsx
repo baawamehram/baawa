@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStructuredSession } from '../../hooks/useStructuredSession'
+import { trackQuestionAnswered, trackAssessmentCompleted } from '../../lib/analytics'
 import { MCQQuestion } from './QuestionTypes/MCQQuestion'
 import { SliderQuestion } from './QuestionTypes/SliderQuestion'
 import { RankingQuestion } from './QuestionTypes/RankingQuestion'
@@ -21,6 +22,8 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
   useEffect(() => {
     if (session.done && !celebrationShown) {
       setCelebrationShown(true)
+      // Track assessment completed event
+      trackAssessmentCompleted(0) // Total time tracked on backend
       // Trigger celebration animation
       setTimeout(() => {
         session.sessionId && onComplete(session.sessionId)
@@ -61,6 +64,13 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
       const idx = session.questionIndex
 
       console.log('handleSubmit called with:', { idx, type, value, displayText, inputType })
+
+      // Track question answered event
+      trackQuestionAnswered(
+        idx,
+        type as 'open_text' | 'mcq' | 'slider' | 'ranking',
+        inputType || 'text'
+      )
 
       session.submitAnswer(idx, type as 'open_text' | 'mcq' | 'slider' | 'ranking', value, displayText, inputType)
     }

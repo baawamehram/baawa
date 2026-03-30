@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { trackAssessmentStarted } from '../../lib/analytics'
 
 interface AssessmentSplashProps {
   onStart: () => void
@@ -7,6 +8,11 @@ interface AssessmentSplashProps {
 
 export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
   const [showButton, setShowButton] = useState(false)
+
+  const handleStart = () => {
+    trackAssessmentStarted('homepage')
+    onStart()
+  }
 
   return (
     <motion.div
@@ -140,7 +146,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 1.2 }}
             onAnimationComplete={() => setShowButton(true)}
-            onClick={onStart}
+            onClick={handleStart}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             style={{
@@ -166,7 +172,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 1.2 }}
-            onClick={onStart}
+            onClick={handleStart}
             style={{
               background: 'none',
               border: 'none',
