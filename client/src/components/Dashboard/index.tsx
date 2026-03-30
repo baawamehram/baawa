@@ -9,11 +9,12 @@ import { RevenueOverview } from './RevenueOverview'
 import { KnowledgeBase } from './KnowledgeBase'
 import { Intelligence } from './Intelligence'
 import { CommandCenter } from './CommandCenter'
+import { MarketingDashboard } from './MarketingDashboard'
 import { API_URL } from '../../lib/api'
 
 import { DashboardThemeProvider, useDashboardTheme } from './ThemeContext'
 
-type Section = 'agent' | 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge' | 'intelligence'
+type Section = 'agent' | 'assessments' | 'pipeline' | 'clients' | 'revenue' | 'knowledge' | 'intelligence' | 'marketing'
 
 const NAV_ITEMS: { key: Section; label: string }[] = [
   { key: 'agent', label: 'Agent 🤖' },
@@ -23,6 +24,7 @@ const NAV_ITEMS: { key: Section; label: string }[] = [
   { key: 'revenue', label: 'Revenue' },
   { key: 'knowledge', label: 'Knowledge Base' },
   { key: 'intelligence', label: 'Intelligence' },
+  { key: 'marketing', label: 'Marketing' },
 ]
 
 function PasswordModal({ onAuth }: { onAuth: (token: string) => void }) {
@@ -196,6 +198,9 @@ function DashboardContent() {
     }
     if (section === 'intelligence') {
       return <Intelligence token={token} on401={handle401} />
+    }
+    if (section === 'marketing') {
+      return <MarketingDashboard token={token} on401={handle401} />
     }
     return null
   }

@@ -22,6 +22,7 @@ import ingestionRouter from './routes/ingestion'
 import debugRouter from './routes/debug'
 import callsRouter from './routes/calls'
 import proposalsRouter from './routes/proposals'
+import marketingRouter from './routes/marketing'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -71,6 +72,7 @@ app.use('/api/admin/ingest', ingestionRouter)
 app.use('/api/admin/debug', debugRouter)
 app.use('/api/calls', callsRouter)
 app.use('/api/proposals', proposalsRouter)
+app.use('/api/marketing', marketingRouter)
 
 // Health
 app.get('/health', async (_req, res) => {
@@ -297,6 +299,67 @@ async function startServer() {
         status VARCHAR(20) DEFAULT 'open',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
+    `)
+
+    // Marketing dashboard: email templates table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS email_templates (
+        id SERIAL PRIMARY KEY,
+        email_type VARCHAR(50) NOT NULL UNIQUE,
+        subject TEXT NOT NULL,
+        html_body TEXT NOT NULL,
+        is_default BOOLEAN NOT NULL DEFAULT false,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+
+    // Marketing dashboard: email sequence config (timing + enabled state)
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS email_sequence_config (
+        id SERIAL PRIMARY KEY,
+        email_type VARCHAR(50) NOT NULL UNIQUE,
+        enabled BOOLEAN NOT NULL DEFAULT true,
+        delay_hours NUMERIC(6,2) NOT NULL DEFAULT 12,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+
+    // Marketing dashboard: A/B tests
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS email_ab_tests (
+        id SERIAL PRIMARY KEY,
+        email_type VARCHAR(50) NOT NULL,
+        variant_name VARCHAR(100) NOT NULL,
+        subject TEXT NOT NULL,
+        html_body TEXT NOT NULL,
+        traffic_split NUMERIC(4,3) NOT NULL DEFAULT 0.5,
+        active BOOLEAN NOT NULL DEFAULT true,
+        winner BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
+
+    // Unique index: only one active A/B test per email type
+    await db.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_ab_tests_one_active
+      ON email_ab_tests(email_type) WHERE active = true
+    `)
+
+    // Track which variant was sent in email_queue
+    await db.query(`ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS ab_variant VARCHAR(20)`)
+
+    // Seed default sequence config (all 8 email types with their hardcoded delays)
+    await db.query(`
+      INSERT INTO email_sequence_config (email_type, enabled, delay_hours) VALUES
+        ('confirmation', true, 0),
+        ('value_reminder', true, 12),
+        ('social_proof', true, 18),
+        ('objection_handler', true, 24),
+        ('last_touch', true, 36),
+        ('reengagement', true, 168),
+        ('pre_call', true, 24),
+        ('post_call', true, 1)
+      ON CONFLICT (email_type) DO NOTHING
     `)
 
     console.log('Startup migrations + indices OK')

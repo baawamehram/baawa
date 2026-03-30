@@ -162,14 +162,6 @@ export function PortalResults() {
         >
           Connecting to Baawa Intelligence…
         </motion.div>
-        {showDemoBypass && (
-          <button 
-            onClick={activateDemo}
-            style={{ background: 'none', border: `1px solid ${tk.border}`, color: tk.accent, borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontSize: 12 }}
-          >
-            Force-load Strategic Preview
-          </button>
-        )}
       </div>
     )
   }
