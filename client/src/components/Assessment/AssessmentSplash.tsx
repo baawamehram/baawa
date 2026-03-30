@@ -47,7 +47,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             textTransform: 'uppercase'
           }}
         >
-          Apply for Discovery
+          ⚡ Limited Spots Available
         </motion.div>
 
         {/* Value */}
@@ -65,8 +65,9 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
               lineHeight: 1.2
             }}
           >
-            Selected founders get a{' '}
-            <span style={{ color: '#059669' }}>$5,000 expert assessment</span>
+            Get your{' '}
+            <span style={{ color: '#059669' }}>$5,000 strategic assessment</span>
+            {' '}free
           </motion.h1>
         </div>
 
@@ -83,7 +84,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             lineHeight: 1.5
           }}
         >
-          Complete this discovery. If we're a fit, our analysts will evaluate your business and schedule a consultation.
+          Complete this 5-minute discovery. If we're a fit, our team personally analyzes your business and invites you to a $5,000 strategic assessment worth thousands in consulting value.
         </motion.p>
 
         {/* Call-to-action text */}
@@ -118,10 +119,10 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
           }}
         >
           <div style={{ fontSize: 12, color: '#8B8B8B', fontFamily: "'Outfit', sans-serif" }}>
-            <span style={{ color: '#059669', fontWeight: 600 }}>287</span> assessments completed
+            <span style={{ color: '#059669', fontWeight: 600 }}>287</span> founders assessed • <span style={{ color: '#059669', fontWeight: 600 }}>92%</span> completed assessment
           </div>
           <div style={{ fontSize: 12, color: '#8B8B8B', fontFamily: "'Outfit', sans-serif" }}>
-            <span style={{ color: '#059669', fontWeight: 600 }}>16</span> founders discovered critical gaps
+            <span style={{ color: '#059669', fontWeight: 600 }}>16</span> discovered critical blind spots • <span style={{ color: '#059669', fontWeight: 600 }}>$340K+</span> in consulting matched
           </div>
         </motion.div>
 
@@ -157,7 +158,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
                 : 'none'
             } as any}
           >
-            Apply Now →
+            Get Your Free Assessment →
           </motion.button>
 
           {/* Skip link */}
@@ -176,7 +177,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
               textDecoration: 'underline'
             }}
           >
-            Skip intro
+            Not ready yet
           </motion.button>
         </div>
       </div>

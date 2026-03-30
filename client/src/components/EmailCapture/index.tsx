@@ -158,7 +158,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 letterSpacing: '0.01em',
               }}
             >
-              Our intelligence is analyzing your answers…
+              Identifying your biggest opportunities…
             </motion.p>
 
             {/* Subtle dots */}
@@ -212,7 +212,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 lineHeight: 1.3,
               }}
             >
-              Analysis complete.
+              Your insights are ready.
             </motion.h2>
 
             <motion.p
@@ -228,7 +228,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                 lineHeight: 1.6,
               }}
             >
-              Where should we send your results?
+              Share your email below. Our team will personally analyze your answers and reach out within 24 hours if we can help.
             </motion.p>
 
             <motion.form
@@ -448,7 +448,7 @@ export function EmailCapture({ sessionId, onComplete }: EmailCaptureProps) {
                   transition: 'background 0.2s',
                 }}
               >
-                {submitting ? 'Submitting…' : 'Unlock my insights'}
+                {submitting ? 'Sending insights…' : 'Send my results →'}
               </motion.button>
             </motion.form>
           </motion.div>

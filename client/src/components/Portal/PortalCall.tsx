@@ -51,9 +51,9 @@ export function PortalCall({ theme, on401 }: Props) {
       <div style={card}>
         <div style={{ textAlign: 'center', padding: '32px 0' }}>
           <div style={{ fontSize: 36, marginBottom: 12 }}>📅</div>
-          <h3 style={{ fontFamily: 'Outfit,sans-serif', color: tk.text, fontSize: 16, margin: '0 0 8px' }}>No call scheduled yet</h3>
+          <h3 style={{ fontFamily: 'Outfit,sans-serif', color: tk.text, fontSize: 16, margin: '0 0 8px' }}>Call coming soon</h3>
           <p style={{ fontFamily: 'Outfit,sans-serif', color: tk.textMuted, fontSize: 13, margin: 0, lineHeight: 1.6 }}>
-            Once our team reviews your assessment, we'll send you availability to book a strategy call.
+            Our team is reviewing your assessment. You'll receive call booking availability <strong style={{ color: tk.accent }}>within 24 hours</strong> if we're a good fit.
           </p>
         </div>
       </div>
