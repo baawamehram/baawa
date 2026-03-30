@@ -6,8 +6,6 @@ interface AssessmentCompleteProps {
 }
 
 export function AssessmentComplete({ onContinue }: AssessmentCompleteProps) {
-  const [canSkip, setCanSkip] = useState(false)
-
   useEffect(() => {
     const timer = setTimeout(() => {
       onContinue()

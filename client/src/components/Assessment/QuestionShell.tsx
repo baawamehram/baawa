@@ -51,6 +51,8 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
   }
 
   const renderQuestion = () => {
+    if (!session.currentQuestion) return null
+
     const { questionType, question, options, sliderConfig } = session.currentQuestion
 
     const handleSubmit = (value: string | number | string[], inputType?: 'voice' | 'text' | 'click' | 'drag') => {

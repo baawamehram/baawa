@@ -6,12 +6,11 @@ interface AssessmentSplashProps {
 }
 
 interface AnimatedNumberProps {
-  from: number
   to: number
   duration: number
 }
 
-function AnimatedNumber({ from, to, duration }: AnimatedNumberProps) {
+function AnimatedNumber({ to, duration }: AnimatedNumberProps) {
   return (
     <motion.span
       initial={{ opacity: 0 }}
