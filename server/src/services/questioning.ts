@@ -3,14 +3,98 @@ import { retrieveRelevantChunks } from './rag'
 import { getActiveConfig } from './journeyConfig'
 import { callLLM, LLMMessage } from './llm-provider'
 
+export type QuestionType = 'open_text' | 'mcq' | 'slider' | 'ranking'
+
 export interface ConversationTurn {
   role: 'user' | 'assistant'
   content: string
+  questionType?: QuestionType
+  options?: string[]
+  sliderConfig?: { min: number; max: number; label: string }
+  structuredAnswer?: {
+    type: QuestionType
+    value: string | number | string[]
+    displayText: string
+  }
+}
+
+export interface QuestionBankItem {
+  id: number
+  type: QuestionType
+  question: string
+  options?: string[]
+  sliderConfig?: { min: number; max: number; label: string }
+  dimension: 'market_clarity' | 'execution_readiness' | 'investment_capacity' | 'priority_clarity' | 'problem_clarity'
 }
 
 export interface QuestionResult {
   question: string
   done: boolean
+  questionType?: QuestionType
+  options?: string[]
+  sliderConfig?: { min: number; max: number; label: string }
+}
+
+export const QUESTION_BANK: QuestionBankItem[] = [
+  {
+    id: 1,
+    type: 'open_text',
+    question: 'Who are you, and what do you want?',
+    dimension: 'problem_clarity'
+  },
+  {
+    id: 2,
+    type: 'mcq',
+    question: 'Where is your business right now?',
+    options: ['Idea stage', 'Pre-revenue', '£0–10K MRR', '£10K–50K MRR', '£50K+ MRR'],
+    dimension: 'execution_readiness'
+  },
+  {
+    id: 3,
+    type: 'mcq',
+    question: "What's your primary goal in the next 90 days?",
+    options: ['More customers', 'Better product', 'Build team', 'Raise funding', 'Scale revenue'],
+    dimension: 'priority_clarity'
+  },
+  {
+    id: 4,
+    type: 'ranking',
+    question: 'Rank your biggest challenges (most pressing first):',
+    options: ['Positioning & brand', 'Customer acquisition', 'Product development', 'Hiring & team', 'Pricing & revenue'],
+    dimension: 'priority_clarity'
+  },
+  {
+    id: 5,
+    type: 'slider',
+    question: 'How clearly do you understand your ideal customer?',
+    sliderConfig: { min: 0, max: 10, label: 'No idea ← → Crystal clear' },
+    dimension: 'market_clarity'
+  },
+  {
+    id: 6,
+    type: 'open_text',
+    question: "What's the hardest business problem you're facing right now?",
+    dimension: 'problem_clarity'
+  },
+  {
+    id: 7,
+    type: 'mcq',
+    question: 'Have you worked with consultants or coaches before?',
+    options: ['Never', 'Under £1K', '£1K–5K', '£5K–20K', '£20K+'],
+    dimension: 'investment_capacity'
+  },
+  {
+    id: 8,
+    type: 'slider',
+    question: 'How committed are you to investing in solving this in the next 30 days?',
+    sliderConfig: { min: 0, max: 10, label: 'Still exploring ← → Ready to act now' },
+    dimension: 'investment_capacity'
+  }
+]
+
+export function getQuestion(index: number): QuestionBankItem | null {
+  if (index < 0 || index >= QUESTION_BANK.length) return null
+  return QUESTION_BANK[index]
 }
 
 /**

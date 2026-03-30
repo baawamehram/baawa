@@ -2,8 +2,8 @@ import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import { db } from '../db/client'
 import { geolocateIP } from '../services/geo'
-import { generateNextQuestion, ConversationTurn } from '../services/questioning'
-import { scoreConversation } from '../services/scoring'
+import { generateNextQuestion, ConversationTurn, QUESTION_BANK, getQuestion, QuestionType } from '../services/questioning'
+import { scoreConversation, scoreConversationHybrid } from '../services/scoring'
 import { sendProspectAck, sendFounderNotification } from '../services/email'
 import { getActiveConfig } from '../services/journeyConfig'
 import { classifyProblemDomains } from '../services/classification'
@@ -54,17 +54,24 @@ router.post('/start', async (req: Request, res: Response) => {
       [config.version, sessionId]
     )
 
-    const { question } = await generateNextQuestion([], 'Start the interview.')
+    // Get Q1 from question bank
+    const q1 = QUESTION_BANK[0]
+    const q1Turn: ConversationTurn = {
+      role: 'assistant',
+      content: q1.question,
+      questionType: q1.type as QuestionType
+    }
 
     // Store Q1 in conversation
     await db.query(
       `UPDATE sessions SET conversation = $1, question_count = 1 WHERE id = $2`,
-      [JSON.stringify([{ role: 'assistant', content: question }]), sessionId]
+      [JSON.stringify([q1Turn]), sessionId]
     )
 
     res.json({
       sessionId,
-      question,
+      question: q1.question,
+      questionType: q1.type,
       city: geo?.city ?? null,
       country: geo?.country ?? null,
     })
@@ -75,18 +82,30 @@ router.post('/start', async (req: Request, res: Response) => {
 })
 
 // POST /api/sessions/:id/answer
-// Submits an answer, generates next question or signals done
+// Submits structured answer, returns next question from question bank
 router.post('/:id/answer', async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const parsed = z.object({ 
-      answer: z.string().min(1).max(5000),
-      inputType: z.enum(['voice', 'text']).optional(),
+
+    // Accept structured answer format
+    const answerSchema = z.discriminatedUnion('type', [
+      z.object({ type: z.literal('open_text'), value: z.string().min(1).max(5000) }),
+      z.object({ type: z.literal('mcq'), value: z.string().min(1).max(500) }),
+      z.object({ type: z.literal('slider'), value: z.number().min(0).max(100) }),
+      z.object({ type: z.literal('ranking'), value: z.array(z.string()).min(1).max(10) }),
+    ])
+
+    const parsed = z.object({
+      questionIndex: z.number().int().min(0).max(7),
+      payload: answerSchema,
+      displayText: z.string().min(1).max(5000),
+      inputType: z.enum(['voice', 'text', 'click', 'drag']).optional(),
       clientLatency: z.number().optional()
     }).safeParse(req.body)
-    if (!parsed.success) return res.status(400).json({ error: 'Invalid answer' })
 
-    const { answer, inputType, clientLatency } = parsed.data
+    if (!parsed.success) return res.status(400).json({ error: 'Invalid answer format' })
+
+    const { questionIndex, payload, displayText, inputType, clientLatency } = parsed.data
 
     const sessionResult = await db.query<{
       conversation: ConversationTurn[]
@@ -104,16 +123,27 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
 
     const conversation = session.conversation
 
-    // Server-side hard cap: if already at 25 questions, signal done
-    if (session.question_count >= 25) {
+    // Hard cap at 8 questions (new system)
+    if (session.question_count >= 8) {
       await db.query(`UPDATE sessions SET status = 'completed' WHERE id = $1`, [id])
       return res.json({ done: true })
     }
 
-    // Append the founder's answer
+    // Append the founder's structured answer
+    const userTurn: ConversationTurn = {
+      role: 'user',
+      content: displayText,
+      questionType: payload.type,
+      structuredAnswer: {
+        type: payload.type,
+        value: payload.value,
+        displayText
+      }
+    }
+
     const updatedConversation: ConversationTurn[] = [
       ...conversation,
-      { role: 'user', content: answer },
+      userTurn,
     ]
 
     // --- REAL-TIME HEARTBEAT (Update Analytics) ---
@@ -124,12 +154,12 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
           step: session.question_count,
           inputType: inputType ?? 'unknown',
           latency: clientLatency ?? 0,
-          words: answer.trim().split(/\s+/).length,
+          words: displayText.trim().split(/\s+/).length,
           timestamp: new Date().toISOString()
         }
 
         await db.query(
-          `INSERT INTO session_analytics 
+          `INSERT INTO session_analytics
            (session_id, question_count, avg_answer_words, min_answer_words, max_answer_words, drop_off_at_question, journey_config_version, events, last_input_method)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
            ON CONFLICT (session_id) DO UPDATE SET
@@ -141,11 +171,11 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
              events = session_analytics.events || EXCLUDED.events,
              last_input_method = EXCLUDED.last_input_method`,
           [
-            id, 
-            stats.question_count, 
-            stats.avg_answer_words, 
-            stats.min_answer_words, 
-            stats.max_answer_words, 
+            id,
+            stats.question_count,
+            stats.avg_answer_words,
+            stats.min_answer_words,
+            stats.max_answer_words,
             stats.question_count,
             session.journey_config_version,
             JSON.stringify([newEvent]),
@@ -157,9 +187,19 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       }
     })()
 
-    const result = await generateNextQuestion(updatedConversation, answer)
+    // Check if this is the last question
+    if (questionIndex >= 7) {
+      // Question 8 submitted — signal done
+      await db.query(
+        `UPDATE sessions SET conversation = $1, status = 'completed' WHERE id = $2`,
+        [JSON.stringify(updatedConversation), id]
+      )
+      return res.json({ done: true })
+    }
 
-    if (result.done) {
+    // Get next question from bank
+    const nextQuestion = getQuestion(questionIndex + 1)
+    if (!nextQuestion) {
       await db.query(
         `UPDATE sessions SET conversation = $1, status = 'completed' WHERE id = $2`,
         [JSON.stringify(updatedConversation), id]
@@ -168,9 +208,17 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
     }
 
     // Append the next question
+    const nextQuestionTurn: ConversationTurn = {
+      role: 'assistant',
+      content: nextQuestion.question,
+      questionType: nextQuestion.type as QuestionType,
+      options: nextQuestion.options,
+      sliderConfig: nextQuestion.sliderConfig
+    }
+
     const newConversation: ConversationTurn[] = [
       ...updatedConversation,
-      { role: 'assistant', content: result.question },
+      nextQuestionTurn,
     ]
 
     await db.query(
@@ -178,7 +226,13 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       [JSON.stringify(newConversation), id]
     )
 
-    res.json({ question: result.question, done: false })
+    res.json({
+      question: nextQuestion.question,
+      questionType: nextQuestion.type,
+      options: nextQuestion.options,
+      sliderConfig: nextQuestion.sliderConfig,
+      done: false
+    })
   } catch (err) {
     console.error('POST /sessions/:id/answer error:', err)
     res.status(500).json({ error: 'Failed to process answer' })
@@ -213,7 +267,7 @@ router.post('/:id/complete', async (req: Request, res: Response) => {
 
     // Removed duplicate email check to support multiple submissions per user
 
-    const scoring = await scoreConversation(session.conversation)
+    const scoring = await scoreConversationHybrid(session.conversation)
 
     const sessionData = await db.query<{ name: string | null }>(
       'SELECT name FROM sessions WHERE id = $1',
