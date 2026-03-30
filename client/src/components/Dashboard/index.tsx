@@ -320,10 +320,10 @@ function DashboardContent() {
 
         <div style={{ paddingTop: '16px', borderTop: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => setToken(null)}
             style={{ textAlign: 'left', padding: '8px 12px', borderRadius: '6px', fontSize: '13px', border: 'none', cursor: 'pointer', background: 'transparent', color: theme.textMuted, fontFamily: "'Outfit', sans-serif", transition: 'color 0.2s' }}
           >
-            ← Home
+            ← Back
           </button>
           <button
             onClick={() => setToken(null)}

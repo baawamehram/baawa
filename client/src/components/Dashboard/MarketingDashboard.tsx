@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { API_URL } from '../../lib/api'
 
 const EMAIL_TYPES = ['confirmation', 'value_reminder', 'social_proof', 'objection_handler', 'last_touch', 'reengagement', 'pre_call', 'post_call'] as const
 type EmailType = typeof EMAIL_TYPES[number]
@@ -112,7 +113,7 @@ function AnalyticsTab({ token, on401 }: Props) {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/marketing/stats', {
+        const res = await fetch(`${API_URL}/api/marketing/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!res.ok) { if (res.status === 401) on401(); return }
@@ -297,7 +298,7 @@ function SequencesTab({ token, on401 }: Props) {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/marketing/sequences', {
+        const res = await fetch(`${API_URL}/api/marketing/sequences`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!res.ok) { if (res.status === 401) on401(); return }
@@ -313,7 +314,7 @@ function SequencesTab({ token, on401 }: Props) {
   const handleToggle = async (emailType: string, enabled: boolean) => {
     setSavingType(emailType)
     try {
-      const res = await fetch(`/api/marketing/sequences/${emailType}`, {
+      const res = await fetch(`${API_URL}/api/marketing/sequences/${emailType}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !enabled }),
@@ -426,7 +427,7 @@ function TemplatesTab({ token }: { token: string }) {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`/api/marketing/templates/${selectedType}`, {
+        const res = await fetch(`${API_URL}/api/marketing/templates/${selectedType}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {
@@ -445,7 +446,7 @@ function TemplatesTab({ token }: { token: string }) {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const res = await fetch(`/api/marketing/templates/${selectedType}`, {
+      const res = await fetch(`${API_URL}/api/marketing/templates/${selectedType}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject: editSubject, html_body: editBody }),
@@ -460,13 +461,13 @@ function TemplatesTab({ token }: { token: string }) {
 
   const handleReset = async () => {
     try {
-      const res = await fetch(`/api/marketing/templates/${selectedType}/reset`, {
+      const res = await fetch(`${API_URL}/api/marketing/templates/${selectedType}/reset`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         // Reload
-        const getRes = await fetch(`/api/marketing/templates/${selectedType}`, {
+        const getRes = await fetch(`${API_URL}/api/marketing/templates/${selectedType}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (getRes.ok) {
@@ -671,7 +672,7 @@ function ABTestsTab({ token }: { token: string }) {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/marketing/ab-tests', {
+        const res = await fetch(`${API_URL}/api/marketing/ab-tests`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {
@@ -688,7 +689,7 @@ function ABTestsTab({ token }: { token: string }) {
   const handleCreateTest = async () => {
     if (!creatingFor || !newVariant.variant_name) return
     try {
-      const res = await fetch('/api/marketing/ab-tests', {
+      const res = await fetch(`${API_URL}/api/marketing/ab-tests`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ email_type: creatingFor, ...newVariant }),
@@ -706,7 +707,7 @@ function ABTestsTab({ token }: { token: string }) {
 
   const handleDeclareWinner = async (id: number) => {
     try {
-      const res = await fetch(`/api/marketing/ab-tests/${id}/declare-winner`, {
+      const res = await fetch(`${API_URL}/api/marketing/ab-tests/${id}/declare-winner`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ apply_to_template: confirm('Apply variant as main template?') }),
