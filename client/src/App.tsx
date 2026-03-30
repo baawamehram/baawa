@@ -1,20 +1,24 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AssessmentShell } from './components/Assessment/AssessmentShell'
+import { AssessmentSplash } from './components/Assessment/AssessmentSplash'
+import { QuestionShell } from './components/Assessment/QuestionShell'
+import { AssessmentComplete } from './components/Assessment/AssessmentComplete'
+import { AssessmentSubmitted } from './components/Assessment/AssessmentSubmitted'
 import { EmailCapture } from './components/EmailCapture'
 import { ThankYou } from './components/ThankYou'
 import Dashboard from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
 import { PortalLogin } from './components/Portal/Login'
 import { PortalResults } from './components/Portal/Results'
+import { AnimatePresence } from 'framer-motion'
 
-type FunnelPhase = 'assessment' | 'email' | 'thankyou'
+type FunnelPhase = 'splash' | 'assessment' | 'complete' | 'email' | 'submitted' | 'thankyou'
 
 function FunnelPage({ onExit }: { onExit: () => void }) {
-  const [phase, setPhase] = useState<FunnelPhase>('assessment')
+  const [phase, setPhase] = useState<FunnelPhase>('splash')
   const [sessionId, setSessionId] = useState<string>('')
 
-  const exitButton = phase !== 'thankyou' && (
+  const exitButton = phase !== 'thankyou' && phase !== 'complete' && phase !== 'submitted' && (
     <button
       onClick={onExit}
       style={{
@@ -30,35 +34,55 @@ function FunnelPage({ onExit }: { onExit: () => void }) {
     </button>
   )
 
-  if (phase === 'assessment') {
-    return (
-      <>
-        {exitButton}
-        <AssessmentShell
-          intakeData={null}
-          onComplete={(id: string) => {
-            setSessionId(id)
-            setPhase('email')
-          }}
-        />
-      </>
-    )
-  }
+  return (
+    <>
+      {exitButton}
+      <AnimatePresence mode="wait">
+        {phase === 'splash' && (
+          <AssessmentSplash
+            key="splash"
+            onStart={() => setPhase('assessment')}
+          />
+        )}
 
-  if (phase === 'email') {
-    return (
-      <>
-        {exitButton}
-        <EmailCapture
-          sessionId={sessionId}
-          onComplete={() => setPhase('thankyou')}
-        />
-      </>
-    )
-  }
+        {phase === 'assessment' && (
+          <QuestionShell
+            key="assessment"
+            onComplete={(id: string) => {
+              setSessionId(id)
+              setPhase('complete')
+            }}
+          />
+        )}
 
-  // 'thankyou'
-  return <ThankYou />
+        {phase === 'complete' && (
+          <AssessmentComplete
+            key="complete"
+            onContinue={() => setPhase('email')}
+          />
+        )}
+
+        {phase === 'email' && (
+          <EmailCapture
+            key="email"
+            sessionId={sessionId}
+            onComplete={() => setPhase('submitted')}
+          />
+        )}
+
+        {phase === 'submitted' && (
+          <AssessmentSubmitted
+            key="submitted"
+            onContinue={() => setPhase('thankyou')}
+          />
+        )}
+
+        {phase === 'thankyou' && (
+          <ThankYou key="thankyou" />
+        )}
+      </AnimatePresence>
+    </>
+  )
 }
 
 export default function App() {
