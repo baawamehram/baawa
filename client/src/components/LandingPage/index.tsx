@@ -542,7 +542,7 @@ export function LandingPage({ onStart }: Props) {
         </div>
         <div className="flex items-center gap-1.5 md:gap-3">
           <LoginMenu />
-          <button onClick={onStart} className="px-3 py-1.5 md:px-5 md:py-2.5 rounded-md bg-[#059669] text-[#FAFAFA] font-['Outfit'] font-semibold text-[11px] md:text-[14px] whitespace-nowrap" style={{ touchAction: 'manipulation' }}>
+          <button onClick={onStart} style={{ background: '#059669', color: '#FAFAFA', border: 'none', cursor: 'pointer', padding: 'clamp(8px 12px, 2vw, 12px 20px)', borderRadius: 6, fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(11px, 2vw, 14px)', fontWeight: 600, whiteSpace: 'nowrap', touchAction: 'manipulation' }}>
             <span className="sm:hidden">Start →</span>
             <span className="hidden sm:inline">Start Assessment</span>
           </button>
