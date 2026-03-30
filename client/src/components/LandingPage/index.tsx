@@ -12,10 +12,7 @@ const SERVICES = [
 
 const NAV_SEQUENCES = [
   ...SERVICES.map(s => ({ text: s, prefix: "We do: ", color: "#059669" })),
-  { text: "Jack of all trades,", prefix: "we are : ", color: "#6B6460" },
-  { text: "masters of none.", prefix: "we are : ", color: "#6B6460" },
-  { text: "oftentimes better than....", prefix: "we are : ", color: "#6B6460" },
-  { text: "a master of one.", prefix: "we are : ", color: "#6B6460" }
+  { text: "A Swiss knife approach AI consultancy", prefix: "we are : ", color: "#6B6460" }
 ]
 
 const IDENTITY_ITEMS = [
@@ -675,7 +672,7 @@ export function LandingPage({ onStart }: Props) {
                 </ul>
               </div>
               <blockquote style={{ background: '#0A0A0A', borderRadius: 16, padding: '32px 28px', margin: 0, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
-                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(20px, 2.5vw, 26px)', fontStyle: 'italic', color: '#FFB09A', lineHeight: 1.45, margin: '0 0 16px' }}>
+                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(20px, 2.5vw, 26px)', fontStyle: 'italic', color: '#34D399', lineHeight: 1.45, margin: '0 0 16px' }}>
                   "The engine asked me three questions in twenty minutes that none of my expensive advisors had asked in six months."
                 </p>
                 <div style={{ fontSize: 12, color: '#6B6460', fontFamily: 'Outfit, sans-serif' }}>— An early Baawa network client</div>
