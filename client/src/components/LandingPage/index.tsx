@@ -429,17 +429,17 @@ function LoginMenu() {
             }}
           >
             <button
-              onClick={() => { navigate('/dashboard'); setOpen(false) }}
+              onClick={() => { navigate('/portal/login'); setOpen(false) }}
               style={{
                 width: '100%', textAlign: 'left', background: 'none', border: 'none',
                 padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
                 display: 'flex', flexDirection: 'column', gap: 2,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(52,211,153,0.05)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
             >
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Staff Access</span>
-              <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>CRM & Consultant Dashboard</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Client Login</span>
+              <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>View your assessment results</span>
             </button>
           </motion.div>
         )}
@@ -455,15 +455,6 @@ export function LandingPage({ onStart }: Props) {
   return (
     <div style={{ fontFamily: 'Outfit, sans-serif', background: '#FDFCFA', color: '#0A0A0A' }}>
 
-      {/* Top navigation */}
-      <div style={{ position: 'fixed', top: 0, right: 0, zIndex: 150, display: 'flex', gap: 12, padding: '16px 24px', alignItems: 'center' }}>
-        <a href="/dashboard" style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(5,150,105,0.2)', background: 'transparent', color: '#059669', fontSize: 13, fontWeight: 600, fontFamily: 'Outfit, sans-serif', textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s' }}>
-          Dashboard
-        </a>
-        <a href="/portal" style={{ padding: '8px 16px', borderRadius: 8, background: '#059669', color: '#FDFCFA', fontSize: 13, fontWeight: 600, fontFamily: 'Outfit, sans-serif', textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s' }}>
-          Portal
-        </a>
-      </div>
 
       {/* About Us Overlay */}
       <AnimatePresence>
