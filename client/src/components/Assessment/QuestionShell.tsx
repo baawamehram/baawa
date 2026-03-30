@@ -55,13 +55,12 @@ export function QuestionShell({ onComplete }: QuestionShellProps) {
 
     const handleSubmit = (value: string | number | string[], inputType?: 'voice' | 'text' | 'click' | 'drag') => {
       const displayText = Array.isArray(value) ? value.join(', ') : String(value)
-      session.submitAnswer(
-        session.questionIndex,
-        questionType || 'open_text',
-        value,
-        displayText,
-        inputType
-      )
+      const type = questionType || 'open_text'
+      const idx = session.questionIndex
+
+      console.log('handleSubmit called with:', { idx, type, value, displayText, inputType })
+
+      session.submitAnswer(idx, type as 'open_text' | 'mcq' | 'slider' | 'ranking', value, displayText, inputType)
     }
 
     switch (questionType) {
