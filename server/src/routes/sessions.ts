@@ -91,7 +91,7 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
     const answerSchema = z.discriminatedUnion('type', [
       z.object({ type: z.literal('open_text'), value: z.string().min(1).max(5000) }),
       z.object({ type: z.literal('mcq'), value: z.string().min(1).max(500) }),
-      z.object({ type: z.literal('slider'), value: z.number().min(0).max(100) }),
+      z.object({ type: z.literal('slider'), value: z.number().min(0).max(10) }),
       z.object({ type: z.literal('ranking'), value: z.array(z.string()).min(1).max(10) }),
     ])
 
@@ -103,7 +103,10 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       clientLatency: z.number().optional()
     }).safeParse(req.body)
 
-    if (!parsed.success) return res.status(400).json({ error: 'Invalid answer format' })
+    if (!parsed.success) {
+      console.error('Answer validation error:', parsed.error.errors)
+      return res.status(400).json({ error: 'Invalid answer format', details: parsed.error.errors })
+    }
 
     const { questionIndex, payload, displayText, inputType, clientLatency } = parsed.data
 
