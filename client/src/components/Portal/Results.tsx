@@ -83,8 +83,6 @@ export function PortalResults() {
     navigate('/portal/login', { replace: true, state: { message: 'Your session expired — log in again.' } })
   }, [navigate])
 
-  const [showDemoBypass, setShowDemoBypass] = useState(false)
-
   const load = useCallback(async () => {
     try {
       const [meRes, msgsRes, listRes] = await Promise.all([
@@ -93,49 +91,21 @@ export function PortalResults() {
         portalFetch(`${API_URL}/api/portal/assessments`, on401),
       ])
       if (!meRes || !msgsRes || !listRes) return
-      if (!meRes.ok) { setLoadError('Connecting to Baawa Intelligence...'); return }
+      if (!meRes.ok) { setLoadError('Failed to load assessment. Please refresh or contact support.'); return }
       const [me, msgs, list] = await Promise.all([meRes.json(), msgsRes.json(), listRes.json()])
       setAssessment(me as Assessment)
       setMessages(msgs as PortalMessage[])
       setAllAssessments(list)
     } catch (err) {
       console.error('Portal load failed:', err)
-      setLoadError('Connecting to Baawa Intelligence...')
+      setLoadError('Failed to load assessment. Please refresh or contact support.')
     }
   }, [on401])
 
   useEffect(() => {
     void load()
-    const timer = setTimeout(() => {
-      if (!assessment) setShowDemoBypass(true)
-    }, 5000)
-    return () => clearTimeout(timer)
-  }, [load, assessment])
+  }, [load])
 
-  const MOCK_ASSESSMENT: Assessment = {
-    id: 999,
-    email: 'hello@baawa.co',
-    created_at: new Date().toISOString(),
-    conversation: [
-      { role: 'assistant', content: "Let's look at your PMF score. How's the retention?" },
-      { role: 'user', content: "It's around 40% month over month." }
-    ],
-    results_unlocked: true,
-    score: 84,
-    score_breakdown: { pmf: 82, validation: 75, growth: 90, mindset: 88, revenue: 85 },
-    score_summary: "Strategic Baseline: Your business has a strong core but is hitting a 'Scaling Wall'. We recommend focus on Operations normalization before the next growth spurt.",
-    biggest_opportunity: "Automating customer onboarding could save 15h/week for the ops team.",
-    biggest_risk: "Single-channel acquisition dependency (Google Ads).",
-    problem_domains: [
-      { domain: 'Marketing', subCategory: 'Acquisition', confidence: 0.95 },
-      { domain: 'Strategy', subCategory: 'Scaling', confidence: 0.88 }
-    ]
-  }
-
-  const activateDemo = () => {
-    setAssessment(MOCK_ASSESSMENT)
-    setAllAssessments([{ id: 999, created_at: new Date().toISOString(), score: 84 }])
-  }
 
   const handleSwitch = async (id: number) => {
     if (id === assessment?.id) return
@@ -169,13 +139,15 @@ export function PortalResults() {
   if (loadError && !assessment) {
     return (
       <div style={{ background: tk.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
-        <p style={{ fontFamily: 'Outfit, sans-serif', color: tk.textMuted }}>{loadError}</p>
-        <button 
-          onClick={activateDemo}
-          style={{ background: tk.accent, color: '#000', border: 'none', borderRadius: 8, padding: '12px 24px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}
-        >
-          View Strategic Preview
-        </button>
+        <div style={{ background: tk.bg2, border: `1px solid ${tk.border}`, borderRadius: 8, padding: 24, maxWidth: 400, textAlign: 'center' }}>
+          <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 14, color: tk.text, margin: '0 0 12px' }}>{loadError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{ background: tk.accent, color: '#000', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}
+          >
+            Refresh Page
+          </button>
+        </div>
       </div>
     )
   }
