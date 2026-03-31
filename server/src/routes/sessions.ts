@@ -97,7 +97,6 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
     ])
 
     const parsed = z.object({
-      questionIndex: z.number().int().min(0).max(7),
       payload: answerSchema,
       displayText: z.string().min(1).max(5000),
       inputType: z.enum(['voice', 'text', 'click', 'drag']).optional(),
@@ -109,7 +108,7 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid answer format', details: parsed.error.errors })
     }
 
-    const { questionIndex, payload, displayText, inputType, clientLatency } = parsed.data
+    const { payload, displayText, inputType, clientLatency } = parsed.data
 
     const sessionResult = await db.query<{
       conversation: ConversationTurn[]
@@ -127,11 +126,7 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
 
     const conversation = session.conversation
 
-    // Hard cap at 8 questions (new system)
-    if (session.question_count >= 8) {
-      await db.query(`UPDATE sessions SET status = 'completed' WHERE id = $1`, [id])
-      return res.json({ done: true })
-    }
+    const currentQuestionCount = session.question_count
 
     // Append the founder's structured answer
     const userTurn: ConversationTurn = {
@@ -155,7 +150,7 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       try {
         const stats = computeAnswerStats(updatedConversation)
         const newEvent = {
-          step: session.question_count,
+          step: currentQuestionCount,
           inputType: inputType ?? 'unknown',
           latency: clientLatency ?? 0,
           words: displayText.trim().split(/\s+/).length,
@@ -191,9 +186,8 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       }
     })()
 
-    // Check if this is the last question
-    if (questionIndex >= 7) {
-      // Question 8 submitted — signal done
+    // If this was the final question (8th), complete session
+    if (currentQuestionCount >= 8) {
       await db.query(
         `UPDATE sessions SET conversation = $1, status = 'completed' WHERE id = $2`,
         [JSON.stringify(updatedConversation), id]
@@ -201,8 +195,8 @@ router.post('/:id/answer', async (req: Request, res: Response) => {
       return res.json({ done: true })
     }
 
-    // Get next question from bank
-    const nextQuestion = getQuestion(questionIndex + 1)
+    // Next question index is driven by question_count in DB (0-based index for QUESTION_BANK)
+    const nextQuestion = getQuestion(currentQuestionCount)
     if (!nextQuestion) {
       await db.query(
         `UPDATE sessions SET conversation = $1, status = 'completed' WHERE id = $2`,

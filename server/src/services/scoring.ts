@@ -202,7 +202,7 @@ export async function scoreConversationHybrid(
   // Phase 2: Claude Gut Check on Q1 + Q6
   const gutCheckPrompt = `Analyze these two founder answers:
 
-Q1 "Who are you, and what do you want?": "${q1Answer}"
+Q1 "Hello there, tell us more about yourself and everything about your business or problem statement.": "${q1Answer}"
 
 Q6 "What's the hardest business problem you're facing?": "${q6Answer}"
 
