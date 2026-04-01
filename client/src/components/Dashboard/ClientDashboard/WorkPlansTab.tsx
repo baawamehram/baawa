@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useDashboardTheme } from '../ThemeContext'
 import { API_URL, authFetch } from '../../../lib/api'
 
@@ -11,6 +11,19 @@ interface WorkPlansTabProps {
   token?: string
   on401?: () => void
 }
+
+interface ParsedTask {
+  title: string
+  description?: string
+}
+
+interface ParsedMarkdown {
+  title: string
+  description?: string
+  tasks: ParsedTask[]
+}
+
+type UploadState = 'idle' | 'uploading' | 'parsing' | 'confirmation' | 'submitting' | 'success' | 'error'
 
 interface WorkPlanTask {
   id: number
@@ -125,6 +138,60 @@ function formatCurrency(amount: number): string {
   }).format(amount)
 }
 
+function parseMarkdown(content: string): ParsedMarkdown {
+  const lines = content.split('\n')
+  let title = ''
+  const tasks: ParsedTask[] = []
+  let currentTask: ParsedTask | null = null
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    const isIndented = /^\s{2,}/.test(line)
+
+    // Find H1 as title (highest priority)
+    if (trimmed.startsWith('# ')) {
+      title = trimmed.slice(2).trim()
+      continue
+    }
+
+    // Skip H2, H3, etc. (section headers)
+    if (trimmed.match(/^#{2,}\s+/)) {
+      currentTask = null
+      continue
+    }
+
+    // Match bullet points (- or *) at start of line (not indented)
+    if (trimmed.match(/^[-*]\s+.+/) && !isIndented) {
+      const taskTitle = trimmed.slice(2).trim()
+      currentTask = { title: taskTitle, description: '' }
+      tasks.push(currentTask)
+      continue
+    }
+
+    // Match sub-bullets (indented - or *) as task descriptions
+    if (isIndented && trimmed.match(/^[-*]\s+.+/) && currentTask) {
+      const detail = trimmed.slice(2).trim()
+      if (currentTask.description) {
+        currentTask.description += '\n' + detail
+      } else {
+        currentTask.description = detail
+      }
+    }
+  }
+
+  // Clean up empty descriptions
+  const cleanedTasks = tasks.map((t) => ({
+    title: t.title,
+    description: t.description ? t.description.trim() : undefined,
+  }))
+
+  return {
+    title,
+    description: '',
+    tasks: cleanedTasks,
+  }
+}
+
 export function WorkPlansTab({
   clientId,
   isAdmin,
@@ -138,6 +205,15 @@ export function WorkPlansTab({
   const [expandedPlan, setExpandedPlan] = useState<number | null>(null)
   const [updatingStatus, setUpdatingStatus] = useState(false)
   const [approvingCosts, setApprovingCosts] = useState(false)
+
+  // Upload state
+  const [uploadState, setUploadState] = useState<UploadState>('idle')
+  const [uploadError, setUploadError] = useState('')
+  const [uploadSuccess, setUploadSuccess] = useState('')
+  const [formData, setFormData] = useState<ParsedMarkdown | null>(null)
+  const [originalMarkdown, setOriginalMarkdown] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [removedTaskIndices, setRemovedTaskIndices] = useState<Set<number>>(new Set())
 
   const stableOn401 = useCallback(on401, [on401])
 
@@ -297,6 +373,176 @@ export function WorkPlansTab({
     }
   }, [token, stableOn401, workPlans])
 
+  const handleFileSelect = useCallback(async (file: File) => {
+    if (!file) return
+
+    setUploadError('')
+    setUploadSuccess('')
+    setUploadState('uploading')
+
+    try {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const content = e.target?.result as string
+        setOriginalMarkdown(content)
+
+        setUploadState('parsing')
+        // Simulate parsing delay for UX feedback
+        await new Promise((resolve) => setTimeout(resolve, 300))
+
+        const parsed = parseMarkdown(content)
+
+        // Validate parsed data
+        if (!parsed.title || parsed.title.trim() === '') {
+          setUploadError('Markdown must contain an H1 title (e.g., # Project Title)')
+          setUploadState('error')
+          return
+        }
+
+        if (parsed.title.length > 255) {
+          setUploadError('Title must be 255 characters or less')
+          setUploadState('error')
+          return
+        }
+
+        if (parsed.tasks.length === 0) {
+          setUploadError('Markdown must contain at least one task (bullet point)')
+          setUploadState('error')
+          return
+        }
+
+        // Validate task titles
+        const invalidTask = parsed.tasks.find((t) => t.title.length > 255)
+        if (invalidTask) {
+          setUploadError('Task titles must be 255 characters or less')
+          setUploadState('error')
+          return
+        }
+
+        setFormData({
+          title: parsed.title,
+          description: parsed.description || '',
+          tasks: parsed.tasks,
+        })
+        setRemovedTaskIndices(new Set())
+        setUploadState('confirmation')
+      }
+
+      reader.onerror = () => {
+        setUploadError('Failed to read file')
+        setUploadState('error')
+      }
+
+      reader.readAsText(file)
+    } catch (err) {
+      console.error('Error processing file:', err)
+      setUploadError('Failed to process file')
+      setUploadState('error')
+    }
+  }, [])
+
+  const handleRemoveTask = useCallback((index: number) => {
+    const newRemoved = new Set(removedTaskIndices)
+    if (newRemoved.has(index)) {
+      newRemoved.delete(index)
+    } else {
+      newRemoved.add(index)
+    }
+    setRemovedTaskIndices(newRemoved)
+  }, [removedTaskIndices])
+
+  const handleSubmitPlan = useCallback(async () => {
+    if (!formData || !token) return
+
+    setUploadState('submitting')
+    setUploadError('')
+
+    try {
+      // Get active tasks (not removed)
+      const activeTasks = formData.tasks.filter(
+        (_, index) => !removedTaskIndices.has(index)
+      )
+
+      if (activeTasks.length === 0) {
+        setUploadError('At least one task must be active')
+        setUploadState('error')
+        return
+      }
+
+      // Create work plan
+      const planRes = await authFetch(
+        `${API_URL}/api/work-plans`,
+        token,
+        stableOn401,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            client_id: clientId,
+            title: formData.title.trim(),
+            description: formData.description?.trim() || null,
+            markdown_source: originalMarkdown,
+            status: 'draft',
+          }),
+        }
+      )
+
+      if (!planRes || !planRes.ok) {
+        setUploadError('Failed to create work plan')
+        setUploadState('error')
+        return
+      }
+
+      const plan = await planRes.json()
+
+      // Create tasks
+      let tasksCreated = 0
+      for (let i = 0; i < activeTasks.length; i++) {
+        const task = activeTasks[i]
+        const taskRes = await authFetch(
+          `${API_URL}/api/work-plan-tasks`,
+          token,
+          stableOn401,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              work_plan_id: plan.id,
+              title: task.title.trim(),
+              description: task.description?.trim() || null,
+              status: 'not_started',
+              order_index: i + 1,
+            }),
+          }
+        )
+
+        if (taskRes && taskRes.ok) {
+          tasksCreated++
+        }
+      }
+
+      // Refresh work plans
+      await fetchWorkPlans()
+
+      setUploadSuccess(`Plan created! ${tasksCreated} task${tasksCreated !== 1 ? 's' : ''} added.`)
+      setUploadState('success')
+
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setFormData(null)
+        setOriginalMarkdown('')
+        setRemovedTaskIndices(new Set())
+        setUploadSuccess('')
+        setUploadState('idle')
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+      }, 2000)
+    } catch (err) {
+      console.error('Error submitting plan:', err)
+      setUploadError('Failed to create work plan and tasks')
+      setUploadState('error')
+    }
+  }, [formData, token, stableOn401, clientId, originalMarkdown, removedTaskIndices, fetchWorkPlans])
+
   // Filter plans for client view (show active/pending)
   const displayPlans = isAdmin
     ? workPlans
@@ -306,6 +552,515 @@ export function WorkPlansTab({
           p.status !== 'draft' &&
           p.status !== 'completed'
       )
+
+  // Render upload section (admin only)
+  const renderUploadSection = () => {
+    if (!isAdmin) return null
+
+    if (uploadState === 'confirmation' && formData) {
+      return (
+        <div
+          style={{
+            padding: '24px',
+            background: theme.input,
+            borderRadius: '8px',
+            border: `1px solid ${theme.border}`,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
+          <h4
+            style={{
+              fontSize: '15px',
+              fontWeight: 600,
+              color: theme.text,
+              margin: 0,
+            }}
+          >
+            Review Plan Details
+          </h4>
+
+          {/* Title input */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: theme.textMuted,
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Plan Title
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: theme.card,
+                border: `1px solid ${theme.border}`,
+                borderRadius: '6px',
+                color: theme.text,
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Description input */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: theme.textMuted,
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Description (optional)
+            </label>
+            <textarea
+              value={formData.description || ''}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: theme.card,
+                border: `1px solid ${theme.border}`,
+                borderRadius: '6px',
+                color: theme.text,
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                minHeight: '80px',
+                resize: 'vertical',
+              }}
+            />
+          </div>
+
+          {/* Tasks preview */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '12px',
+              }}
+            >
+              <label
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: theme.textMuted,
+                  margin: 0,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                Tasks to Create
+              </label>
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: theme.accent,
+                  fontWeight: 600,
+                }}
+              >
+                {formData.tasks.length - removedTaskIndices.size} active
+              </span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                maxHeight: '300px',
+                overflowY: 'auto',
+              }}
+            >
+              {formData.tasks.map((task, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: '12px',
+                    background: removedTaskIndices.has(index)
+                      ? 'rgba(249,113,113,0.1)'
+                      : theme.card,
+                    border: `1px solid ${
+                      removedTaskIndices.has(index)
+                        ? theme.statusError
+                        : theme.border
+                    }`,
+                    borderRadius: '6px',
+                    display: 'flex',
+                    gap: '12px',
+                    alignItems: 'flex-start',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: removedTaskIndices.has(index)
+                          ? theme.textMuted
+                          : theme.text,
+                        textDecoration: removedTaskIndices.has(index)
+                          ? 'line-through'
+                          : 'none',
+                        marginBottom: task.description ? '4px' : 0,
+                      }}
+                    >
+                      {task.title}
+                    </div>
+                    {task.description && (
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: theme.textMuted,
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-word',
+                          opacity: removedTaskIndices.has(index) ? 0.5 : 1,
+                        }}
+                      >
+                        {task.description}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleRemoveTask(index)}
+                    style={{
+                      padding: '4px 8px',
+                      background: 'transparent',
+                      color: removedTaskIndices.has(index)
+                        ? theme.textMuted
+                        : theme.statusError,
+                      border: `1px solid ${
+                        removedTaskIndices.has(index)
+                          ? theme.textMuted
+                          : theme.statusError
+                      }`,
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      fontFamily: "'Outfit', sans-serif",
+                      textTransform: 'uppercase',
+                      flexShrink: 0,
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget as HTMLButtonElement
+                      if (!removedTaskIndices.has(index)) {
+                        el.style.background = theme.statusError
+                        el.style.color = theme.bg
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const el = e.currentTarget as HTMLButtonElement
+                      if (!removedTaskIndices.has(index)) {
+                        el.style.background = 'transparent'
+                        el.style.color = theme.statusError
+                      }
+                    }}
+                  >
+                    {removedTaskIndices.has(index) ? 'Undo' : 'Remove'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              paddingTop: '12px',
+              borderTop: `1px solid ${theme.border}`,
+            }}
+          >
+            <button
+              onClick={() => {
+                setUploadState('idle')
+                setFormData(null)
+                setOriginalMarkdown('')
+                setRemovedTaskIndices(new Set())
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = ''
+                }
+              }}
+              disabled={false}
+              style={{
+                padding: '10px 16px',
+                background: 'transparent',
+                color: theme.textMuted,
+                border: `1px solid ${theme.border}`,
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 600,
+                fontFamily: "'Outfit', sans-serif",
+                transition: 'all 0.2s',
+                opacity: 1,
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.color = theme.text
+                el.style.borderColor = theme.text
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.color = theme.textMuted
+                el.style.borderColor = theme.border
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitPlan}
+              disabled={removedTaskIndices.size === formData.tasks.length}
+              style={{
+                padding: '10px 16px',
+                background:
+                  removedTaskIndices.size === formData.tasks.length
+                    ? theme.textMuted
+                    : theme.primary,
+                color: removedTaskIndices.size === formData.tasks.length
+                  ? theme.bg
+                  : theme.primaryText,
+                border: 'none',
+                borderRadius: '6px',
+                cursor:
+                  removedTaskIndices.size === formData.tasks.length
+                    ? 'not-allowed'
+                    : 'pointer',
+                fontSize: '13px',
+                fontWeight: 600,
+                fontFamily: "'Outfit', sans-serif",
+                transition: 'opacity 0.2s',
+              }}
+            >
+              {uploadState === 'confirmation'
+                ? 'Create Work Plan'
+                : 'Creating Plan...'}
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    if (uploadState === 'success') {
+      return (
+        <div
+          style={{
+            padding: '16px',
+            background: 'rgba(52,211,153,0.1)',
+            border: `1px solid ${theme.statusSuccess}`,
+            color: theme.statusSuccess,
+            borderRadius: '8px',
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>✓</span>
+          <span style={{ fontSize: '14px', fontWeight: 500 }}>
+            {uploadSuccess}
+          </span>
+        </div>
+      )
+    }
+
+    if (uploadState === 'error') {
+      return (
+        <div
+          style={{
+            padding: '16px',
+            background: 'rgba(248,113,113,0.1)',
+            border: `1px solid ${theme.statusError}`,
+            color: theme.statusError,
+            borderRadius: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <span style={{ fontSize: '18px' }}>!</span>
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>
+              {uploadError}
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setUploadState('idle')
+              setUploadError('')
+              if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+              }
+            }}
+            style={{
+              padding: '6px 12px',
+              background: theme.statusError,
+              color: theme.bg,
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 600,
+              fontFamily: "'Outfit', sans-serif",
+              alignSelf: 'flex-start',
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLButtonElement
+              el.style.opacity = '0.8'
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLButtonElement
+              el.style.opacity = '1'
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      )
+    }
+
+    if (uploadState === 'uploading' || uploadState === 'parsing') {
+      return (
+        <div
+          style={{
+            padding: '24px',
+            background: theme.input,
+            borderRadius: '8px',
+            border: `1px solid ${theme.border}`,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              border: `3px solid ${theme.border}`,
+              borderTop: `3px solid ${theme.accent}`,
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
+          <p
+            style={{
+              margin: 0,
+              color: theme.textMuted,
+              fontSize: '14px',
+            }}
+          >
+            {uploadState === 'uploading'
+              ? 'Reading file...'
+              : 'Parsing markdown...'}
+          </p>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )
+    }
+
+    // Idle state - show upload input
+    return (
+      <div
+        style={{
+          padding: '24px',
+          background: theme.input,
+          borderRadius: '8px',
+          border: `2px dashed ${theme.border}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+          alignItems: 'center',
+          textAlign: 'center',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        onMouseEnter={(e) => {
+          const el = e.currentTarget as HTMLDivElement
+          el.style.borderColor = theme.accent
+          el.style.background = theme.card
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLDivElement
+          el.style.borderColor = theme.border
+          el.style.background = theme.input
+        }}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <div
+          style={{
+            fontSize: '28px',
+          }}
+        >
+          📄
+        </div>
+        <div>
+          <p
+            style={{
+              margin: '0 0 4px 0',
+              color: theme.text,
+              fontSize: '14px',
+              fontWeight: 600,
+            }}
+          >
+            Upload Markdown Work Plan
+          </p>
+          <p
+            style={{
+              margin: 0,
+              color: theme.textMuted,
+              fontSize: '12px',
+            }}
+          >
+            Drag and drop or click to select a .md file
+          </p>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".md,text/markdown"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) {
+              handleFileSelect(file)
+            }
+          }}
+          style={{
+            display: 'none',
+          }}
+        />
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -338,18 +1093,19 @@ export function WorkPlansTab({
 
   if (displayPlans.length === 0) {
     return (
-      <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ fontFamily: "'Outfit', sans-serif", display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <h3
           style={{
             fontSize: '20px',
             fontWeight: 600,
             color: theme.text,
-            margin: '0 0 16px 0',
+            margin: 0,
             letterSpacing: '0.05em',
           }}
         >
           WORK PLANS
         </h3>
+        {renderUploadSection()}
         <div
           style={{
             color: theme.textMuted,
@@ -385,6 +1141,9 @@ export function WorkPlansTab({
       >
         WORK PLANS
       </h3>
+
+      {/* Upload Section (Admin Only) */}
+      {renderUploadSection()}
 
       {/* Work Plans List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
