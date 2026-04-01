@@ -33,25 +33,35 @@ interface EmailQueueRecord {
  */
 export async function initializeEmailQueue() {
   try {
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS email_queue (
-        id SERIAL PRIMARY KEY,
-        assessment_id INTEGER NOT NULL REFERENCES assessments(id),
-        email_type VARCHAR(50) NOT NULL,
-        sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        scheduled_for TIMESTAMP,
-        error_count INTEGER DEFAULT 0,
-        last_error TEXT
-      )
+    // Note: email_queue is created by index.ts migrations, but we ensure the schema is correct here
+
+    // Verify email_queue exists and has assessment_id column
+    const tableCheckResult = await db.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'email_queue' AND column_name = 'assessment_id'
     `)
 
-    // Create index for faster lookups
+    if (tableCheckResult.rows.length === 0) {
+      console.warn('⚠️ email_queue table missing assessment_id column, attempting migration...')
+      try {
+        await db.query(`
+          ALTER TABLE email_queue ADD COLUMN assessment_id INTEGER REFERENCES assessments(id)
+        `)
+        console.log('✅ Added assessment_id column to email_queue')
+      } catch (err) {
+        console.error('Failed to add assessment_id column:', err)
+      }
+    }
+
+    // Create indices for faster lookups if they don't exist
     await db.query(`
       CREATE INDEX IF NOT EXISTS idx_email_queue_assessment
       ON email_queue(assessment_id, email_type)
     `)
+
+    console.log('✅ Email queue initialized')
   } catch (err) {
-    console.error('Failed to initialize email queue table:', err)
+    console.error('Failed to initialize email queue:', err)
   }
 }
 
