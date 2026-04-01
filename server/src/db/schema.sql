@@ -206,29 +206,37 @@ CREATE INDEX IF NOT EXISTS idx_email_queue_type ON email_queue(email_type);
 -- Email templates for different sequences
 CREATE TABLE IF NOT EXISTS email_templates (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL UNIQUE,
-  subject VARCHAR(255) NOT NULL,
-  body TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  email_type VARCHAR(50) NOT NULL UNIQUE,
+  subject TEXT NOT NULL,
+  html_body TEXT NOT NULL,
+  is_default BOOLEAN NOT NULL DEFAULT false,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Email sequence configuration
+-- Email sequence configuration (timing + enabled state)
 CREATE TABLE IF NOT EXISTS email_sequence_config (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL UNIQUE,
-  sequence JSONB NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  email_type VARCHAR(50) NOT NULL UNIQUE,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  delay_hours NUMERIC(6,2) NOT NULL DEFAULT 12,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- A/B test configuration for emails
 CREATE TABLE IF NOT EXISTS email_ab_tests (
   id SERIAL PRIMARY KEY,
-  email_type VARCHAR(100) NOT NULL,
-  control_template_id INT REFERENCES email_templates(id),
-  variant_template_id INT REFERENCES email_templates(id),
-  status VARCHAR(50) NOT NULL DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  email_type VARCHAR(50) NOT NULL,
+  variant_name VARCHAR(100) NOT NULL,
+  subject TEXT NOT NULL,
+  html_body TEXT NOT NULL,
+  traffic_split NUMERIC(4,3) NOT NULL DEFAULT 0.5,
+  active BOOLEAN NOT NULL DEFAULT true,
+  winner BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ab_tests_one_active
+  ON email_ab_tests(email_type) WHERE active = true;
 
 -- Call scheduling: slots offered to prospects
 CREATE TABLE IF NOT EXISTS call_slots (
@@ -309,3 +317,6 @@ ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS portal_visible BOOLEAN DEFAULT
 -- Add missing columns to clients if needed
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS website VARCHAR(255);
+
+-- Add missing columns to email_queue if needed
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS ab_variant VARCHAR(20);

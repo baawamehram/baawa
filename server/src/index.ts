@@ -301,49 +301,8 @@ async function startServer() {
       )
     `)
 
-    // Marketing dashboard: email templates table
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS email_templates (
-        id SERIAL PRIMARY KEY,
-        email_type VARCHAR(50) NOT NULL UNIQUE,
-        subject TEXT NOT NULL,
-        html_body TEXT NOT NULL,
-        is_default BOOLEAN NOT NULL DEFAULT false,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `)
-
-    // Marketing dashboard: email sequence config (timing + enabled state)
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS email_sequence_config (
-        id SERIAL PRIMARY KEY,
-        email_type VARCHAR(50) NOT NULL UNIQUE,
-        enabled BOOLEAN NOT NULL DEFAULT true,
-        delay_hours NUMERIC(6,2) NOT NULL DEFAULT 12,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `)
-
-    // Marketing dashboard: A/B tests
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS email_ab_tests (
-        id SERIAL PRIMARY KEY,
-        email_type VARCHAR(50) NOT NULL,
-        variant_name VARCHAR(100) NOT NULL,
-        subject TEXT NOT NULL,
-        html_body TEXT NOT NULL,
-        traffic_split NUMERIC(4,3) NOT NULL DEFAULT 0.5,
-        active BOOLEAN NOT NULL DEFAULT true,
-        winner BOOLEAN NOT NULL DEFAULT false,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `)
-
-    // Unique index: only one active A/B test per email type
-    await db.query(`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_ab_tests_one_active
-      ON email_ab_tests(email_type) WHERE active = true
-    `)
+    // Tables for marketing/email system are now created by schema.sql migration
+    // These statements have been moved to server/src/db/schema.sql to ensure they run first
 
     // Track which variant was sent in email_queue
     await db.query(`ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS ab_variant VARCHAR(20)`)
