@@ -117,17 +117,8 @@ router.post('/verify', async (req: Request, res: Response) => {
     const jwtPayload = { assessmentId, email: assessmentResult.rows[0].email }
     const signedToken = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' })
 
-    console.log(`[PORTAL] Setting cookie for assessmentId=${assessmentId}, email=${email}`)
-    res.cookie('portal_token', signedToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    })
-
-    console.log(`[PORTAL] ✅ Verified successfully for ${email}, cookie set, responding with ok:true`)
-    res.json({ ok: true })
+    console.log(`[PORTAL] ✅ Verified successfully for ${email}, returning token`)
+    res.json({ ok: true, token: signedToken })
   } catch (err) {
     console.error('POST /portal/verify error:', err)
     res.status(500).json({ error: 'Failed to verify link' })

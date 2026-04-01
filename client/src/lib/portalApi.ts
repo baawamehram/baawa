@@ -18,13 +18,21 @@ export async function portalFetch(
     headers['Content-Type'] = 'application/json'
   }
 
+  // Add Authorization header with token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('portal_token') : null
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,
-    credentials: 'include',
   })
 
   if (res.status === 401) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('portal_token')
+    }
     onUnauthorized()
     return null
   }

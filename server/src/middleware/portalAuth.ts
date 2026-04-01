@@ -12,7 +12,12 @@ declare global {
 
 export async function requirePortalAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const token = req.cookies?.portal_token as string | undefined
+    // Check Authorization header first (modern approach for cross-domain)
+    let token = req.headers.authorization?.replace(/^Bearer\s+/, '')
+    // Fallback to cookie for legacy clients
+    if (!token) {
+      token = req.cookies?.portal_token as string | undefined
+    }
     if (!token) {
       res.status(401).json({ error: 'Not authenticated' })
       return
