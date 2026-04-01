@@ -78,7 +78,7 @@ export function ClientDashboard({
       case 'overview':
         return <OverviewTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} token={token} on401={stableOn401} />
       case 'assessment':
-        return <AssessmentTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
+        return <AssessmentTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} token={token} on401={stableOn401} />
       case 'work-plans':
         return <WorkPlansTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'tasks':
