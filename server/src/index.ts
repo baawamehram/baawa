@@ -376,6 +376,66 @@ async function startServer() {
       ON CONFLICT (email_type) DO NOTHING
     `)
 
+    // Work plans schema
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS work_plans (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+        assessment_id INTEGER NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        markdown_source TEXT,
+        status VARCHAR(50) DEFAULT 'draft',
+        client_approved_at TIMESTAMPTZ,
+        client_approved_by VARCHAR(255),
+        costs_approved_at TIMESTAMPTZ,
+        costs_approved_by VARCHAR(255),
+        total_cost NUMERIC(12, 2),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        created_by VARCHAR(255)
+      )
+    `)
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS work_plan_tasks (
+        id SERIAL PRIMARY KEY,
+        work_plan_id INTEGER NOT NULL REFERENCES work_plans(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        order_index INTEGER,
+        status VARCHAR(50) DEFAULT 'not_started',
+        assigned_to VARCHAR(255),
+        due_date DATE,
+        estimated_hours NUMERIC(6, 1),
+        actual_hours NUMERIC(6, 1),
+        cost NUMERIC(12, 2),
+        progress_percent INTEGER DEFAULT 0,
+        completed_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `)
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS work_plan_costs (
+        id SERIAL PRIMARY KEY,
+        work_plan_id INTEGER NOT NULL REFERENCES work_plans(id) ON DELETE CASCADE,
+        description VARCHAR(255) NOT NULL,
+        amount NUMERIC(12, 2) NOT NULL,
+        category VARCHAR(100),
+        approved BOOLEAN DEFAULT false,
+        approved_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `)
+
+    // Work plans indices
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_work_plans_client ON work_plans(client_id)`)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_work_plans_status ON work_plans(status)`)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_work_plan_tasks_plan ON work_plan_tasks(work_plan_id)`)
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_work_plan_costs_plan ON work_plan_costs(work_plan_id)`)
+
     console.log('Startup migrations + indices OK')
 
     // Initialize email queue and start scheduler

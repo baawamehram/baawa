@@ -10,7 +10,8 @@
       "Bash(find /c/Users/G15/baawa-mehram/server -name *.sql -o -name migrate*)",
       "Bash(git commit -m \"Add missing database tables to schema: portal_tokens, email_queue, proposals, etc.:*)",
       "Bash(git commit -m \"Add verbose logging to migration script to identify failing SQL statements:*)",
-      "Bash(git commit -m \"Add back email table creation to startServer:*)"
+      "Bash(git commit -m \"Add back email table creation to startServer:*)",
+      "Bash(pkill -f \"tsx watch\")"
     ]
   }
 }
