@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { SubmissionList } from './SubmissionList'
 import { SubmissionDetail } from './SubmissionDetail'
 import { Pipeline } from './Pipeline'
+import { ClientsPage } from './ClientsPage'
 import { ClientDetail } from './ClientDetail'
 import { RevenueOverview } from './RevenueOverview'
 import { KnowledgeBase } from './KnowledgeBase'
@@ -177,7 +178,16 @@ function DashboardContent() {
         />
       )
     }
-    if (section === 'pipeline' || section === 'clients') {
+    if (section === 'pipeline') {
+      return (
+        <ClientsPage
+          token={token}
+          on401={handle401}
+          onSelectClient={(id) => setSelectedClientId(id)}
+        />
+      )
+    }
+    if (section === 'clients') {
       return (
         <Pipeline
           token={token}
