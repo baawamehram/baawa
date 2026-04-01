@@ -21,7 +21,8 @@
       "Bash(find C:UsersG15baawa-mehram/.claude/worktrees/client-dashboard-redesign/server -type f -name *.ts)",
       "Bash(/tmp/spec_check.md:*)",
       "Bash(find /c/Users/G15/baawa-mehram -type f -name *.ts -path */server/src/routes/*)",
-      "Bash(ls -la /c/Users/G15/baawa-mehram/.claude/worktrees/client-dashboard-redesign/server/src/routes/*.test.ts)"
+      "Bash(ls -la /c/Users/G15/baawa-mehram/.claude/worktrees/client-dashboard-redesign/server/src/routes/*.test.ts)",
+      "Bash(find . -name *.test.ts -o -name *.test.tsx -o -name *.spec.ts)"
     ]
   }
 }
