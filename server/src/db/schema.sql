@@ -161,3 +161,151 @@ ALTER TABLE sessions ADD COLUMN IF NOT EXISTS name VARCHAR(255);
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS region VARCHAR(255);
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS language VARCHAR(50);
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+
+-- Portal authentication: OTP tokens for email login
+CREATE TABLE IF NOT EXISTS portal_tokens (
+  id SERIAL PRIMARY KEY,
+  assessment_id INT NOT NULL REFERENCES assessments(id),
+  token VARCHAR(6) NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_portal_tokens_assessment ON portal_tokens(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_portal_tokens_token ON portal_tokens(token);
+
+-- Portal: Messages between prospect and team
+CREATE TABLE IF NOT EXISTS portal_messages (
+  id SERIAL PRIMARY KEY,
+  assessment_id INT NOT NULL REFERENCES assessments(id),
+  sender VARCHAR(50) NOT NULL CHECK (sender IN ('team', 'prospect')),
+  body TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_portal_messages_assessment ON portal_messages(assessment_id);
+
+-- Email queue for email scheduler
+CREATE TABLE IF NOT EXISTS email_queue (
+  id SERIAL PRIMARY KEY,
+  assessment_id INT REFERENCES assessments(id),
+  email_type VARCHAR(100) NOT NULL,
+  recipient_email VARCHAR(255) NOT NULL,
+  subject VARCHAR(255),
+  body TEXT,
+  ab_variant VARCHAR(50),
+  status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed')),
+  sent_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_queue_status ON email_queue(status);
+CREATE INDEX IF NOT EXISTS idx_email_queue_assessment ON email_queue(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_email_queue_type ON email_queue(email_type);
+
+-- Email templates for different sequences
+CREATE TABLE IF NOT EXISTS email_templates (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  subject VARCHAR(255) NOT NULL,
+  body TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Email sequence configuration
+CREATE TABLE IF NOT EXISTS email_sequence_config (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  sequence JSONB NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- A/B test configuration for emails
+CREATE TABLE IF NOT EXISTS email_ab_tests (
+  id SERIAL PRIMARY KEY,
+  email_type VARCHAR(100) NOT NULL,
+  control_template_id INT REFERENCES email_templates(id),
+  variant_template_id INT REFERENCES email_templates(id),
+  status VARCHAR(50) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Call scheduling: slots offered to prospects
+CREATE TABLE IF NOT EXISTS call_slots (
+  id SERIAL PRIMARY KEY,
+  assessment_id INT NOT NULL REFERENCES assessments(id),
+  proposed_slots JSONB,
+  selected_slot TIMESTAMP,
+  status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_call_slots_assessment ON call_slots(assessment_id);
+
+-- Proposals sent to prospects
+CREATE TABLE IF NOT EXISTS proposals (
+  id SERIAL PRIMARY KEY,
+  assessment_id INT NOT NULL REFERENCES assessments(id),
+  title VARCHAR(255),
+  content TEXT,
+  status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'approved', 'rejected')),
+  sent_at TIMESTAMP,
+  approved_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_proposals_assessment ON proposals(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_proposals_status ON proposals(status);
+
+-- Agreements: signed proposals
+CREATE TABLE IF NOT EXISTS agreements (
+  id SERIAL PRIMARY KEY,
+  proposal_id INT NOT NULL REFERENCES proposals(id),
+  assessment_id INT NOT NULL REFERENCES assessments(id),
+  signed_name VARCHAR(255),
+  signed_at TIMESTAMP,
+  signed_ip VARCHAR(50),
+  signed_user_agent TEXT,
+  status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'signed')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(proposal_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_agreements_assessment ON agreements(assessment_id);
+
+-- Sentinel: AI-detected insights and proposals
+CREATE TABLE IF NOT EXISTS sentinel_proposals (
+  id SERIAL PRIMARY KEY,
+  assessment_id INT NOT NULL REFERENCES assessments(id),
+  type VARCHAR(50) NOT NULL CHECK (type IN ('friction', 'optimization', 'anomaly')),
+  observation TEXT,
+  proposal TEXT,
+  behavioral_frame VARCHAR(100),
+  status VARCHAR(50) NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'implemented', 'archived')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_sentinel_assessment ON sentinel_proposals(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_sentinel_status ON sentinel_proposals(status);
+
+-- Add missing columns to assessments if needed
+ALTER TABLE assessments ADD COLUMN IF NOT EXISTS results_unlocked BOOLEAN DEFAULT FALSE;
+ALTER TABLE assessments ADD COLUMN IF NOT EXISTS problem_domains JSONB;
+ALTER TABLE assessments ADD COLUMN IF NOT EXISTS founder_archetype VARCHAR(100);
+ALTER TABLE assessments ADD COLUMN IF NOT EXISTS engagement_pulse VARCHAR(100);
+ALTER TABLE assessments ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+
+-- Add missing columns to deliverables if needed
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS content TEXT;
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_url VARCHAR(255);
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_data BYTEA;
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_name VARCHAR(255);
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS file_mime VARCHAR(100);
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS milestone_order INT;
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMP;
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS accepted_by VARCHAR(255);
+ALTER TABLE deliverables ADD COLUMN IF NOT EXISTS portal_visible BOOLEAN DEFAULT FALSE;
+
+-- Add missing columns to clients if needed
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS website VARCHAR(255);
