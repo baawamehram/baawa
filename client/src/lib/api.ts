@@ -1,6 +1,6 @@
 export const API_URL = import.meta.env.VITE_API_URL || (
   typeof window !== 'undefined' && window.location.hostname !== 'localhost'
-    ? 'https://baawa-mehram-production.up.railway.app'
+    ? 'https://trustworthy-charisma-production-ba9e.up.railway.app'
     : 'http://localhost:3001'
 );
 
