@@ -79,8 +79,14 @@ export function PortalResults() {
   }, [])
 
   const on401 = useCallback(() => {
+    localStorage.removeItem('portal_token')
     navigate('/portal/login', { replace: true, state: { message: 'Your session expired — log in again.' } })
   }, [navigate])
+
+  const handleLogout = () => {
+    localStorage.removeItem('portal_token')
+    navigate('/portal/login', { replace: true })
+  }
 
   const load = useCallback(async () => {
     try {
@@ -180,7 +186,7 @@ export function PortalResults() {
           style={{ background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: tk.textMuted, fontSize: 16 }}>
           {theme === 'light' ? '🌙' : '☀️'}
         </button>
-        <button onClick={() => navigate('/portal/login')} aria-label="Logout" title="Logout"
+        <button onClick={handleLogout} aria-label="Logout" title="Logout"
           style={{ background: 'none', border: `1px solid #ef4444`, borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: '#ef4444', fontSize: 13, fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}>
           Logout
         </button>
