@@ -80,6 +80,18 @@ function formatDate(date: Date | string): string {
   return d.toLocaleDateString()
 }
 
+function getNextActionDueDate(phase: string, startDate: string): string | null {
+  const start = new Date(startDate)
+  if (phase === 'phase1') {
+    const due = new Date(start.getTime() + 14 * 24 * 60 * 60 * 1000) // 14 days
+    return formatDate(due)
+  } else if (phase === 'phase2') {
+    const due = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 days
+    return formatDate(due)
+  }
+  return null
+}
+
 export function OverviewTab({
   clientId,
   isAdmin,
@@ -184,6 +196,15 @@ export function OverviewTab({
     fetchClientData()
   }, [fetchClientData])
 
+  const handleActivityClick = (tabKey: string | undefined) => {
+    if (tabKey) {
+      // Navigate to related tab
+      // This infrastructure allows the parent ClientDashboard to handle tab switching
+      // by exposing an onTabChange callback prop if needed in future
+      console.log('Activity clicked - related tab:', tabKey)
+    }
+  }
+
   if (loading) {
     return (
       <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.text }}>
@@ -275,12 +296,19 @@ export function OverviewTab({
           fontSize: '13px',
           marginBottom: '16px',
         }}>
-          {clientData.stage === 'phase1' ? (
-            'Waiting for client feedback on proposal'
-          ) : clientData.stage === 'phase2' ? (
-            'Continue with Phase 2 deliverables'
-          ) : (
-            'Engagement has concluded'
+          <div>
+            {clientData.stage === 'phase1' ? (
+              'Waiting for client feedback on proposal'
+            ) : clientData.stage === 'phase2' ? (
+              'Continue with Phase 2 deliverables'
+            ) : (
+              'Engagement has concluded'
+            )}
+          </div>
+          {clientData.stage !== 'churned' && (
+            <div style={{ color: theme.textMuted, fontSize: 13, marginTop: 8 }}>
+              Due: {getNextActionDueDate(clientData.stage, clientData.start_date)}
+            </div>
           )}
         </div>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -407,12 +435,13 @@ export function OverviewTab({
             {activities.map((activity) => (
               <div
                 key={activity.id}
+                onClick={() => handleActivityClick(activity.relatedTabKey)}
                 style={{
                   padding: '12px',
                   background: theme.input,
                   borderRadius: '6px',
                   borderLeft: `3px solid ${theme.accent}`,
-                  cursor: 'pointer',
+                  cursor: activity.relatedTabKey ? 'pointer' : 'default',
                   transition: 'all 0.2s',
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -420,8 +449,10 @@ export function OverviewTab({
                   gap: '12px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = theme.card
-                  e.currentTarget.style.transform = 'translateX(2px)'
+                  if (activity.relatedTabKey) {
+                    e.currentTarget.style.background = theme.card
+                    e.currentTarget.style.transform = 'translateX(2px)'
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = theme.input
