@@ -36,66 +36,51 @@ export function PortalLogin() {
       .catch(() => { /* not logged in, stay on login */ })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSendCode = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('[LOGIN] handleSendCode called with email:', email)
     setError('')
     setLoading(true)
     try {
-      const url = `${API_URL}/api/portal/login`
-      const body = { email: email.toLowerCase().trim() }
-      console.log('[LOGIN] Fetching:', url, 'with body:', body)
-      const res = await fetch(url, {
+      const res = await fetch(`${API_URL}/api/portal/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email: email.toLowerCase().trim() }),
       })
-      console.log('[LOGIN] Response status:', res.status)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        console.log('[LOGIN] Error response:', data)
         setError((data as { error?: string }).error ?? 'Failed to send code.')
+        setLoading(false)
         return
       }
-      console.log('[LOGIN] Code sent successfully, moving to OTP step')
       setStep('otp')
+      setLoading(false)
     } catch (err) {
-      console.error('[LOGIN] Catch block error:', err)
       setError('Network error. Please try again.')
-    } finally {
       setLoading(false)
     }
   }
 
-  const handleVerifyCode = async (e: React.FormEvent) => {
+  const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('[LOGIN] handleVerifyCode called with email:', email, 'code:', code)
     setError('')
     setLoading(true)
     try {
-      const url = `${API_URL}/api/portal/verify`
-      const body = { email: email.toLowerCase().trim(), token: code }
-      console.log('[LOGIN] Fetching:', url, 'with body:', body)
-      const res = await fetch(url, {
+      const res = await fetch(`${API_URL}/api/portal/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email: email.toLowerCase().trim(), token: code }),
       })
-      console.log('[LOGIN] Response status:', res.status)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        console.log('[LOGIN] Error response:', data)
         setError((data as { error?: string }).error ?? 'Incorrect or expired code.')
+        setLoading(false)
         return
       }
-      console.log('[LOGIN] Verification successful, navigating to /portal/results')
       navigate('/portal/results', { replace: true })
     } catch (err) {
-      console.error('[LOGIN] Catch block error:', err)
       setError('Verification failed. Try again.')
-    } finally {
       setLoading(false)
     }
   }
@@ -134,9 +119,9 @@ export function PortalLogin() {
           <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(22px, 4vw, 28px)', color: tk.text, margin: 0, lineHeight: 1.3 }}>
             Client Login
           </h1>
-          <div 
+          <div
             title={health === 'ok' ? 'Connected to Baawa Intelligence' : 'Connecting to Baawa Intelligence...'}
-            style={{ width: 8, height: 8, borderRadius: '50%', background: health === 'ok' ? '#10b981' : '#f59e0b', marginTop: 4 }} 
+            style={{ width: 8, height: 8, borderRadius: '50%', background: health === 'ok' ? '#10b981' : '#f59e0b', marginTop: 4 }}
           />
         </div>
 
@@ -146,7 +131,7 @@ export function PortalLogin() {
               Enter your email to receive a 6-digit access code.
             </p>
 
-            <form onSubmit={(e) => void handleSendCode(e)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <form onSubmit={handleSendCode} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label htmlFor="portal-email" style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Email address
@@ -168,18 +153,18 @@ export function PortalLogin() {
                 <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>
               )}
 
-              <motion.button
+              <button
                 type="submit"
                 disabled={loading}
-                whileHover={loading ? undefined : { scale: 1.02 }}
-                whileTap={loading ? undefined : { scale: 0.98 }}
-                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #064E3B, #059669)`, color: '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : 'linear-gradient(135deg, #064E3B, #059669)', color: '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
+                onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = 'scale(1.02)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
                 {loading ? 'Sending…' : 'Get access code →'}
-              </motion.button>
+              </button>
 
               {health === 'error' && (
-                <button 
+                <button
                   type="button"
                   onClick={() => navigate('/portal/results', { replace: true })}
                   style={{ background: 'none', border: 'none', color: tk.accent, fontSize: 11, cursor: 'pointer', textAlign: 'center', marginTop: 8 }}
@@ -195,7 +180,7 @@ export function PortalLogin() {
               Enter the 6-digit code sent to <strong style={{ color: tk.text }}>{email}</strong>.
             </p>
 
-            <form onSubmit={(e) => void handleVerifyCode(e)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <form onSubmit={handleVerifyCode} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label htmlFor="portal-code" style={{ fontFamily: 'Outfit, sans-serif', fontSize: 12, color: tk.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Verification Code
@@ -204,7 +189,6 @@ export function PortalLogin() {
                   id="portal-code"
                   type="text"
                   inputMode="numeric"
-                  pattern="[0-9]*"
                   maxLength={6}
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
@@ -219,15 +203,15 @@ export function PortalLogin() {
                 <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>
               )}
 
-              <motion.button
+              <button
                 type="submit"
                 disabled={loading}
-                whileHover={loading ? undefined : { scale: 1.02 }}
-                whileTap={loading ? undefined : { scale: 0.98 }}
-                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : `linear-gradient(135deg, #064E3B, #059669)`, color: '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '13px 24px', borderRadius: 10, border: 'none', background: loading ? tk.accentLight : 'linear-gradient(135deg, #064E3B, #059669)', color: '#fff', fontFamily: 'Outfit, sans-serif', fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
+                onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = 'scale(1.02)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
                 {loading ? 'Verifying…' : 'Verify & Enter Portal →'}
-              </motion.button>
+              </button>
 
               <button
                 type="button"
