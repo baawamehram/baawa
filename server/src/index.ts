@@ -24,6 +24,7 @@ import callsRouter from './routes/calls'
 import proposalsRouter from './routes/proposals'
 import marketingRouter from './routes/marketing'
 import workplansRouter from './routes/workplans'
+import workplantasksRouter from './routes/workplantasks'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -75,6 +76,7 @@ app.use('/api/calls', callsRouter)
 app.use('/api/proposals', proposalsRouter)
 app.use('/api/marketing', marketingRouter)
 app.use('/api/work-plans', workplansRouter)
+app.use('/api/work-plan-tasks', workplantasksRouter)
 
 // Health
 app.get('/health', async (_req, res) => {
