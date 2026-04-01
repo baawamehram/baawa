@@ -86,9 +86,9 @@ export function PortalResults() {
   const load = useCallback(async () => {
     try {
       const [meRes, msgsRes, listRes] = await Promise.all([
-        portalFetch(`${API_URL}/api/portal/me`, on401),
-        portalFetch(`${API_URL}/api/portal/messages`, on401),
-        portalFetch(`${API_URL}/api/portal/assessments`, on401),
+        portalFetch('/api/portal/me', on401),
+        portalFetch('/api/portal/messages', on401),
+        portalFetch('/api/portal/assessments', on401),
       ])
       if (!meRes || !msgsRes || !listRes) return
       if (!meRes.ok) { setLoadError('Failed to load assessment. Please refresh or contact support.'); return }
