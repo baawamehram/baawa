@@ -84,7 +84,7 @@ export function ClientDashboard({
       case 'tasks':
         return <TasksTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'agreements':
-        return <AgreementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
+        return <AgreementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} token={token} on401={stableOn401} />
       case 'engagements':
         return <EngagementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'profile':
