@@ -95,12 +95,11 @@ async function recordEmailSent(assessmentId: number, emailType: EmailQueueRecord
 async function getAssessmentForEmail(assessmentId: number) {
   const result = await db.query(
     `SELECT
-      id, email,
-      (SELECT name FROM sessions WHERE assessment_id = $1 LIMIT 1) as name,
-      (SELECT id FROM sessions WHERE assessment_id = $1 LIMIT 1) as session_id,
-      (SELECT created_at FROM sessions WHERE assessment_id = $1 LIMIT 1) as completed_at,
-      (SELECT selected_slot FROM call_slots WHERE assessment_id = $1 LIMIT 1) as call_booked
-    FROM assessments WHERE id = $1`,
+      a.id, a.email, a.session_id,
+      (SELECT name FROM sessions WHERE id = a.session_id LIMIT 1) as name,
+      (SELECT created_at FROM sessions WHERE id = a.session_id LIMIT 1) as completed_at,
+      (SELECT selected_slot FROM call_slots WHERE assessment_id = a.id LIMIT 1) as call_booked
+    FROM assessments a WHERE a.id = $1`,
     [assessmentId]
   )
   return result.rows[0]
@@ -159,15 +158,15 @@ export function startEmailScheduler() {
 async function processScheduledEmails() {
   const assessments = await db.query(`
     SELECT a.id, a.email,
-      (SELECT name FROM sessions WHERE assessment_id = a.id LIMIT 1) as name,
-      (SELECT id FROM sessions WHERE assessment_id = a.id LIMIT 1) as session_id,
-      (SELECT created_at FROM sessions WHERE assessment_id = a.id LIMIT 1) as completed_at,
+      (SELECT name FROM sessions WHERE id = a.session_id LIMIT 1) as name,
+      a.session_id as session_id,
+      (SELECT created_at FROM sessions WHERE id = a.session_id LIMIT 1) as completed_at,
       (SELECT selected_slot FROM call_slots WHERE assessment_id = a.id LIMIT 1) as call_booked
     FROM assessments a
     WHERE a.status = 'completed'
       AND a.email IS NOT NULL
-      AND (SELECT name FROM sessions WHERE assessment_id = a.id LIMIT 1) IS NOT NULL
-    ORDER BY (SELECT created_at FROM sessions WHERE assessment_id = a.id LIMIT 1) DESC
+      AND (SELECT name FROM sessions WHERE id = a.session_id LIMIT 1) IS NOT NULL
+    ORDER BY (SELECT created_at FROM sessions WHERE id = a.session_id LIMIT 1) DESC
     LIMIT 100
   `)
 
