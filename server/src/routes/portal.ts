@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express'
 import { z } from 'zod'
+import { randomInt } from 'crypto'
 import jwt from 'jsonwebtoken'
 import { db } from '../db/client'
 import { sendPortalOTP, sendProspectReplyNotification, sendCallConfirmation } from '../services/email'
@@ -33,9 +34,9 @@ router.post('/login', async (req: Request, res: Response) => {
         [assessmentId]
       )
 
-      const token = Math.floor(100000 + Math.random() * 900000).toString()
+      const token = randomInt(100000, 1000000).toString()
       await db.query(
-        `INSERT INTO portal_tokens (assessment_id, token, expires_at) VALUES ($1, $2, NOW() + interval '1 hour')`,
+        `INSERT INTO portal_tokens (assessment_id, token, expires_at) VALUES ($1, $2, NOW() + interval '15 minutes')`,
         [assessmentId, token]
       )
 
@@ -64,30 +65,6 @@ router.post('/verify', async (req: Request, res: Response) => {
 
     const { email: rawEmail, token } = parsed.data
     const email = rawEmail.toLowerCase().trim()
-
-    // --- MASTER BYPASS FOR DEBUGGING ---
-    if (token === '000000') {
-      console.log(`[AUTH] Master bypass (000000) used for ${email}`)
-      const latestAssessment = await db.query<{ id: number; email: string }>(
-        'SELECT id, email FROM assessments WHERE email = $1 ORDER BY created_at DESC LIMIT 1',
-        [email]
-      )
-      if (latestAssessment.rows[0]) {
-        const assessmentId = latestAssessment.rows[0].id
-        const jwtPayload = { assessmentId, email: latestAssessment.rows[0].email }
-        const signedToken = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' })
-        
-        res.cookie('portal_token', signedToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          path: '/',
-        })
-        return res.json({ ok: true })
-      }
-    }
-    // -----------------------------------
 
     // 1. Check if token exists for this email
     const result = await db.query<{ id: number; assessment_id: number; is_expired: boolean }>(
@@ -128,6 +105,7 @@ router.post('/verify', async (req: Request, res: Response) => {
       secure: true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
     })
 
     res.json({ ok: true })
@@ -212,6 +190,7 @@ router.post('/switch', requirePortalAuth, async (req: Request, res: Response) =>
       secure: true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
     })
 
     res.json({ ok: true })
@@ -235,7 +214,7 @@ router.post('/messages', requirePortalAuth, async (req: Request, res: Response) 
     )
 
     // Gap 2: Notify founder
-    const dashboardUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+    const dashboardUrl = process.env.CLIENT_URL ?? 'http://localhost:5173'
     void sendProspectReplyNotification(req.portalUser!.email, parsed.data.body, dashboardUrl)
       .catch(e => console.error('sendProspectReplyNotification failed:', e))
 
