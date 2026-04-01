@@ -5,7 +5,7 @@ import { SubmissionList } from './SubmissionList'
 import { SubmissionDetail } from './SubmissionDetail'
 import { Pipeline } from './Pipeline'
 import { ClientsPage } from './ClientsPage'
-import { ClientDetail } from './ClientDetail'
+import { ClientDashboard } from './ClientDashboard'
 import { RevenueOverview } from './RevenueOverview'
 import { KnowledgeBase } from './KnowledgeBase'
 import { Intelligence } from './Intelligence'
@@ -142,11 +142,12 @@ function DashboardContent() {
     }
     if (selectedClientId !== null) {
       return (
-        <ClientDetail
-          id={selectedClientId}
+        <ClientDashboard
+          clientId={selectedClientId}
           token={token}
           on401={handle401}
           onBack={() => setSelectedClientId(null)}
+          isAdmin={true}
         />
       )
     }
