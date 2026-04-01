@@ -80,7 +80,7 @@ export function ClientDashboard({
       case 'assessment':
         return <AssessmentTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} token={token} on401={stableOn401} />
       case 'work-plans':
-        return <WorkPlansTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
+        return <WorkPlansTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} token={token} on401={stableOn401} />
       case 'tasks':
         return <TasksTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'agreements':
