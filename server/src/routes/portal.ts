@@ -77,6 +77,8 @@ router.post('/verify', async (req: Request, res: Response) => {
       [email, token]
     )
 
+    console.log(`[PORTAL] Token query result rows: ${result.rows.length}`)
+
     if (!result.rows[0]) {
       console.log(`[PORTAL] No token found for email=${email}, token=${token}`)
       // Check if token exists at all (email mismatch)
@@ -97,6 +99,7 @@ router.post('/verify', async (req: Request, res: Response) => {
 
     // 2. If it exists but is expired, delete it and tell the user
     if (is_expired) {
+      console.log(`[PORTAL] Token expired for ${email}`)
       await db.query(`DELETE FROM portal_tokens WHERE id = $1`, [tokenId])
       return res.status(400).json({ error: 'This code has expired. Please request a new one.' })
     }
@@ -114,6 +117,7 @@ router.post('/verify', async (req: Request, res: Response) => {
     const jwtPayload = { assessmentId, email: assessmentResult.rows[0].email }
     const signedToken = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' })
 
+    console.log(`[PORTAL] Setting cookie for assessmentId=${assessmentId}, email=${email}`)
     res.cookie('portal_token', signedToken, {
       httpOnly: true,
       secure: true,
@@ -122,6 +126,7 @@ router.post('/verify', async (req: Request, res: Response) => {
       path: '/',
     })
 
+    console.log(`[PORTAL] ✅ Verified successfully for ${email}, cookie set, responding with ok:true`)
     res.json({ ok: true })
   } catch (err) {
     console.error('POST /portal/verify error:', err)
