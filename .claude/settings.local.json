@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -name .env* -o -name *.env)",
+      "Bash(find . -path ./.git -prune -o -name *railway* -o -name *deploy* -o -name *vercel*)",
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"Fix sentinel proposals query: use assessment_id instead of session_id UUID:*)"
+    ]
+  }
+}

@@ -74,7 +74,7 @@ export async function conductDiscovery(sessionId: string): Promise<SentinelFindi
     // 3. Persist findings
     for (const f of findings) {
       await db.query(`
-        INSERT INTO sentinel_proposals (session_id, type, observation, proposal, behavioral_frame)
+        INSERT INTO sentinel_proposals (assessment_id, type, observation, proposal, behavioral_frame)
         VALUES ($1, $2, $3, $4, $5)
       `, [sessionId, f.type, f.observation, f.proposal, f.behavioral_frame])
     }
@@ -86,10 +86,10 @@ export async function conductDiscovery(sessionId: string): Promise<SentinelFindi
   }
 }
 
-export async function getSessionFindings(sessionId: string) {
+export async function getSessionFindings(assessmentId: string | number) {
   const result = await db.query(`
-    SELECT * FROM sentinel_proposals WHERE session_id = $1 ORDER BY created_at DESC
-  `, [sessionId])
+    SELECT * FROM sentinel_proposals WHERE assessment_id = $1 ORDER BY created_at DESC
+  `, [assessmentId])
   return result.rows
 }
 
@@ -97,7 +97,7 @@ export async function getAllOpenFindings() {
   const result = await db.query(`
     SELECT sp.*, a.email as founder_email
     FROM sentinel_proposals sp
-    LEFT JOIN assessments a ON sp.session_id = a.id
+    LEFT JOIN assessments a ON sp.assessment_id = a.id
     WHERE sp.status = 'open'
     ORDER BY sp.created_at DESC
   `)
