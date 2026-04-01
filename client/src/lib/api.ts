@@ -1,8 +1,15 @@
-export const API_URL = import.meta.env.VITE_API_URL || (
-  typeof window !== 'undefined' && window.location.hostname !== 'localhost'
-    ? 'https://trustworthy-charisma-production-ba9e.up.railway.app'
-    : 'http://localhost:3001'
-);
+export const API_URL = (() => {
+  // Try env var first
+  if (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes('apphttps')) {
+    return import.meta.env.VITE_API_URL
+  }
+  // Fallback based on environment
+  if (typeof window === 'undefined' || window.location.hostname === 'localhost') {
+    return 'http://localhost:3001'
+  }
+  // Production hardcoded (bypass broken env var)
+  return 'https://trustworthy-charisma-production-ba9e.up.railway.app'
+})();
 
 export async function authFetch(
   url: string,
