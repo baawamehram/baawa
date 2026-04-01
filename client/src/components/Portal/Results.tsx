@@ -178,6 +178,10 @@ export function PortalResults() {
     <div style={{ background: tk.bg, minHeight: '100vh', boxSizing: 'border-box' }}>
       {/* Top-right controls */}
       <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 100, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button onClick={() => navigate('/portal/dashboard')} aria-label="View dashboard" title="View full dashboard"
+          style={{ background: tk.accent, border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: '#000', fontSize: 13, fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}>
+          📊 Dashboard
+        </button>
         <button onClick={() => window.location.href = '/'} aria-label="Back to home" title="Back to home"
           style={{ background: 'none', border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: tk.textMuted, fontSize: 14, fontFamily: 'Outfit, sans-serif' }}>
           ← Home

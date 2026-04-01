@@ -10,6 +10,7 @@ import Dashboard from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
 import { PortalLogin } from './components/Portal/Login'
 import { PortalResults } from './components/Portal/Results'
+import { PortalClientDashboard } from './components/Portal/ClientDashboard'
 import { AnimatePresence } from 'framer-motion'
 
 type FunnelPhase = 'splash' | 'assessment' | 'complete' | 'email' | 'submitted' | 'thankyou'
@@ -103,6 +104,7 @@ export default function App() {
         <Route path="/portal" element={<Navigate to="/portal/login" replace />} />
         <Route path="/portal/login" element={<PortalLogin />} />
         <Route path="/portal/results" element={<PortalResults />} />
+        <Route path="/portal/dashboard" element={<PortalClientDashboard />} />
       </Routes>
     </BrowserRouter>
   )
