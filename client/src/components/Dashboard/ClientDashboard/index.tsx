@@ -76,7 +76,7 @@ export function ClientDashboard({
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
+        return <OverviewTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} token={token} on401={stableOn401} />
       case 'assessment':
         return <AssessmentTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'work-plans':
