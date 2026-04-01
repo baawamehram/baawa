@@ -38,24 +38,32 @@ export function PortalLogin() {
 
   const handleSendCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    console.log('[LOGIN] Form submitted, email:', email)
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/api/portal/login`, {
+      const url = `${API_URL}/api/portal/login`
+      const body = { email: email.toLowerCase().trim() }
+      console.log('[LOGIN] Fetching:', url, 'body:', body)
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email: email.toLowerCase().trim() }),
+        body: JSON.stringify(body),
       })
+      console.log('[LOGIN] Response status:', res.status)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
+        console.error('[LOGIN] Error:', data)
         setError((data as { error?: string }).error ?? 'Failed to send code.')
         setLoading(false)
         return
       }
+      console.log('[LOGIN] Success, moving to OTP step')
       setStep('otp')
       setLoading(false)
     } catch (err) {
+      console.error('[LOGIN] Exception:', err)
       setError('Network error. Please try again.')
       setLoading(false)
     }
@@ -63,23 +71,36 @@ export function PortalLogin() {
 
   const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    console.log('[VERIFY] Form submitted, code:', code, 'email:', email)
+    if (!code || code.length !== 6) {
+      console.error('[VERIFY] Invalid code length:', code.length)
+      setError('Code must be 6 digits')
+      return
+    }
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/api/portal/verify`, {
+      const url = `${API_URL}/api/portal/verify`
+      const body = { email: email.toLowerCase().trim(), token: code }
+      console.log('[VERIFY] Fetching:', url, 'body:', body)
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email: email.toLowerCase().trim(), token: code }),
+        body: JSON.stringify(body),
       })
+      console.log('[VERIFY] Response status:', res.status)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
+        console.error('[VERIFY] Error:', data)
         setError((data as { error?: string }).error ?? 'Incorrect or expired code.')
         setLoading(false)
         return
       }
+      console.log('[VERIFY] Success! Navigating to results')
       navigate('/portal/results', { replace: true })
     } catch (err) {
+      console.error('[VERIFY] Exception:', err)
       setError('Verification failed. Try again.')
       setLoading(false)
     }
