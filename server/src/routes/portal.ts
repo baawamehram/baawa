@@ -66,6 +66,8 @@ router.post('/verify', async (req: Request, res: Response) => {
     const { email: rawEmail, token } = parsed.data
     const email = rawEmail.toLowerCase().trim()
 
+    console.log(`[PORTAL] Verify attempt: email=${email}, token=${token}`)
+
     // 1. Check if token exists for this email
     const result = await db.query<{ id: number; assessment_id: number; is_expired: boolean }>(
       `SELECT bt.id, bt.assessment_id, (bt.expires_at <= NOW()) as is_expired
@@ -76,6 +78,18 @@ router.post('/verify', async (req: Request, res: Response) => {
     )
 
     if (!result.rows[0]) {
+      console.log(`[PORTAL] No token found for email=${email}, token=${token}`)
+      // Check if token exists at all (email mismatch)
+      const tokenCheck = await db.query(
+        `SELECT bt.token, bt.expires_at, a.email FROM portal_tokens bt
+         JOIN assessments a ON bt.assessment_id = a.id
+         WHERE bt.token = $1 LIMIT 1`,
+        [token]
+      )
+      if (tokenCheck.rows[0]) {
+        console.log(`[PORTAL] Token found but email mismatch. Expected: ${email}, Got: ${tokenCheck.rows[0].email}`)
+        return res.status(400).json({ error: `Email mismatch. Token issued for: ${tokenCheck.rows[0].email}` })
+      }
       return res.status(400).json({ error: 'Incorrect code. Please try again.' })
     }
 
