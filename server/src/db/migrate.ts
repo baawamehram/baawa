@@ -13,10 +13,24 @@ async function migrate() {
       .map(stmt => stmt.trim())
       .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'))
 
+    console.log(`[MIGRATE] Executing ${statements.length} SQL statements from schema.sql`)
+
+    let executed = 0
     for (const statement of statements) {
-      await client.query(statement)
+      executed++
+      // Log first 100 chars of statement
+      const preview = statement.substring(0, 100).replace(/\n/g, ' ')
+      console.log(`[MIGRATE] Statement ${executed}/${statements.length}: ${preview}...`)
+      try {
+        await client.query(statement)
+      } catch (err) {
+        console.error(`[MIGRATE] Statement ${executed} FAILED:`)
+        console.error(`Statement: ${statement.substring(0, 200)}...`)
+        console.error(`Error: ${(err as Error).message}`)
+        throw err
+      }
     }
-    console.log(`Migration complete: executed ${statements.length} statements`)
+    console.log(`[MIGRATE] ✓ Migration complete: executed ${executed} statements`)
   } finally {
     client.release()
     await db.end()

@@ -8,7 +8,8 @@
       "Bash(git commit -m \"Fix sentinel proposals query: use assessment_id instead of session_id UUID:*)",
       "Bash(git push:*)",
       "Bash(find /c/Users/G15/baawa-mehram/server -name *.sql -o -name migrate*)",
-      "Bash(git commit -m \"Add missing database tables to schema: portal_tokens, email_queue, proposals, etc.:*)"
+      "Bash(git commit -m \"Add missing database tables to schema: portal_tokens, email_queue, proposals, etc.:*)",
+      "Bash(git commit -m \"Add verbose logging to migration script to identify failing SQL statements:*)"
     ]
   }
 }
