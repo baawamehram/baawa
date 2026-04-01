@@ -4,10 +4,28 @@ interface AssessmentTabProps {
   clientId: number
   isAdmin: boolean
   onClose?: () => void
+  isLoading?: boolean
+  error?: string | null
 }
 
-export function AssessmentTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose }: AssessmentTabProps) {
+export function AssessmentTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose, isLoading = false, error = null }: AssessmentTabProps) {
   const { theme } = useDashboardTheme()
+
+  if (isLoading) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.text }}>
+        Loading...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.statusError }}>
+        Error: {error}
+      </div>
+    )
+  }
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>

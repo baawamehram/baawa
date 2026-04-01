@@ -11,7 +11,9 @@
       "Bash(git commit -m \"Add missing database tables to schema: portal_tokens, email_queue, proposals, etc.:*)",
       "Bash(git commit -m \"Add verbose logging to migration script to identify failing SQL statements:*)",
       "Bash(git commit -m \"Add back email table creation to startServer:*)",
-      "Bash(pkill -f \"tsx watch\")"
+      "Bash(pkill -f \"tsx watch\")",
+      "Bash(find /c/Users/G15/baawa-mehram -type f -name *.tsx -o -name *.ts)",
+      "Bash(find /c/Users/G15/baawa-mehram/.claude/worktrees/client-dashboard-redesign/client/src/components/Dashboard -type f -name *.tsx)"
     ]
   }
 }

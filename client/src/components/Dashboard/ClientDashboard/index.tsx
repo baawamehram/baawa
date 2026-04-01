@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useDashboardTheme } from '../ThemeContext'
 import { API_URL, authFetch } from '../../../lib/api'
 import { OverviewTab } from './OverviewTab'
@@ -51,10 +51,13 @@ export function ClientDashboard({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Wrap on401 in useCallback to ensure stable reference across renders
+  const stableOn401 = useCallback(on401, [on401])
+
   useEffect(() => {
     const fetchClient = async () => {
       try {
-        const res = await authFetch(`${API_URL}/api/clients/${clientId}`, token, on401)
+        const res = await authFetch(`${API_URL}/api/clients/${clientId}`, token, stableOn401)
         if (!res) return
         const data = await res.json()
         setClientData(data)
@@ -66,26 +69,26 @@ export function ClientDashboard({
     }
 
     fetchClient()
-  }, [clientId, token, on401])
+  }, [clientId, token])
 
   const visibleTabs = isAdmin ? TABS : TABS.filter(tab => !tab.adminOnly)
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <OverviewTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'assessment':
-        return <AssessmentTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <AssessmentTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'work-plans':
-        return <WorkPlansTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <WorkPlansTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'tasks':
-        return <TasksTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <TasksTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'agreements':
-        return <AgreementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <AgreementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'engagements':
-        return <EngagementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <EngagementsTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       case 'profile':
-        return <ProfileTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} />
+        return <ProfileTab clientId={clientId} isAdmin={isAdmin} onClose={onBack} isLoading={false} error={null} />
       default:
         return null
     }
@@ -101,7 +104,7 @@ export function ClientDashboard({
 
   if (error) {
     return (
-      <div style={{ fontFamily: "'Outfit', sans-serif", color: '#f87171' }}>
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.statusError }}>
         {error}
       </div>
     )

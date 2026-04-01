@@ -4,10 +4,28 @@ interface EngagementsTabProps {
   clientId: number
   isAdmin: boolean
   onClose?: () => void
+  isLoading?: boolean
+  error?: string | null
 }
 
-export function EngagementsTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose }: EngagementsTabProps) {
+export function EngagementsTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose, isLoading = false, error = null }: EngagementsTabProps) {
   const { theme } = useDashboardTheme()
+
+  if (isLoading) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.text }}>
+        Loading...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.statusError }}>
+        Error: {error}
+      </div>
+    )
+  }
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>

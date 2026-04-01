@@ -4,10 +4,28 @@ interface ProfileTabProps {
   clientId: number
   isAdmin: boolean
   onClose?: () => void
+  isLoading?: boolean
+  error?: string | null
 }
 
-export function ProfileTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose }: ProfileTabProps) {
+export function ProfileTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose, isLoading = false, error = null }: ProfileTabProps) {
   const { theme } = useDashboardTheme()
+
+  if (isLoading) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.text }}>
+        Loading...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.statusError }}>
+        Error: {error}
+      </div>
+    )
+  }
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>

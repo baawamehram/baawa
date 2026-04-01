@@ -4,10 +4,28 @@ interface WorkPlansTabProps {
   clientId: number
   isAdmin: boolean
   onClose?: () => void
+  isLoading?: boolean
+  error?: string | null
 }
 
-export function WorkPlansTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose }: WorkPlansTabProps) {
+export function WorkPlansTab({ clientId: _clientId, isAdmin: _isAdmin, onClose: _onClose, isLoading = false, error = null }: WorkPlansTabProps) {
   const { theme } = useDashboardTheme()
+
+  if (isLoading) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.text }}>
+        Loading...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ fontFamily: "'Outfit', sans-serif", color: theme.statusError }}>
+        Error: {error}
+      </div>
+    )
+  }
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>
