@@ -393,8 +393,14 @@ interface Props {
 
 function LoginMenu() {
   const [open, setOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const navigate = useNavigate()
   const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('portal_token') : null
+    setIsLoggedIn(!!token)
+  }, [])
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -406,13 +412,23 @@ function LoginMenu() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  const handleLogout = () => {
+    localStorage.removeItem('portal_token')
+    setIsLoggedIn(false)
+    setOpen(false)
+  }
+
   return (
     <div ref={menuRef} style={{ position: 'relative' }}>
       <button
         onClick={() => setOpen(!open)}
-        className="px-2.5 py-1.5 md:px-4 md:py-2 rounded-md border border-black/10 text-[#6B6460] text-[10px] md:text-[13px] font-medium font-['Outfit'] hover:bg-black/5 transition-colors flex items-center gap-1.5"
+        className={`px-2.5 py-1.5 md:px-4 md:py-2 rounded-md border text-[10px] md:text-[13px] font-medium font-['Outfit'] transition-colors flex items-center gap-1.5 ${
+          isLoggedIn
+            ? 'border-[#059669]/30 bg-[#059669]/5 text-[#059669] hover:bg-[#059669]/10'
+            : 'border-black/10 text-[#6B6460] hover:bg-black/5'
+        }`}
       >
-        Login {open ? '▲' : '▼'}
+        {isLoggedIn ? '✓ Logged In' : 'Login'} {open ? '▲' : '▼'}
       </button>
       <AnimatePresence>
         {open && (
@@ -424,23 +440,54 @@ function LoginMenu() {
             style={{
               position: 'absolute', top: '100%', right: 0, marginTop: 8,
               background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12,
-              boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, minWidth: 180,
+              boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, minWidth: 200,
               padding: 8, overflow: 'hidden',
             }}
           >
-            <button
-              onClick={() => { navigate('/portal/login'); setOpen(false) }}
-              style={{
-                width: '100%', textAlign: 'left', background: 'none', border: 'none',
-                padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
-                display: 'flex', flexDirection: 'column', gap: 2,
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(52,211,153,0.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-            >
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Client Login</span>
-              <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>View your assessment results</span>
-            </button>
+            {isLoggedIn ? (
+              <>
+                <button
+                  onClick={() => { navigate('/portal/results'); setOpen(false) }}
+                  style={{
+                    width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                    padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
+                    display: 'flex', flexDirection: 'column', gap: 2,
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(52,211,153,0.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>View Assessment</span>
+                  <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>Go to your results</span>
+                </button>
+                <div style={{ height: '1px', background: 'rgba(0,0,0,0.08)', margin: '4px 0' }} />
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                    padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
+                    display: 'flex', flexDirection: 'column', gap: 2,
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239,68,68,0.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', fontFamily: 'Outfit' }}>Logout</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => { navigate('/portal/login'); setOpen(false) }}
+                style={{
+                  width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                  padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s',
+                  display: 'flex', flexDirection: 'column', gap: 2,
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(52,211,153,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+              >
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', fontFamily: 'Outfit' }}>Client Login</span>
+                <span style={{ fontSize: 10, color: '#6B6460', fontFamily: 'Outfit' }}>View your assessment results</span>
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
