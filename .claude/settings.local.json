@@ -14,7 +14,11 @@
       "Bash(pkill -f \"tsx watch\")",
       "Bash(find /c/Users/G15/baawa-mehram -type f -name *.tsx -o -name *.ts)",
       "Bash(find /c/Users/G15/baawa-mehram/.claude/worktrees/client-dashboard-redesign/client/src/components/Dashboard -type f -name *.tsx)",
-      "Bash(find /c/Users/G15/baawa-mehram/.claude/worktrees/client-dashboard-redesign -type f \\\\\\(-name schema* -o -name *migration* \\\\\\))"
+      "Bash(find /c/Users/G15/baawa-mehram/.claude/worktrees/client-dashboard-redesign -type f \\\\\\(-name schema* -o -name *migration* \\\\\\))",
+      "Bash(/tmp/work_plans_summary.md:*)",
+      "Read(//tmp/**)",
+      "Bash(find C:UsersG15baawa-mehram -type f \\\\\\(-name *.ts -o -name *.tsx \\\\\\) -path */api/*)",
+      "Bash(find C:UsersG15baawa-mehram/.claude/worktrees/client-dashboard-redesign/server -type f -name *.ts)"
     ]
   }
 }
