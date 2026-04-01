@@ -38,22 +38,30 @@ export function PortalLogin() {
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('[LOGIN] handleSendCode called with email:', email)
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/api/portal/login`, {
+      const url = `${API_URL}/api/portal/login`
+      const body = { email: email.toLowerCase().trim() }
+      console.log('[LOGIN] Fetching:', url, 'with body:', body)
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email: email.toLowerCase().trim() }),
+        body: JSON.stringify(body),
       })
+      console.log('[LOGIN] Response status:', res.status)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
+        console.log('[LOGIN] Error response:', data)
         setError((data as { error?: string }).error ?? 'Failed to send code.')
         return
       }
+      console.log('[LOGIN] Code sent successfully, moving to OTP step')
       setStep('otp')
-    } catch {
+    } catch (err) {
+      console.error('[LOGIN] Catch block error:', err)
       setError('Network error. Please try again.')
     } finally {
       setLoading(false)
@@ -62,22 +70,30 @@ export function PortalLogin() {
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('[LOGIN] handleVerifyCode called with email:', email, 'code:', code)
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/api/portal/verify`, {
+      const url = `${API_URL}/api/portal/verify`
+      const body = { email: email.toLowerCase().trim(), token: code }
+      console.log('[LOGIN] Fetching:', url, 'with body:', body)
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email: email.toLowerCase().trim(), token: code }),
+        body: JSON.stringify(body),
       })
+      console.log('[LOGIN] Response status:', res.status)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
+        console.log('[LOGIN] Error response:', data)
         setError((data as { error?: string }).error ?? 'Incorrect or expired code.')
         return
       }
+      console.log('[LOGIN] Verification successful, navigating to /portal/results')
       navigate('/portal/results', { replace: true })
-    } catch {
+    } catch (err) {
+      console.error('[LOGIN] Catch block error:', err)
       setError('Verification failed. Try again.')
     } finally {
       setLoading(false)
