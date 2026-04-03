@@ -172,7 +172,7 @@ export function LandingPage({ onStart }: Props) {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <LogoDark height={32} />
-            <span className="hidden md:inline text-sm text-saturn-muted">
+            <span className="hidden md:inline text-sm text-saturn-white">
               The Digital Tailors
             </span>
           </div>
@@ -234,7 +234,7 @@ export function LandingPage({ onStart }: Props) {
           >
             Bespoke AI systems. Built for your business. Owned by you forever.
           </h1>
-          <p className="text-lg md:text-xl text-saturn-muted mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-saturn-white mb-8 max-w-2xl mx-auto">
             We measure, we build, we stitch — and we stay. As you grow, we adjust the fit.
           </p>
           <CTAButton onClick={onStart}>Start your free diagnostic</CTAButton>
@@ -262,32 +262,38 @@ export function LandingPage({ onStart }: Props) {
       {/* HOW IT WORKS */}
       <HowItWorksSection ref={howItWorksRef} />
 
-      {/* WHO WE WORK WITH - New Section */}
+      {/* OUR TEAM - Core Expertise */}
       <section className="py-20 px-6 bg-saturn-charcoal relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <h2
-            className="text-5xl md:text-6xl font-bold text-center mb-16"
+            className="text-5xl md:text-6xl font-bold text-center mb-16 text-saturn-white"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            Who We Work With
+            The Team Behind Your System
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Card 1: Genesis */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1: AI Engineers */}
             <div className="bg-saturn-gray p-8 rounded">
-              <h3 className="text-2xl font-semibold mb-4">Genesis</h3>
-              <p className="text-lg text-saturn-white mb-2 font-semibold">New & Early-Stage Founders</p>
-              <p className="text-saturn-muted">
-                You're launching. We build your entire operational backbone — marketing, sales, operations — from day one. All connected. All yours.
+              <h3 className="text-2xl font-semibold mb-4 text-saturn-white">AI Engineers</h3>
+              <p className="text-base text-saturn-white leading-relaxed">
+                Custom LLM integration, RAG systems, and intelligent automation built specifically for your business logic. No off-the-shelf templates.
               </p>
             </div>
 
-            {/* Card 2: Archaeology */}
+            {/* Card 2: Data Architects */}
             <div className="bg-saturn-gray p-8 rounded">
-              <h3 className="text-2xl font-semibold mb-4">Archaeology</h3>
-              <p className="text-lg text-saturn-white mb-2 font-semibold">Established Businesses</p>
-              <p className="text-saturn-muted">
-                You've been running for years. Your data is sitting dead. We excavate it, structure it, and turn it into your most valuable business asset.
+              <h3 className="text-2xl font-semibold mb-4 text-saturn-white">Data Architects</h3>
+              <p className="text-base text-saturn-white leading-relaxed">
+                We structure your operational data, build scalable pipelines, and turn raw information into actionable insights your team can use daily.
+              </p>
+            </div>
+
+            {/* Card 3: Operations Specialists */}
+            <div className="bg-saturn-gray p-8 rounded">
+              <h3 className="text-2xl font-semibold mb-4 text-saturn-white">Operations Specialists</h3>
+              <p className="text-base text-saturn-white leading-relaxed">
+                We design your workflows, integrate your tools, and hand over systems your team actually wants to use. Then we step back.
               </p>
             </div>
           </div>
