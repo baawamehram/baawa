@@ -276,7 +276,7 @@ export function LandingPage({ onStart }: Props) {
             {/* Card 1: Genesis */}
             <div className="bg-saturn-gray p-8 rounded">
               <h3 className="text-2xl font-semibold mb-4">Genesis</h3>
-              <p className="text-lg text-saturn-gray mb-2 font-semibold">New & Early-Stage Founders</p>
+              <p className="text-lg text-saturn-white mb-2 font-semibold">New & Early-Stage Founders</p>
               <p className="text-saturn-muted">
                 You're launching. We build your entire operational backbone — marketing, sales, operations — from day one. All connected. All yours.
               </p>
@@ -285,7 +285,7 @@ export function LandingPage({ onStart }: Props) {
             {/* Card 2: Archaeology */}
             <div className="bg-saturn-gray p-8 rounded">
               <h3 className="text-2xl font-semibold mb-4">Archaeology</h3>
-              <p className="text-lg text-saturn-gray mb-2 font-semibold">Established Businesses</p>
+              <p className="text-lg text-saturn-white mb-2 font-semibold">Established Businesses</p>
               <p className="text-saturn-muted">
                 You've been running for years. Your data is sitting dead. We excavate it, structure it, and turn it into your most valuable business asset.
               </p>
@@ -315,12 +315,12 @@ export function LandingPage({ onStart }: Props) {
       <section className="py-20 px-6 bg-saturn-gray flex flex-col items-center justify-center">
         <div className="text-center max-w-2xl">
           <h2
-            className="text-5xl md:text-6xl font-bold mb-6"
+            className="text-5xl md:text-6xl font-bold mb-6 text-saturn-white"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             Ready for something made for you?
           </h2>
-          <p className="text-xl text-saturn-muted mb-8">
+          <p className="text-xl text-saturn-white mb-8">
             No templates. No off-the-shelf. A system built around your business — and a partner who stays as you grow.
           </p>
           <CTAButton onClick={onStart}>Start your free diagnostic</CTAButton>
@@ -331,7 +331,7 @@ export function LandingPage({ onStart }: Props) {
       <footer className="py-8 px-6 bg-saturn-charcoal border-t border-saturn-muted/20">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <LogoDark height={24} />
-          <p className="text-sm text-saturn-muted">
+          <p className="text-sm text-saturn-white">
             © {new Date().getFullYear()} Baawa — The Digital Tailors
           </p>
         </div>
