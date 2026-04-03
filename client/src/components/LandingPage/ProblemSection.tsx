@@ -1,5 +1,5 @@
 // client/src/components/LandingPage/ProblemSection.tsx
-import React, { useRef } from 'react';
+import React from 'react';
 import { ScrollLatticeBackground } from './ScrollLatticeBackground';
 
 export const ProblemSection = React.forwardRef<HTMLDivElement>((_, ref) => (
