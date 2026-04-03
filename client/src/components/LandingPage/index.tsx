@@ -4,7 +4,6 @@ import { Player } from "@remotion/player";
 import { motion } from "framer-motion";
 import { HeroComposition } from "../../remotion/HeroVideo";
 import { LogoDark } from "../Logo";
-import { ProofBar } from "./ProofBar";
 import { ProblemSection } from "./ProblemSection";
 import { HowItWorksSection } from "./HowItWorksSection";
 import { ScrollLatticeBackground } from "./ScrollLatticeBackground";
@@ -174,7 +173,7 @@ export function LandingPage({ onStart }: Props) {
           <div className="flex items-center gap-8">
             <LogoDark height={32} />
             <span className="hidden md:inline text-sm text-saturn-muted">
-              Helping solo founders get unstuck
+              The Digital Tailors
             </span>
           </div>
 
@@ -233,17 +232,21 @@ export function LandingPage({ onStart }: Props) {
             className="text-6xl md:text-7xl font-bold mb-6 leading-tight"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            You're not stuck. You're just doing too much yourself.
+            Bespoke AI systems. Built for your business. Owned by you forever.
           </h1>
           <p className="text-lg md:text-xl text-saturn-muted mb-8 max-w-2xl mx-auto">
-            We diagnose your business, build your AI systems, train your team, and step away. You stay focused on what only you can do.
+            We measure, we build, we stitch — and we stay. As you grow, we adjust the fit.
           </p>
-          <CTAButton onClick={onStart}>Take the free diagnostic</CTAButton>
+          <CTAButton onClick={onStart}>Start your free diagnostic</CTAButton>
         </div>
       </section>
 
-      {/* PROOF BAR */}
-      <ProofBar />
+      {/* PROOF BAR - Replaced with single line */}
+      <div className="bg-saturn-charcoal border-y border-saturn-gray py-4">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-sm font-semibold text-saturn-emerald-light">Custom built · You own everything · We grow with you</p>
+        </div>
+      </div>
 
       {/* PROBLEM SECTION */}
       <ProblemSection ref={problemRef} />
@@ -258,6 +261,38 @@ export function LandingPage({ onStart }: Props) {
 
       {/* HOW IT WORKS */}
       <HowItWorksSection ref={howItWorksRef} />
+
+      {/* WHO WE WORK WITH - New Section */}
+      <section className="py-20 px-6 bg-saturn-charcoal relative overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <h2
+            className="text-5xl md:text-6xl font-bold text-center mb-16"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
+            Who We Work With
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Card 1: Genesis */}
+            <div className="bg-saturn-gray p-8 rounded">
+              <h3 className="text-2xl font-semibold mb-4">Genesis</h3>
+              <p className="text-lg text-saturn-gray mb-2 font-semibold">New & Early-Stage Founders</p>
+              <p className="text-saturn-muted">
+                You're launching. We build your entire operational backbone — marketing, sales, operations — from day one. All connected. All yours.
+              </p>
+            </div>
+
+            {/* Card 2: Archaeology */}
+            <div className="bg-saturn-gray p-8 rounded">
+              <h3 className="text-2xl font-semibold mb-4">Archaeology</h3>
+              <p className="text-lg text-saturn-gray mb-2 font-semibold">Established Businesses</p>
+              <p className="text-saturn-muted">
+                You've been running for years. Your data is sitting dead. We excavate it, structure it, and turn it into your most valuable business asset.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* WHO IT'S FOR */}
       <section ref={whoItForRef} className="py-20 px-6 bg-saturn-charcoal relative overflow-hidden">
@@ -283,9 +318,12 @@ export function LandingPage({ onStart }: Props) {
             className="text-5xl md:text-6xl font-bold mb-6"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            Start your diagnostic. It's free. We'll tell you exactly where you're stuck.
+            Ready for something made for you?
           </h2>
-          <CTAButton onClick={onStart}>Take the free diagnostic</CTAButton>
+          <p className="text-xl text-saturn-muted mb-8">
+            No templates. No off-the-shelf. A system built around your business — and a partner who stays as you grow.
+          </p>
+          <CTAButton onClick={onStart}>Start your free diagnostic</CTAButton>
         </div>
       </section>
 
@@ -294,7 +332,7 @@ export function LandingPage({ onStart }: Props) {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <LogoDark height={24} />
           <p className="text-sm text-saturn-muted">
-            © {new Date().getFullYear()} Baawa. Transformational mentorship for founders.
+            © {new Date().getFullYear()} Baawa — The Digital Tailors
           </p>
         </div>
       </footer>
