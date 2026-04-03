@@ -71,9 +71,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
               lineHeight: 1.2
             }}
           >
-            Get your{' '}
-            <span style={{ color: '#059669' }}>$5,000 strategic assessment</span>
-            {' '}free
+            Let's understand your business.
           </motion.h1>
         </div>
 
@@ -90,7 +88,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             lineHeight: 1.5
           }}
         >
-          Complete this 5-minute discovery. If we're a fit, our team personally analyzes your business and invites you to a $5,000 strategic assessment worth thousands in consulting value.
+          12 honest questions. We read every answer personally. You'll get a clear picture of where you're stuck and what to do next — free, within 48 hours.
         </motion.p>
 
         {/* Call-to-action text */}
@@ -106,7 +104,7 @@ export function AssessmentSplash({ onStart }: AssessmentSplashProps) {
             lineHeight: 1.5
           }}
         >
-          5-10 minutes. Answer honestly so we can properly evaluate you.
+          No sales call ambush. No automated PDF. A real human reads this.
         </motion.p>
 
         {/* Social Proof Stats */}
